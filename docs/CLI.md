@@ -51,7 +51,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.1", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.2", "mcp", "--context", "work"]
     }
   }
 }
@@ -222,7 +222,7 @@ record bodies; read them separately if your grant permits it.
 Local validation includes separate processes sharing one write, immutable retry
 after lost responses, strict inputs, receipt validation and an official MCP
 client communicating through stdio to actual Worker/SQLite domain services.
-Hosted owner acceptance and named product integrations remain separate gates.
+Compatibility with each agent host requires its own connection test.
 
 
 ## Agent profiles and terminal identity
@@ -371,11 +371,11 @@ a successful consumption receipt does not authorize repeating its side effect.
 ## Package boundary
 
 Only the CLI/MCP source, its generated public command catalog, bundled agent skill
-and this README are distributed. Application source, infrastructure configuration,
+and the selected guide/plugin files are distributed. Application source, infrastructure configuration,
 private product documents, test identities and credentials are excluded. No
 installation script runs and no background daemon or telemetry is installed.
 The package is distributed for the GeniusTasker beta; no open-source license has
-been granted. A public GitHub repository is not required to install it.
+been granted. The public agent-tools repository contains only the standalone client.
 
 ## Independent memories
 

@@ -5,3 +5,7 @@ node_modules/
 .DS_Store
 coverage/
 .geniustasker/
+
+AGENTS.local.md
+.claude/
+.codex/

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "geniustasker": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pulsarinteractive/geniustasker@0.1.0-beta.2",
+        "mcp",
+        "--context",
+        "work"
+      ]
+    }
+  }
+}

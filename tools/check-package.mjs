@@ -6,7 +6,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const [pack] = JSON.parse(execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: root, encoding: 'utf8' }));
 const metadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 if (metadata.name !== '@pulsarinteractive/geniustasker' || metadata.publishConfig?.access !== 'public' || metadata.publishConfig?.tag !== 'beta' || !/^\d+\.\d+\.\d+-beta\.\d+$/.test(metadata.version)) throw Error('Release metadata must target the reviewed beta package');
-const allowed = /^(package\.json|README\.md|bin\/[a-z-]+\.mjs|src\/[a-z-]+\.mjs|skills\/geniustasker\/SKILL\.md)$/;
+const allowed = /^(package\.json|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|examples\/(?:mcp\.json|codex\.toml)|plugin\.json|mcp\.json|docs\/[A-Z]+\.md|bin\/[a-z-]+\.mjs|src\/[a-z-]+\.mjs|skills\/[a-z-]+\/SKILL\.md|skills\/[a-z-]+\/references\/[a-z-]+\.md|skills\/[a-z-]+\/agents\/openai\.yaml)$/;
 for (const entry of pack.files) {
   if (!allowed.test(entry.path)) throw Error(`Unexpected package file: ${entry.path}`);
   const path = join(root, entry.path), stat = await lstat(path);

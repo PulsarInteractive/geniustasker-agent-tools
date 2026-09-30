@@ -1,0 +1,4 @@
+interface:
+  display_name: "GeniusTasker Memory"
+  short_description: "Navigate and maintain independent product knowledge"
+  default_prompt: "Use $geniustasker-memory to find the relevant product knowledge and update it with verified results."

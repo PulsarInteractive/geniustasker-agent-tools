@@ -90,6 +90,6 @@ export class AgentClient {
     return { node: process.versions.node, origin: this.transport.origin, connectedLocally: Boolean(session),
       sameEnvironment: session ? session.origin === this.transport.origin : null,
       needsLogin: session ? session.refreshPending === true : true, storage: 'private OS-user file',
-      publication: 'local preview; npm distribution is not enabled', writes: 'Discover server capabilities before attempting changes.' };
+      publication: 'CLI installation does not grant service access; this beta requires an admitted account.', writes: 'Discover server capabilities before attempting changes.' };
   }
 }

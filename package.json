@@ -1,6 +1,6 @@
 {
   "name": "@pulsarinteractive/geniustasker",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "private": false,
   "description": "GeniusTasker delegated CLI and local agent tools",
   "type": "module",
@@ -14,12 +14,20 @@
     "bin/",
     "src/",
     "skills/",
-    "README.md"
+    "docs/",
+    "examples/",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "plugin.json",
+    "mcp.json"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node tools/check-package.mjs",
-    "prepublishOnly": "npm test && npm run check"
+    "check": "node tools/check-package.mjs && node tools/check-public.mjs && node tools/check-plugin.mjs",
+    "prepublishOnly": "npm test && npm run check",
+    "check:public": "node tools/check-public.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.1.0",
@@ -27,12 +35,28 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
-    "@modelcontextprotocol/client": "2.1.0"
+    "@modelcontextprotocol/client": "2.1.0",
+    "ajv": "8.20.0"
   },
   "license": "UNLICENSED",
   "publishConfig": {
     "access": "public",
     "tag": "beta",
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PulsarInteractive/geniustasker-agent-tools.git"
+  },
+  "homepage": "https://github.com/PulsarInteractive/geniustasker-agent-tools#readme",
+  "bugs": {
+    "url": "https://github.com/PulsarInteractive/geniustasker-agent-tools/issues"
+  },
+  "keywords": [
+    "geniustasker",
+    "mcp",
+    "cli",
+    "agent-skills",
+    "codex"
+  ]
 }
