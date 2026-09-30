@@ -2,6 +2,14 @@ import { McpServer } from '@modelcontextprotocol/server';
 import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import * as z from 'zod/v4';
 import { CommandJournal, commandSchema, draftSchema, operationIdSchema } from './commands.mjs';
+import {
+  MediaJournal,
+  mediaPrepareSchema,
+  mediaActionSchema,
+  mediaDownloadSchema,
+  mediaAction,
+  downloadMedia,
+} from './media.mjs';
 import { safeError } from './errors.mjs';
 import {
   AgentProfiles,
@@ -70,6 +78,38 @@ export function createMcpServer(client) {
         }
       },
     );
+  const media = new MediaJournal(client);
+  register(
+    'tasker_media_prepare',
+    'Prepare one explicitly selected local image or attachment for Memory. No upload yet; retain operationId.',
+    mediaPrepareSchema,
+    (input) => media.prepare(input),
+    false,
+    { readOnlyHint: false, destructiveHint: false },
+  );
+  register(
+    'tasker_media_upload',
+    'Upload a prepared file using the same operationId after an uncertain response. Charges the Memory owner storage quota.',
+    z.object({ operationId: operationIdSchema }).strict(),
+    (input) => media.upload(input.operationId),
+    true,
+    { destructiveHint: false },
+  );
+  register(
+    'tasker_media_action',
+    'Inspect, publish, cancel or remove a private Memory asset; removal does not delete document blocks.',
+    mediaActionSchema,
+    (input) => mediaAction(client, input),
+    true,
+  );
+  register(
+    'tasker_media_download',
+    'Download one currently authorized private attachment to an explicit new local file. Never overwrites an existing file.',
+    mediaDownloadSchema,
+    (input) => downloadMedia(client, input),
+    false,
+    { readOnlyHint: false, destructiveHint: false },
+  );
   register(
     'tasker_identity',
     'Read the connected owner, connection and agent profile. Never returns credentials.',

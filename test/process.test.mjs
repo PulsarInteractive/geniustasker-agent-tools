@@ -151,7 +151,7 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   });
   t.after(() => client.close());
   const listing = await client.listTools();
-  assert.equal(listing.tools.length, 19);
+  assert.equal(listing.tools.length, 23);
   const search = await client.callTool({
     name: 'tasker_search',
     arguments: { scope: 'memory:one', query: 'owl' },

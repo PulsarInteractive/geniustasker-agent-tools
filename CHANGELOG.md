@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Private Memory attachments through resumable MCP/CLI uploads, bounded binary transport and explicit downloads.
+
 - Memory full-text search, bounded Graph neighborhoods and permission-aware references.
 - Graph node/edge commands and richer document metadata from the API contract.
 - Three additional MCP tools and matching CLI commands; independent node content survives unavailable references.

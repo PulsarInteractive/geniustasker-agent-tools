@@ -8,6 +8,7 @@ import { CommandJournal, describeCommands, readCommandFile } from './commands.mj
 import { AgentProfiles } from './profiles.mjs';
 import { readChanges, watchChanges } from './changes.mjs';
 import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
+import { MediaJournal, mediaAction, downloadMedia } from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 
 export const commands = {
@@ -47,6 +48,22 @@ export const commands = {
   'memories list': {
     summary: 'List independent account memories; follow nextAfter even for an empty page.',
     options: ['after'],
+  },
+  'media prepare': {
+    summary: 'Prepare a local private attachment; retain its operation ID.',
+    options: ['scope', 'file', 'content-type', 'epoch'],
+  },
+  'media upload': {
+    summary: 'Upload or safely retry the prepared operation.',
+    options: ['operation'],
+  },
+  'media action': {
+    summary: 'Inspect, publish, cancel or remove a private attachment.',
+    options: ['scope', 'owner', 'id', 'action'],
+  },
+  'media download': {
+    summary: 'Download an authorized attachment to a new local file.',
+    options: ['scope', 'owner', 'id', 'file'],
   },
   'memory search': {
     summary: 'Search document blocks or Graph nodes without loading the corpus.',
@@ -326,6 +343,29 @@ export async function main(
                 ? {}
                 : { waitSeconds: Number(options['wait-seconds']) }),
             });
+    } else if (command === 'media prepare') {
+      data = await new MediaJournal(client).prepare({
+        scope: options.scope,
+        file: options.file,
+        contentType: options['content-type'],
+        epoch: options.epoch,
+      });
+    } else if (command === 'media upload') {
+      data = await new MediaJournal(client).upload(options.operation);
+    } else if (command === 'media action') {
+      data = await mediaAction(client, {
+        scope: options.scope,
+        ownerId: options.owner,
+        id: options.id,
+        action: options.action,
+      });
+    } else if (command === 'media download') {
+      data = await downloadMedia(client, {
+        scope: options.scope,
+        ownerId: options.owner,
+        id: options.id,
+        file: options.file,
+      });
     } else if (['memory search', 'graph explore', 'memory resolve'].includes(command)) {
       const input = Object.fromEntries(
         commands[command].options

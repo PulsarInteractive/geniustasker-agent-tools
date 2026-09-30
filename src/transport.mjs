@@ -55,7 +55,7 @@ export class Transport {
     this.timeoutMs = timeoutMs;
     this.signal = signal;
   }
-  async request(path, { method = 'GET', form, json, token, query } = {}) {
+  async request(path, { method = 'GET', form, json, token, query, bytes, binary = false } = {}) {
     if (
       !(path.startsWith('/api/agents/') || path === '/.well-known/oauth-authorization-server') ||
       path.startsWith('//')
@@ -79,6 +79,14 @@ export class Transport {
         }
       }
     }
+    if (
+      (bytes !== undefined || binary) &&
+      (url.pathname !== '/api/agents/v1/media/content' ||
+        (bytes !== undefined && (!Buffer.isBuffer(bytes) || bytes.length > 15000000)) ||
+        (bytes !== undefined && (json !== undefined || form)))
+    ) {
+      fail('invalid_arguments', 'Binary transfer requires the bounded delegated media endpoint.');
+    }
     if (form && json !== undefined) {
       fail('invalid_arguments', 'Choose one request body format.');
     }
@@ -98,15 +106,23 @@ export class Transport {
         redirect: 'error',
         signal,
         headers: {
-          Accept: 'application/json',
+          Accept: binary ? 'application/octet-stream' : 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(form
-            ? { 'Content-Type': 'application/x-www-form-urlencoded' }
-            : jsonBody
-              ? { 'Content-Type': 'application/json' }
-              : {}),
+          ...(bytes !== undefined
+            ? { 'Content-Type': 'application/octet-stream', 'Content-Length': String(bytes.length) }
+            : form
+              ? { 'Content-Type': 'application/x-www-form-urlencoded' }
+              : jsonBody
+                ? { 'Content-Type': 'application/json' }
+                : {}),
         },
-        ...(form ? { body: new URLSearchParams(form) } : jsonBody ? { body: jsonBody } : {}),
+        ...(bytes !== undefined
+          ? { body: bytes }
+          : form
+            ? { body: new URLSearchParams(form) }
+            : jsonBody
+              ? { body: jsonBody }
+              : {}),
       });
     } catch {
       throw new AgentError('network_unavailable', 'The API did not return a usable response.', {
@@ -122,7 +138,7 @@ export class Transport {
       if (response.body) {
         for await (const chunk of response.body) {
           size += chunk.length;
-          if (size > 262144) {
+          if (size > (binary && response.ok ? 15000000 : 262144)) {
             fail('invalid_response', 'The API response exceeded the size limit.');
           }
           chunks.push(chunk);
@@ -136,6 +152,9 @@ export class Transport {
         retryable: true,
         execution: method === 'GET' ? 'not_applicable' : 'unknown',
       });
+    }
+    if (binary && response.ok) {
+      return Buffer.concat(chunks);
     }
     let data;
     try {

@@ -71,7 +71,13 @@ relationships or missing source facts. References may target a different memory;
 edge endpoints must be nodes in the same graph. Remove incident edges explicitly
 before deleting a node. Account limits and optimistic revisions still apply.
 
-Private image upload remains a separately discovered capability. Do not embed
-base64 files into Markdown or invent endpoints when upload is unavailable.
+Discover `mediaUploadAvailable` before uploading. For each explicitly authorized
+local file, call `tasker_media_prepare` with the target scope/epoch, file and MIME
+type; retain the operation ID and pass it to `tasker_media_upload`. After a timeout,
+retry that same ID. Link its returned assetId from an image or attachment block.
+Do not embed base64 files in documents. Use an explicit new destination for
+`tasker_media_download`; never upload a directory or private administrative files.
+The Memory owner pays for the bytes. Removed files leave repairable block links.
+Image/PDF/text support and byte limits come from capabilities, not guesswork.
 Report what was actually stored, verified, skipped and still pending without
 exposing private source content.

@@ -33,7 +33,7 @@ codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.
 ```
 
 Other stdio MCP hosts can use [examples/mcp.json](examples/mcp.json).
-The MCP exposes 16 tools for identity, capabilities, projects, memories, bounded
+The published beta.3 MCP exposes 16 tools for identity, capabilities, projects, memories, bounded
 reads, profiles and journaled changes. It uses the session you explicitly approved.
 GeniusTasker records work; your agent chooses and executes its own workflow.
 
@@ -101,3 +101,18 @@ References recheck current access. If a friend withdraws access, the content
 becomes unavailable while the node and its own text remain intact. A new grant
 restores resolution; a link never grants access by itself. The client does not
 cache resolved content. Discover capabilities before selecting a workflow.
+
+### Private attachments (next beta)
+
+Discover `mediaUploadAvailable` and `maxUploadBytes` first. Prepare one explicitly
+selected file with `media prepare --scope memory:ID --epoch EPOCH --file diagram.png
+--content-type image/png`, then `media upload --operation UUID`. Keep that operation
+ID after a timeout: retries verify the same bytes and do not create a second file.
+Use the returned `assetId` in an image or attachment block. Images, PDF and plain
+text are supported up to 15 MB; storage is charged to the Memory owner.
+
+MCP equivalents are `tasker_media_prepare`, `tasker_media_upload`,
+`tasker_media_action` and `tasker_media_download`. Downloads require an explicit
+new local path and fresh read access. Removal leaves document blocks in place
+so people can see and repair the unavailable attachment. No credentials, URLs
+with public access tokens or file bytes are embedded in documents.
