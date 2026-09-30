@@ -1,0 +1,7 @@
+node_modules/
+*.tgz
+.env*
+.npmrc
+.DS_Store
+coverage/
+.geniustasker/
