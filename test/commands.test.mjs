@@ -26,6 +26,43 @@ const receipt = (input) => ({
   affectedCollections: ['tasks'],
 });
 
+test('Memory creation explains UUID identity locally without rejecting stable page source IDs', () => {
+  const id = randomUUID();
+  const command = {
+    ...draft(),
+    kind: 'memory.create',
+    scope: `memory:${id}`,
+    epoch: id,
+    id,
+    operationId: randomUUID(),
+    issuedAt: Date.now(),
+    data: { title: 'Reference library' },
+  };
+  assert.equal(validateCommand(command).id, id);
+  assert.throws(
+    () =>
+      validateCommand({
+        ...command,
+        id: 'source-id',
+        scope: 'memory:source-id',
+        epoch: 'source-id',
+      }),
+    (error) => error.code === 'invalid_arguments' && error.message.includes('UUID v4'),
+  );
+  assert.throws(() => validateCommand({ ...command, epoch: 'different' }), {
+    code: 'invalid_arguments',
+  });
+  assert.equal(
+    validateCommand({
+      ...command,
+      kind: 'memory.page.create',
+      id: 'stable-page',
+      data: { title: 'Reference', path: 'brand/reference', sourceId: 'source/document' },
+    }).id,
+    'stable-page',
+  );
+});
+
 test('prepare is local and private; lost replies retain immutable requests for an explicit safe retry', async (t) => {
   const requests = [];
   const f = await fixture(t, async (url, options) => {

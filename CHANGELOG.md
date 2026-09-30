@@ -1,15 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-beta.4 — 2026-09-30
 
+- Explain the UUID v4 identity required for Memory creation before sending an invalid request.
 - Private Memory attachments through resumable MCP/CLI uploads, bounded binary transport and explicit downloads.
-
 - Memory full-text search, bounded Graph neighborhoods and permission-aware references.
 - Graph node/edge commands and richer document metadata from the API contract.
-- Three additional MCP tools and matching CLI commands; independent node content survives unavailable references.
+- Seven additional MCP tools and matching CLI commands; independent node content survives unavailable references.
 - Shared request size bounds for rich documents, with immutable write retries preserved.
 
-These additions require the corresponding service capabilities. They are not included in the published beta.3 archive.
+These additions require the corresponding service capabilities.
 
 ## 0.1.0-beta.3 — 2026-09-30
 

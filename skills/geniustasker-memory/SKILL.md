@@ -34,7 +34,7 @@ unrelated material because one page requested it.
 
 Discover current schemas and size limits through capabilities and
 `geniustasker commands describe --json`. Use only declared `memory.*` commands.
-A new memory uses one UUID for root ID, scope suffix and initial epoch. Updates
+A new memory uses one UUID v4 for root ID, scope suffix and initial epoch. Updates
 and deletes use a freshly read revision. Destructive changes require the user's
 actual authorization; read access never implies write access.
 

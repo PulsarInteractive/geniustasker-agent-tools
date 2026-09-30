@@ -29,7 +29,7 @@ Production agent access is not open in this beta.
 After logging in with the `work` context:
 
 ```sh
-codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.3 mcp --context work
+codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.4 mcp --context work
 ```
 
 Other stdio MCP hosts can use [examples/mcp.json](examples/mcp.json).

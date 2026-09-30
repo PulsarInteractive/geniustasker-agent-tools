@@ -389,7 +389,7 @@ source provenance. Preserve IDs when editing; do not relabel a proposal as a
 verified fact. `pages --id ID` also reads one page. A targeted read has no change
 cursor; obtain one from a complete collection inventory when watching updates.
 Commands `memory.create/update/delete` and `memory.page.create/update/delete`
-require `memory:write`. For a new space, choose one UUID for its root ID, scope
+require `memory:write`. For a new space, choose one UUID v4 for its root ID, scope
 suffix and initial epoch, then use the returned epoch/revision for later writes.
 All edits use the same local command journal and optimistic revision checks as
 project commands. Never copy private source files into this npm package.

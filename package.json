@@ -1,6 +1,6 @@
 {
   "name": "@pulsarinteractive/geniustasker",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "private": false,
   "description": "GeniusTasker delegated CLI and local agent tools",
   "type": "module",
