@@ -102,3 +102,11 @@ client operation, CLI/MCP adapter, failure tests and user documentation together
 Prefer existing transport and storage primitives. A future remote MCP adapter is
 a separate integration described in [OpenAI integration](OPENAI.md); the current
 local plugin manifest must not imply that endpoint already exists.
+
+## Focused knowledge reads
+
+`knowledge.mjs` validates bounded search, Graph neighborhood and reference inputs
+for both CLI and MCP. It checks response scope/shape, never follows cursors
+automatically and never persists linked Memory content. `truncated` is an explicit
+partial graph, not evidence that omitted nodes or relations do not exist. Target
+permissions remain server-owned and independent of access to the referring graph.

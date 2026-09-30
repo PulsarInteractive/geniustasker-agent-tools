@@ -104,12 +104,15 @@ export async function readCommandFile(path) {
     handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
     const stat = await handle.stat();
     if (!stat.isFile() || stat.size > catalog.maxCommandBytes) {
-      fail('invalid_arguments', 'Use a regular JSON file no larger than 32 KiB.');
+      fail(
+        'invalid_arguments',
+        `Use a regular JSON file no larger than ${catalog.maxCommandBytes} bytes.`,
+      );
     }
     const bytes = Buffer.alloc(catalog.maxCommandBytes + 1),
       result = await handle.read(bytes, 0, bytes.length, 0);
     if (result.bytesRead > catalog.maxCommandBytes) {
-      fail('invalid_arguments', 'Command file exceeds 32 KiB.');
+      fail('invalid_arguments', `Command file exceeds ${catalog.maxCommandBytes} bytes.`);
     }
     return JSON.parse(bytes.subarray(0, result.bytesRead).toString('utf8'));
   } catch (error) {

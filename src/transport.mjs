@@ -1,4 +1,5 @@
 import { AgentError, fail } from './errors.mjs';
+import catalog from './command-catalog.mjs';
 
 export const ORIGINS = Object.freeze({
   production: 'https://api-geniustasker.pulsarinteractive.cloud',
@@ -82,8 +83,11 @@ export class Transport {
       fail('invalid_arguments', 'Choose one request body format.');
     }
     const jsonBody = json === undefined ? undefined : JSON.stringify(json);
-    if (jsonBody && Buffer.byteLength(jsonBody) > 32768) {
-      fail('invalid_arguments', 'Command exceeds the 32 KiB request limit.');
+    if (jsonBody && Buffer.byteLength(jsonBody) > catalog.maxCommandBytes) {
+      fail(
+        'invalid_arguments',
+        `Command exceeds the ${catalog.maxCommandBytes} byte request limit.`,
+      );
     }
     let response;
     const timeout = AbortSignal.timeout(this.timeoutMs);

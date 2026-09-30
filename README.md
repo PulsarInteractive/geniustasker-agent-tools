@@ -79,3 +79,25 @@ The CLI, MCP server, skills and documentation are available under the
 [MIT license](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for
 vendor components. The separately hosted GeniusTasker application and backend
 are not part of this repository.
+
+## Memory and Graph (next beta)
+
+Memory stores structured documents independently of projects. Graph connects
+nodes and links them to a page or a stable document block. These commands require
+the matching deployed service capabilities; they are not in the published beta.3.
+
+```sh
+geniustasker memory search --scope memory:ID --query "release checklist" --json
+geniustasker graph explore --scope memory:ID --center NODE_ID --depth 2 --json
+geniustasker memory resolve --scope memory:ID --page PAGE_ID --block BLOCK_ID --json
+```
+
+The matching MCP tools are `tasker_search`, `tasker_graph` and `tasker_reference`.
+Search is paginated; Graph returns a bounded neighborhood and reports truncation.
+Use `resources list` for complete selected records and `commands describe` for
+contract-derived node/edge write fields. Writes keep the same immutable journal.
+
+References recheck current access. If a friend withdraws access, the content
+becomes unavailable while the node and its own text remain intact. A new grant
+restores resolution; a link never grants access by itself. The client does not
+cache resolved content. Discover capabilities before selecting a workflow.

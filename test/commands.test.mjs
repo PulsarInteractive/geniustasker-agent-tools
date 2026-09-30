@@ -127,7 +127,7 @@ test('command inputs reject malformed revisions, hidden author fields, oversize 
     { kind: 'arbitrary.write' },
     { expectedRevision: '1' },
     { kind: 'task.update', expectedRevision: null },
-    { data: { title: '界'.repeat(12000) } },
+    { data: { title: '界'.repeat(50000) } },
   ]) {
     assert.throws(() => validateCommand({ ...base, ...patch }), { code: 'invalid_arguments' });
   }

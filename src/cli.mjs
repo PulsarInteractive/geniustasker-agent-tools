@@ -7,6 +7,7 @@ import { deviceLogin, browserLogin } from './login.mjs';
 import { CommandJournal, describeCommands, readCommandFile } from './commands.mjs';
 import { AgentProfiles } from './profiles.mjs';
 import { readChanges, watchChanges } from './changes.mjs';
+import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 
 export const commands = {
@@ -46,6 +47,19 @@ export const commands = {
   'memories list': {
     summary: 'List independent account memories; follow nextAfter even for an empty page.',
     options: ['after'],
+  },
+  'memory search': {
+    summary: 'Search document blocks or Graph nodes without loading the corpus.',
+    options: ['scope', 'query', 'collection', 'after', 'epoch', 'checkpoint'],
+  },
+  'graph explore': {
+    summary: 'Read a bounded Graph neighborhood around one node.',
+    options: ['scope', 'center', 'depth', 'epoch', 'checkpoint'],
+  },
+  'memory resolve': {
+    summary:
+      'Resolve a Memory page or block with current permissions; unavailable links preserve nodes.',
+    options: ['scope', 'page', 'block'],
   },
   'projects list': {
     summary: 'Read a bounded project page; follow nextAfter even for an empty page.',
@@ -312,6 +326,26 @@ export async function main(
                 ? {}
                 : { waitSeconds: Number(options['wait-seconds']) }),
             });
+    } else if (['memory search', 'graph explore', 'memory resolve'].includes(command)) {
+      const input = Object.fromEntries(
+        commands[command].options
+          .filter((key) => options[key] !== undefined)
+          .map((key) => [key, options[key]]),
+      );
+      if (command === 'memory search') {
+        data = await searchMemory(client, input);
+      } else if (command === 'graph explore') {
+        data = await exploreGraph(client, {
+          ...input,
+          ...(input.depth === undefined ? {} : { depth: Number(input.depth) }),
+        });
+      } else {
+        data = await resolveMemory(client, {
+          scope: input.scope,
+          pageId: input.page,
+          ...(input.block === undefined ? {} : { blockId: input.block }),
+        });
+      }
     } else if (command === 'resources list' || command === 'questions answers') {
       if (
         !(command === 'questions answers'

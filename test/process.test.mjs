@@ -53,7 +53,32 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     requests.push(request.url);
     response.setHeader('Content-Type', 'application/json');
     const url = new URL(request.url, 'http://local');
-    if (url.pathname.endsWith('/capabilities')) {
+    if (url.pathname.endsWith('/knowledge')) {
+      const mode = url.searchParams.get('mode');
+      response.end(
+        JSON.stringify({
+          scope: url.searchParams.get('scope'),
+          mode,
+          items: [],
+          nodes: mode === 'graph' ? [{ id: url.searchParams.get('center') }] : [],
+          edges: [],
+          truncated: false,
+          nextAfter: null,
+        }),
+      );
+    } else if (url.pathname.endsWith('/reference')) {
+      response.end(
+        JSON.stringify({
+          scope: url.searchParams.get('scope'),
+          pageId: url.searchParams.get('pageId'),
+          blockId: null,
+          status: 'unavailable',
+          epoch: null,
+          accessRevision: null,
+          page: null,
+        }),
+      );
+    } else if (url.pathname.endsWith('/capabilities')) {
       response.end(JSON.stringify({ writesAvailable: false, collections: [{ id: 'tasks' }] }));
     } else if (url.pathname.endsWith('/projects')) {
       response.end(JSON.stringify({ items: [], nextAfter: 'next-visible-scan' }));
@@ -126,7 +151,22 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   });
   t.after(() => client.close());
   const listing = await client.listTools();
-  assert.equal(listing.tools.length, 16);
+  assert.equal(listing.tools.length, 19);
+  const search = await client.callTool({
+    name: 'tasker_search',
+    arguments: { scope: 'memory:one', query: 'owl' },
+  });
+  assert.equal(search.structuredContent.data.mode, 'search');
+  const graph = await client.callTool({
+    name: 'tasker_graph',
+    arguments: { scope: 'memory:one', center: 'owl' },
+  });
+  assert.equal(graph.structuredContent.data.nodes[0].id, 'owl');
+  const reference = await client.callTool({
+    name: 'tasker_reference',
+    arguments: { scope: 'memory:friend', pageId: 'owl' },
+  });
+  assert.equal(reference.structuredContent.data.status, 'unavailable');
   assert.ok(listing.tools.every((tool) => tool.inputSchema.additionalProperties === false));
   assert.equal(
     listing.tools.find((tool) => tool.name === 'tasker_execute_command').annotations.readOnlyHint,

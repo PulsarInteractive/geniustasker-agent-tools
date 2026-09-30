@@ -1,6 +1,6 @@
 // Generated from contracts/agents.tsp. Do not edit by hand.
 export default {
-  "maxCommandBytes": 32768,
+  "maxCommandBytes": 131072,
   "commands": {
     "approval.cancel": {
       "fields": [
@@ -101,7 +101,8 @@ export default {
         "productKey",
         "summary",
         "instructions",
-        "color"
+        "color",
+        "kind"
       ],
       "module": "Memory/$",
       "permission": "memory:write"
@@ -112,6 +113,80 @@ export default {
       "module": "Memory/$",
       "permission": "memory:write"
     },
+    "memory.edge.create": {
+      "create": true,
+      "fields": [
+        "source",
+        "target",
+        "relation",
+        "label",
+        "note",
+        "certainty",
+        "references",
+        "provenance"
+      ],
+      "module": "Memory/MemoryEdge",
+      "permission": "memory:write"
+    },
+    "memory.edge.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Memory/MemoryEdge",
+      "permission": "memory:write"
+    },
+    "memory.edge.update": {
+      "fields": [
+        "source",
+        "target",
+        "relation",
+        "label",
+        "note",
+        "certainty",
+        "references",
+        "provenance"
+      ],
+      "module": "Memory/MemoryEdge",
+      "permission": "memory:write"
+    },
+    "memory.node.create": {
+      "create": true,
+      "fields": [
+        "title",
+        "summary",
+        "text",
+        "kind",
+        "authority",
+        "certainty",
+        "tags",
+        "references",
+        "sourceId",
+        "provenance"
+      ],
+      "module": "Memory/MemoryNode",
+      "permission": "memory:write"
+    },
+    "memory.node.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Memory/MemoryNode",
+      "permission": "memory:write"
+    },
+    "memory.node.update": {
+      "fields": [
+        "title",
+        "summary",
+        "text",
+        "kind",
+        "authority",
+        "certainty",
+        "tags",
+        "references",
+        "sourceId",
+        "provenance"
+      ],
+      "module": "Memory/MemoryNode",
+      "permission": "memory:write"
+    },
     "memory.page.create": {
       "create": true,
       "fields": [
@@ -120,7 +195,16 @@ export default {
         "summary",
         "blocks",
         "tags",
-        "provenance"
+        "provenance",
+        "sourceId",
+        "parentId",
+        "directory",
+        "order",
+        "kind",
+        "state",
+        "authority",
+        "section",
+        "metadataJson"
       ],
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
@@ -138,7 +222,16 @@ export default {
         "summary",
         "blocks",
         "tags",
-        "provenance"
+        "provenance",
+        "sourceId",
+        "parentId",
+        "directory",
+        "order",
+        "kind",
+        "state",
+        "authority",
+        "section",
+        "metadataJson"
       ],
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
@@ -149,7 +242,8 @@ export default {
         "productKey",
         "summary",
         "instructions",
-        "color"
+        "color",
+        "kind"
       ],
       "module": "Memory/$",
       "permission": "memory:write"
