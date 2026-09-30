@@ -1,4 +1,4 @@
-# GeniusTasker CLI & MCP · private beta
+# GeniusTasker CLI and MCP reference
 
 Connect your own AI tools to your projects: read progress, work on tickets,
 comment, ask questions and keep a useful handoff. Your account and project
@@ -156,7 +156,6 @@ Protocol references: [OAuth device authorization](https://www.rfc-editor.org/rfc
 [OAuth metadata](https://www.rfc-editor.org/rfc/rfc8414), and the
 [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk).
 
-
 ## Prepare, execute and recover writes
 
 Request the relevant permissions when connecting, for example:
@@ -224,7 +223,6 @@ after lost responses, strict inputs, receipt validation and an official MCP
 client communicating through stdio to actual Worker/SQLite domain services.
 Compatibility with each agent host requires its own connection test.
 
-
 ## Agent profiles and terminal identity
 
 The initial profile works without configuration. Use independent named contexts
@@ -266,7 +264,6 @@ A definite `profile_selection_conflict` or `profile_selection_denied` preserves
 the previous usable credentials; read the profile list again. An unknown rotation
 outcome requires logout/login, just like an unknown refresh. Credentials never
 appear in selection results, CLI output, MCP tool results or package artifacts.
-
 
 ## Ask a human on a ticket
 
@@ -314,7 +311,6 @@ an open anonymous question's public checkpoint.
 profile can close only questions it created. It cannot answer on behalf of its
 owner, impersonate another profile, or use a poll result as new authorization.
 
-
 ## Work updates and handoffs
 
 Prepare `task.report` through the normal command journal with the current task
@@ -328,7 +324,6 @@ receipt. Read `workPhase`/`lastWorkReport` on the task and `workReport` on its
 comment. Completing/reopening a ticket clears its current phase. A report is
 progress information, not approval or proof independently verified by Tasker.
 Correct published reports with a new report; never rewrite an older receipt.
-
 
 ## Ask for approval of one precise action
 
@@ -374,8 +369,8 @@ Only the CLI/MCP source, its generated public command catalog, bundled agent ski
 and the selected guide/plugin files are distributed. Application source, infrastructure configuration,
 private product documents, test identities and credentials are excluded. No
 installation script runs and no background daemon or telemetry is installed.
-The package is distributed for the GeniusTasker beta; no open-source license has
-been granted. The public agent-tools repository contains only the standalone client.
+The standalone client and skills are distributed under the MIT license.
+Third-party components retain their original licenses.
 
 ## Independent memories
 

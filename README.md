@@ -29,7 +29,7 @@ Production agent access is not open in this beta.
 After logging in with the `work` context:
 
 ```sh
-codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.2 mcp --context work
+codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.3 mcp --context work
 ```
 
 Other stdio MCP hosts can use [examples/mcp.json](examples/mcp.json).
@@ -58,13 +58,13 @@ plugin. The hosted HTTPS MCP/OAuth integration remains a separate milestone in
 
 ```sh
 npm ci
-npm test
-npm run check
+npm run verify
 ```
 
 Tests use synthetic fixtures and local mock servers. CI has no production credentials.
 `npm run check` checks the public file boundary, package contents and plugin schema.
-See [Contributing](CONTRIBUTING.md) and [Release process](docs/RELEASING.md).
+See [Contributing](CONTRIBUTING.md), [Architecture](docs/ARCHITECTURE.md),
+[Testing](docs/TESTING.md) and [Release process](docs/RELEASING.md).
 
 ## Privacy and source boundary
 
@@ -73,5 +73,9 @@ private product documents belong here. Only the agent client and its public
 interface contract are included. Credentials stay in the user's private local
 store; never paste them into an issue. See [Security](SECURITY.md).
 
-Source is visible; package licensing remains `UNLICENSED`. No general open-source
-reuse license or license to the separate GeniusTasker application is implied.
+## License
+
+The CLI, MCP server, skills and documentation are available under the
+[MIT license](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for
+vendor components. The separately hosted GeniusTasker application and backend
+are not part of this repository.

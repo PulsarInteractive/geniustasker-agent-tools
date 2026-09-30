@@ -1,4 +1,4 @@
 interface:
-  display_name: "GeniusTasker"
-  short_description: "Work on shared projects with your own agents"
-  default_prompt: "Use $geniustasker to review my project and record the next useful step."
+  display_name: 'GeniusTasker'
+  short_description: 'Work on shared projects with your own agents'
+  default_prompt: 'Use $geniustasker to review my project and record the next useful step.'

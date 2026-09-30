@@ -22,7 +22,6 @@ agent policy. Use `question.close` only for this profile's own question, with it
 current revision. If no answer arrives, record the blocker and proceed only with
 independent authorized work; do not invent approval or repeatedly poll rapidly.
 
-
 ## Leave a useful handoff
 
 Use the discovered `task.report` command with `tasks:write`, an open unarchived
@@ -41,7 +40,6 @@ rewriting history. Human users can moderate/delete comments, so a missing receip
 is not an invitation to recreate its text. Completing/reopening the task clears
 its current work phase and retains the report as history. A report does not grant
 permission or count as approval. Use a question when a human answer is needed.
-
 
 ## Request and consume a precise human decision
 

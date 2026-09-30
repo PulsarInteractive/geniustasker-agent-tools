@@ -1,18 +1,14 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "geniustasker",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "description": "Track project work and independent product memories with your own agents.",
   "author": {
     "name": "Pulsar Interactive"
   },
   "repository": "https://github.com/PulsarInteractive/geniustasker-agent-tools",
-  "license": "UNLICENSED",
-  "keywords": [
-    "productivity",
-    "projects",
-    "memory"
-  ],
+  "license": "MIT",
+  "keywords": ["productivity", "projects", "memory"],
   "extensions": {
     "com.openai": {
       "interface": {
@@ -20,13 +16,8 @@
         "shortDescription": "Projects, progress and memory for your agents",
         "developerName": "Pulsar Interactive",
         "category": "Productivity",
-        "capabilities": [
-          "Read",
-          "Write"
-        ],
-        "defaultPrompt": [
-          "Use GeniusTasker to review my project progress and next tasks."
-        ]
+        "capabilities": ["Read", "Write"],
+        "defaultPrompt": ["Use GeniusTasker to review my project progress and next tasks."]
       }
     }
   }

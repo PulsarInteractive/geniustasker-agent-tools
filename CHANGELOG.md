@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-beta.3 — 2026-09-30
+
+- MIT license for the client, skills and documentation; third-party license notices.
+- Consistent source formatting, ESLint checks and pinned CI actions.
+- Architecture, testing and contribution guides.
+- Canonical Pulsar Interactive repository links.
+
 ## 0.1.0-beta.2 — 2026-09-30
 
 - Public standalone repository, synthetic tests and CI.

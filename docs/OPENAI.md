@@ -9,14 +9,14 @@ Nothing here is an OpenAI directory approval or a hosted remote MCP endpoint.
 
 ## Hosted plugin milestone
 
-| Work | Acceptance |
-| --- | --- |
-| HTTPS Streamable HTTP MCP adapter | Real initialize, tools/list and tool calls; reuse existing product commands and quotas |
-| MCP OAuth compatibility | Protected-resource and authorization discovery, audience/resource binding, supported client registration, allowed callbacks, PKCE, expiry and revocation |
-| Host authentication | Real browser consent, resource-limited reads, denied access and reauthentication |
-| Writes | Explicit grants, correctly annotated tools, immutable retries and conflicts; no blanket approval |
-| Optional company-knowledge search | Authorized search/fetch with user-openable citations and bounded results |
-| Plugin review | Accurate install copy, privacy/terms links, domain verification, real test account, honest limitations |
+| Work                              | Acceptance                                                                                                                                               |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTTPS Streamable HTTP MCP adapter | Real initialize, tools/list and tool calls; reuse existing product commands and quotas                                                                   |
+| MCP OAuth compatibility           | Protected-resource and authorization discovery, audience/resource binding, supported client registration, allowed callbacks, PKCE, expiry and revocation |
+| Host authentication               | Real browser consent, resource-limited reads, denied access and reauthentication                                                                         |
+| Writes                            | Explicit grants, correctly annotated tools, immutable retries and conflicts; no blanket approval                                                         |
+| Optional company-knowledge search | Authorized search/fetch with user-openable citations and bounded results                                                                                 |
+| Plugin review                     | Accurate install copy, privacy/terms links, domain verification, real test account, honest limitations                                                   |
 
 The current CLI OAuth flow is a foundation; it is not proof that every hosted
 MCP client's registration and resource-discovery requirements are implemented.

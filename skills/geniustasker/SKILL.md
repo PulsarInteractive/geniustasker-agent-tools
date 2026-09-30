@@ -99,8 +99,6 @@ to evade quotas. If the requested capability is unavailable, say what is pending
 and preserve the useful findings. Final progress should identify the actual
 project/ticket and distinguish completed work, validation and remaining work.
 
-
-
 ## Specialized workflows
 
 - To create, switch or restrict an agent identity, read [Profiles](references/profiles.md).

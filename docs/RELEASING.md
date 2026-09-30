@@ -1,7 +1,7 @@
 # Release process
 
 1. Update package, lockfile, MCP server version, plugin version and example pins together.
-2. Review public contract/skill changes and run `npm ci`, `npm test`, `npm run check` and `npm audit`.
+2. Review public contract/skill changes and run `npm ci`, `npm run verify` and `npm audit`.
 3. Inspect `git diff` and the complete `npm pack --dry-run --json` list. No private repository history or product files may enter this repo.
 4. Pack and inspect the actual archive. `npm publish <archive> --access public --tag beta` requires the maintainer's npm authentication.
 5. Confirm registry version/tag/integrity, install using a fresh cache and exercise real MCP through an explicitly authorized beta account. Keep private results outside this repository.
