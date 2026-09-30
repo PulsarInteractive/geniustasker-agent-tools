@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { lstatSync, readFileSync } from 'node:fs';
+import { lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -40,7 +40,7 @@ export function inspectPublicFile(
     }
   }
 }
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const files = [
     ...new Set(
       execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
