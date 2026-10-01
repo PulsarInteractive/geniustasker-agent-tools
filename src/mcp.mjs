@@ -172,7 +172,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_resources',
-    'Read a discovered project collection or memory/pages from an independent memory scope. For Memory, pageIndex gives a light navigation list; pages with id or path fetches one document without a change cursor. Carry epoch and checkpoint from the first page; restart on context_changed.',
+    'Read a discovered project collection or memory/pages from an independent memory scope. When advertised, projectDocumentIndex lists project titles/folders and projectDocuments with id reads one document; documents contains task attachments. For Memory, pageIndex gives a light navigation list; pages with id or path fetches one document without a change cursor. Carry epoch and checkpoint from the first page; restart on context_changed.',
     z
       .object({
         scope: z

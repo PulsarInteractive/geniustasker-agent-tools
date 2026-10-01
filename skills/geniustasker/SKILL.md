@@ -25,6 +25,9 @@ List projects, then select a scope from the returned data. Read a collection
 listed in capabilities with `resources list --scope project:ID --collection
 tasks --json`, or MCP `tasker_resources`. Collections include tasks, comments,
 goals, documents, workflows, sprints and summary history when permitted.
+For document indexes, schedules, membership and planning collections, read
+[Focused project reads](references/project-reads.md). `documents` means task
+attachments; `projectDocumentIndex` and `projectDocuments` cover the project library.
 
 Read bounded pages. Follow `nextAfter` even if the project page is empty: ACL
 filtering can hide every item in a scanned page. For resource continuation,
