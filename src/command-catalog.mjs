@@ -97,6 +97,7 @@ export default {
     "memory.create": {
       "create": true,
       "fields": [
+        "contentRoles",
         "title",
         "productKey",
         "summary",
@@ -151,6 +152,8 @@ export default {
     "memory.node.create": {
       "create": true,
       "fields": [
+        "imageAssetId",
+        "detailLevel",
         "title",
         "summary",
         "text",
@@ -173,6 +176,8 @@ export default {
     },
     "memory.node.update": {
       "fields": [
+        "imageAssetId",
+        "detailLevel",
         "title",
         "summary",
         "text",
@@ -190,6 +195,8 @@ export default {
     "memory.page.create": {
       "create": true,
       "fields": [
+        "visibility",
+        "readRoles",
         "title",
         "path",
         "summary",
@@ -217,6 +224,8 @@ export default {
     },
     "memory.page.update": {
       "fields": [
+        "visibility",
+        "readRoles",
         "title",
         "path",
         "summary",
@@ -238,6 +247,7 @@ export default {
     },
     "memory.update": {
       "fields": [
+        "contentRoles",
         "title",
         "productKey",
         "summary",

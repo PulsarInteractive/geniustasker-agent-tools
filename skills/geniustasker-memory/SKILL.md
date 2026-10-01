@@ -81,3 +81,27 @@ The Memory owner pays for the bytes. Removed files leave repairable block links.
 Image/PDF/text support and byte limits come from capabilities, not guesswork.
 Report what was actually stored, verified, skipped and still pending without
 exposing private source content.
+
+## Page access and visual Graph levels
+
+A memory can define `contentRoles` (stable IDs and display names). Membership
+assignments are managed in the application. Page `visibility` is `inherit`,
+`restricted`, or `private`; `readRoles` selects defined roles for a restricted
+page. Restrictions apply through parent folders and to attached files. Content
+roles never grant editing rights. Only memory administrators can change page
+restrictions or move existing pages between parents. Never change sharing as a
+workaround for denied reads.
+
+Resources, search, references and media reads enforce current page access.
+After permission changes, discard cached results and restart incremental reads
+when `reset_required` is returned. An offline copy cannot establish current
+access. Keep Graph nodes and their own notes when a linked page is unavailable.
+
+Nodes accept `imageAssetId` for an image uploaded to the same memory and
+`detailLevel`: `auto`, `overview`, `identity`, or `detail`. The node `kind` is its content type. Overview shows products, projects and brands;
+Identities shows characters, people and entities (never places or scenes). Details
+shows every type and supports type/status filters. Prefer `auto`; an explicit
+`overview` can highlight another type there. Display level is not authorization.
+Upload only approved imagery. Attaching a private image to a shared Graph makes
+it visible to that Graph's readers and requires the user's authorization.
+Read the full current record before editing and preserve its revision.

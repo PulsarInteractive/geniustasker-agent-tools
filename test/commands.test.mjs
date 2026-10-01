@@ -215,3 +215,38 @@ test('CLI prepare/retry/inspect operates on files without putting text or tokens
   );
   assert.ok(!stdout.includes('gta1.'));
 });
+
+test('knowledge fields permit page restrictions and images without membership escalation', () => {
+  const base = {
+    ...draft(),
+    scope: 'memory:knowledge',
+    epoch: 'knowledge',
+    operationId: randomUUID(),
+    issuedAt: Date.now(),
+  };
+  for (const [kind, data] of [
+    [
+      'memory.node.create',
+      { title: 'Companion', detailLevel: 'identity', imageAssetId: randomUUID() },
+    ],
+    ['memory.page.create', { title: 'Plan', visibility: 'restricted', readRoles: ['finance'] }],
+    ['memory.update', { contentRoles: [{ id: 'finance', name: 'Finance' }] }],
+  ]) {
+    assert.deepEqual(
+      validateCommand({
+        ...base,
+        kind,
+        data,
+        ...(kind === 'memory.update' ? { id: 'knowledge', expectedRevision: '1' } : {}),
+      }).data,
+      data,
+    );
+  }
+  assert.throws(() =>
+    validateCommand({
+      ...base,
+      kind: 'memory.page.create',
+      data: { title: 'Plan', roles: ['MEMORY.ADMIN'] },
+    }),
+  );
+});
