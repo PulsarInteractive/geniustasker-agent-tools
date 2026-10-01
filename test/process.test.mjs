@@ -99,6 +99,8 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     } else if (url.pathname.endsWith('/resources')) {
       response.end(
         JSON.stringify({
+          scope: url.searchParams.get('scope'),
+          collection: url.searchParams.get('collection'),
           items: [{ id: 'task-1', data: { title: 'Example' } }],
           epoch: 'e',
           checkpoint: 'c',

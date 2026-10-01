@@ -110,3 +110,17 @@ for both CLI and MCP. It checks response scope/shape, never follows cursors
 automatically and never persists linked Memory content. `truncated` is an explicit
 partial graph, not evidence that omitted nodes or relations do not exist. Target
 permissions remain server-owned and independent of access to the referring graph.
+
+## Conditional resource cache
+
+`read-cache.mjs` keeps at most 64 responses and 8 MiB in process memory, with
+15-minute idle eviction. Exact query keys include a hashed origin/credential
+realm. Every hit makes an authenticated conditional request; no cache entry can
+bypass current server permissions, quotas or source versions. Servers without
+validators remain compatible and receive ordinary reads.
+
+Concurrent identical reads share one request. Generation fences prevent late
+responses from repopulating a cache after account/profile changes, failures or
+MCP writes. Failed validation clears cached private bodies; there is no stale
+success fallback and no persistent resource cache. Returned values are cloned so
+one tool call cannot mutate another caller's cached result.

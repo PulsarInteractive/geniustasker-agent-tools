@@ -22,6 +22,12 @@ Carry `epoch` and `checkpoint` from the first page when continuing an inventory.
 An index omits page bodies; it is not evidence of their contents. After context
 change, restart the read. Access denial is not permission to switch accounts.
 
+For a large library, cross-memory questions or resumable maintenance, read
+[focused knowledge workflows](references/knowledge-workflows.md). It explains
+how to combine search, Graph neighborhoods and targeted pages without downloading
+every space. The client revalidates its bounded resource cache on every access;
+it never treats an offline or refused request as a successful cached read.
+
 ## Maintain editable, trustworthy knowledge
 
 Keep pages focused and use stable paths. Preserve block IDs for existing content.

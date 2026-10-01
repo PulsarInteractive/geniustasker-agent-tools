@@ -1,4 +1,6 @@
 import { fail } from './errors.mjs';
+import { createHash } from 'node:crypto';
+import { ConditionalReadCache } from './read-cache.mjs';
 
 /** Validate a token response before it can replace an origin-bound local session. */
 export function credentials(result, origin, now = Date.now()) {
@@ -45,6 +47,11 @@ export class AgentClient {
   constructor(transport, store) {
     this.transport = transport;
     this.store = store;
+    this.readCache = new ConditionalReadCache();
+    this.readRealm = null;
+  }
+  invalidateReads() {
+    this.readCache.clear();
   }
   async session() {
     const session = await this.store.read();
@@ -89,6 +96,7 @@ export class AgentClient {
    * access and refresh together so an in-flight old command cannot acquire the
    * new profile's identity. It never extends the server's absolute lifetime. */
   async renewLocked(session, selection) {
+    this.invalidateReads();
     await this.store.write({ ...session, refreshPending: true });
     let result;
     try {
@@ -176,12 +184,52 @@ export class AgentClient {
     ) {
       fail('invalid_arguments', 'Unknown delegated resource.');
     }
-    const token = await this.accessToken();
+    let token;
+    try {
+      token = await this.accessToken();
+    } catch (error) {
+      this.invalidateReads();
+      throw error;
+    }
+    const realm = createHash('sha256').update(`${this.transport.origin}\n${token}`).digest('hex');
+    if (realm !== this.readRealm) {
+      this.invalidateReads();
+      this.readRealm = realm;
+    }
+    if (resource === 'resources') {
+      if (query && Object.hasOwn(query, 'ifNoneMatch')) {
+        fail('invalid_arguments', 'Resource validators are managed by the client.');
+      }
+      const normalized = Object.entries(query ?? {})
+        .filter(([, value]) => value !== undefined)
+        .sort(([a], [b]) => a.localeCompare(b));
+      const key = JSON.stringify([realm, resource, normalized]);
+      return this.readCache.read(key, async (etag) => {
+        const result = await this.transport.request('/api/agents/v1/resources', {
+          token,
+          query: { ...query, ...(etag ? { ifNoneMatch: etag } : {}) },
+        });
+        if (
+          result?.scope !== query?.scope ||
+          result?.collection !== query?.collection ||
+          !Array.isArray(result?.items)
+        ) {
+          fail('invalid_response', 'The resource response did not match the requested collection.');
+        }
+        return result;
+      });
+    }
     // No blanket retries, no automatic writes. Revocation and ACL errors remain
     // visible to the agent. A caller chooses how to recover using the envelope.
-    return this.transport.request(`/api/agents/v1/${resource}`, { token, query });
+    try {
+      return await this.transport.request(`/api/agents/v1/${resource}`, { token, query });
+    } catch (error) {
+      this.invalidateReads();
+      throw error;
+    }
   }
   async logout() {
+    this.invalidateReads();
     return this.store.locked(async () => {
       if (!(await this.store.read())) {
         return { connected: false, alreadyDisconnected: true };
