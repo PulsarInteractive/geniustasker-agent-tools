@@ -1,0 +1,4 @@
+interface:
+  display_name: 'GeniusTasker Documentation'
+  short_description: 'Keep selected product knowledge in repository Markdown'
+  default_prompt: 'Use $geniustasker-documentation for the selected GeniusTasker knowledge workflow.'

@@ -55,14 +55,15 @@ explains the available local integration and hosted integration status.
 
 ## Documentation
 
-| Guide                                                                                                    | Use it for                                                    |
-| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [CLI reference](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/CLI.md)     | Commands, browser login, remote terminals and troubleshooting |
-| [Usage limits](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/LIMITS.md)   | Plan limits, shared account quotas and safe retries           |
-| [Memory & Graph](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md) | Documents, links, attachments and access changes              |
-| [Security](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/SECURITY.md)          | Credential handling and reporting a vulnerability             |
-| [Contributing](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/CONTRIBUTING.md)  | Local development, tests and contribution guidelines          |
-| [Changelog](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/CHANGELOG.md)        | Changes in each release                                       |
+| Guide                                                                                                                          | Use it for                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| [CLI reference](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/CLI.md)                           | Commands, browser login, remote terminals and troubleshooting |
+| [Usage limits](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/LIMITS.md)                         | Plan limits, shared account quotas and safe retries           |
+| [Memory & Graph](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md)                       | Documents, links, attachments and access changes              |
+| [Repository documentation](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/DOCUMENTATION_SYNC.md) | Source selection, Markdown snapshots and freshness            |
+| [Security](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/SECURITY.md)                                | Credential handling and reporting a vulnerability             |
+| [Contributing](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/CONTRIBUTING.md)                        | Local development, tests and contribution guidelines          |
+| [Changelog](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/CHANGELOG.md)                              | Changes in each release                                       |
 
 ## License
 

@@ -180,6 +180,8 @@ export class AgentClient {
         'changes',
         'knowledge',
         'reference',
+        'memory/tree',
+        'memory/markdown',
       ].includes(resource)
     ) {
       fail('invalid_arguments', 'Unknown delegated resource.');

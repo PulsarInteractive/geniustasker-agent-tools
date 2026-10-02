@@ -1,0 +1,4 @@
+interface:
+  display_name: 'GeniusTasker Graph'
+  short_description: 'Connect product knowledge with typed relations'
+  default_prompt: 'Use $geniustasker-graph for the selected GeniusTasker knowledge workflow.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'GeniusTasker Resources'
+  short_description: 'Compare and reuse private document media'
+  default_prompt: 'Use $geniustasker-media for the selected GeniusTasker knowledge workflow.'

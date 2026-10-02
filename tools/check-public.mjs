@@ -4,7 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const allowed =
-  /^(?:LICENSE|LICENSES\/Apache-2\.0\.txt|THIRD_PARTY_NOTICES\.md|\.editorconfig|\.prettierrc\.json|\.prettierignore|eslint\.config\.mjs|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|\.gitignore|package(?:-lock)?\.json|plugin\.json|mcp\.json|\.agents\/plugins\/marketplace\.json|\.github\/(?:workflows\/ci\.yml|PULL_REQUEST_TEMPLATE\.md)|(?:bin|src)\/[a-z-]+\.mjs|test\/(?:fixtures\/)?[a-z.-]+\.mjs|tools\/(?:check-public|check-package|check-plugin)\.mjs|tools\/schemas\/(?:plugin|mcp)\.schema\.json|docs\/[A-Z]+\.md|examples\/(?:mcp\.json|codex\.toml)|skills\/[a-z-]+\/(?:SKILL\.md|references\/[a-z-]+\.md|agents\/openai\.yaml))$/;
+  /^(?:LICENSE|LICENSES\/Apache-2\.0\.txt|THIRD_PARTY_NOTICES\.md|\.editorconfig|\.prettierrc\.json|\.prettierignore|eslint\.config\.mjs|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|\.gitignore|package(?:-lock)?\.json|plugin\.json|mcp\.json|\.agents\/plugins\/marketplace\.json|\.github\/(?:workflows\/ci\.yml|PULL_REQUEST_TEMPLATE\.md)|(?:bin|src)\/[a-z-]+\.mjs|test\/(?:fixtures\/)?[a-z.-]+\.mjs|tools\/(?:check-public|check-package|check-plugin)\.mjs|tools\/schemas\/(?:plugin|mcp)\.schema\.json|docs\/[A-Z][A-Z_]*\.md|examples\/(?:mcp\.json|codex\.toml)|skills\/[a-z-]+\/(?:SKILL\.md|references\/[a-z-]+\.md|agents\/openai\.yaml))$/;
 const blocked = [
   /sk-(?:proj-)?[A-Za-z0-9_-]{24,}/,
   /(?:gh[pousr]_|github_pat_|npm_)[A-Za-z0-9_]{30,}/,

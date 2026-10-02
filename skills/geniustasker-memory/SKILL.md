@@ -13,7 +13,7 @@ Do not collect passwords or tokens, approve your own consent, or edit credential
 
 1. Call `tasker_identity` and `tasker_capabilities` (CLI `whoami`, `capabilities`).
 2. Use `tasker_memories` / `memories list`. Follow `nextAfter`, including empty pages.
-3. Read `tasker_resources` with a discovered `memory:ID` scope and `collection: pageIndex`.
+3. When `documentationSync` is advertised, use `tasker_memory_tree` to navigate folders and compare branch versions. Otherwise read `tasker_resources` with `collection: pageIndex`.
 4. Fetch the needed `pages` by `id` or `path`. Targeted reads do not return a change cursor.
 5. Use `tasker_search` (`memory search`) to find page or node excerpts. Read the
    full record before editing; an excerpt does not establish the full context.
@@ -83,7 +83,10 @@ type; retain the operation ID and pass it to `tasker_media_upload`. After a time
 retry that same ID. Link its returned assetId from an image or attachment block.
 Do not embed base64 files in documents. Use an explicit new destination for
 `tasker_media_download`; never upload a directory or private administrative files.
-The Memory owner pays for the bytes. Removed files leave repairable block links.
+The Memory owner pays for the bytes. Compare proposed replacements with
+`tasker_media_compare` and reuse an identical asset ID. When
+`protectedMemoryAssets` is advertised, in-use resource deletion is blocked,
+including private-page and Graph uses; unlink only the authorized references.
 Image/PDF/text support and byte limits come from capabilities, not guesswork.
 Report what was actually stored, verified, skipped and still pending without
 exposing private source content.
@@ -111,3 +114,7 @@ shows every type and supports type/status filters. Prefer `auto`; an explicit
 Upload only approved imagery. Attaching a private image to a shared Graph makes
 it visible to that Graph's readers and requires the user's authorization.
 Read the full current record before editing and preserve its revision.
+
+For a repository documentation mirror, use the documentation skill and packaged
+`docs/DOCUMENTATION_SYNC.md`: check at least once per working day before relying
+on the local copy, and sync again after relevant completed changes.

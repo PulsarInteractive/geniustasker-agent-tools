@@ -1,3 +1,9 @@
+import { readFile } from 'node:fs/promises';
+import {
+  syncDocumentation,
+  documentationStatus,
+  unlockDocumentation,
+} from './documentation-sync.mjs';
 import open, { apps } from 'open';
 import catalog from './command-catalog.mjs';
 import { CredentialStore } from './store.mjs';
@@ -7,8 +13,9 @@ import { deviceLogin, browserLogin } from './login.mjs';
 import { CommandJournal, describeCommands, readCommandFile } from './commands.mjs';
 import { AgentProfiles } from './profiles.mjs';
 import { readChanges, watchChanges } from './changes.mjs';
+import { readMemoryTree, readMemoryMarkdown } from './documentation.mjs';
 import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
-import { MediaJournal, mediaAction, downloadMedia } from './media.mjs';
+import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 
 export const commands = {
@@ -49,6 +56,10 @@ export const commands = {
     summary: 'List independent account memories; follow nextAfter even for an empty page.',
     options: ['after'],
   },
+  'media compare': {
+    summary: 'Compare a local file with an existing resource before uploading a replacement.',
+    options: ['scope', 'id', 'file'],
+  },
   'media prepare': {
     summary: 'Prepare a local private attachment; retain its operation ID.',
     options: ['scope', 'file', 'content-type', 'epoch'],
@@ -64,6 +75,26 @@ export const commands = {
   'media download': {
     summary: 'Download an authorized attachment to a new local file.',
     options: ['scope', 'owner', 'id', 'file'],
+  },
+  'docs sync': {
+    summary: 'Refresh selected Memory/Graph sources in a managed local documentation directory.',
+    options: ['directory', 'file', 'max-files', 'max-bytes'],
+  },
+  'docs status': {
+    summary: 'Inspect the local snapshot date and selections without a network request.',
+    options: ['directory'],
+  },
+  'docs unlock': {
+    summary: 'Remove a sync lock only when its process on this host has stopped.',
+    options: ['directory'],
+  },
+  'memory tree': {
+    summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
+    options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match'],
+  },
+  'memory markdown': {
+    summary: 'Fetch one portable Markdown document with stable media IDs and source metadata.',
+    options: ['scope', 'page', 'revision', 'epoch', 'checkpoint'],
   },
   'memory search': {
     summary: 'Search document blocks or Graph nodes without loading the corpus.',
@@ -343,6 +374,52 @@ export async function main(
                 ? {}
                 : { waitSeconds: Number(options['wait-seconds']) }),
             });
+    } else if (command === 'docs sync') {
+      let configuration;
+      if (options.file) {
+        const raw = await readFile(options.file, 'utf8');
+        if (Buffer.byteLength(raw) > 32768) {
+          fail('invalid_arguments', 'The source configuration is too large.');
+        }
+        try {
+          configuration = JSON.parse(raw);
+        } catch {
+          fail('invalid_arguments', 'The source configuration must be JSON.');
+        }
+      }
+      data = await syncDocumentation(client, {
+        directory: options.directory,
+        configuration,
+        maxFiles: options['max-files'] === undefined ? undefined : Number(options['max-files']),
+        maxBytes: options['max-bytes'] === undefined ? undefined : Number(options['max-bytes']),
+      });
+    } else if (command === 'docs status' || command === 'docs unlock') {
+      data = await (command === 'docs status' ? documentationStatus : unlockDocumentation)({
+        directory: options.directory,
+      });
+    } else if (command === 'memory tree') {
+      data = await readMemoryTree(client, {
+        scope: options.scope,
+        parentId: options.parent,
+        after: options.after,
+        epoch: options.epoch,
+        checkpoint: options.checkpoint,
+        ifNoneMatch: options['if-none-match'],
+      });
+    } else if (command === 'memory markdown') {
+      data = await readMemoryMarkdown(client, {
+        scope: options.scope,
+        pageId: options.page,
+        revision: options.revision,
+        epoch: options.epoch,
+        checkpoint: options.checkpoint,
+      });
+    } else if (command === 'media compare') {
+      data = await compareMedia(client, {
+        scope: options.scope,
+        id: options.id,
+        file: options.file,
+      });
     } else if (command === 'media prepare') {
       data = await new MediaJournal(client).prepare({
         scope: options.scope,

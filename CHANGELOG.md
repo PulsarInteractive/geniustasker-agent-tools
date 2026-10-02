@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Incremental repository documentation from selected Memory folders and Graphs,
+  with generated Markdown provenance and optional digest-verified local media.
+- Safe staged exports, local-edit detection, access revalidation, revocation
+  cleanup and account isolation; large Graphs use bounded portable chunks.
+- Tree and Markdown read tools, documentation sync/status and media comparison.
+- Focused documentation, resource and Graph skills with daily/post-work refresh.
+
+Requires the service's `documentationSync` and `protectedMemoryAssets`
+capabilities as appropriate. The published package version is recorded below.
+
 ## 0.1.0-beta.4 — 2026-10-02
 
 - Short npm overview, focused Memory guide and account usage tables.

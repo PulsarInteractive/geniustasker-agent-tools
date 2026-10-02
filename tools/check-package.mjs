@@ -26,7 +26,7 @@ if (readme.split('\n')[0] !== '# GeniusTasker CLI & MCP' || /private beta/i.test
   throw Error('Use the product title and keep release details in the documentation');
 }
 const allowed =
-  /^(LICENSE|LICENSES\/Apache-2\.0\.txt|THIRD_PARTY_NOTICES\.md|package\.json|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|examples\/(?:mcp\.json|codex\.toml)|plugin\.json|mcp\.json|docs\/[A-Z]+\.md|bin\/[a-z-]+\.mjs|src\/[a-z-]+\.mjs|skills\/[a-z-]+\/SKILL\.md|skills\/[a-z-]+\/references\/[a-z-]+\.md|skills\/[a-z-]+\/agents\/openai\.yaml)$/;
+  /^(LICENSE|LICENSES\/Apache-2\.0\.txt|THIRD_PARTY_NOTICES\.md|package\.json|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|examples\/(?:mcp\.json|codex\.toml)|plugin\.json|mcp\.json|docs\/[A-Z][A-Z_]*\.md|bin\/[a-z-]+\.mjs|src\/[a-z-]+\.mjs|skills\/[a-z-]+\/SKILL\.md|skills\/[a-z-]+\/references\/[a-z-]+\.md|skills\/[a-z-]+\/agents\/openai\.yaml)$/;
 for (const entry of pack.files) {
   if (!allowed.test(entry.path)) {
     throw Error(`Unexpected package file: ${entry.path}`);

@@ -37,6 +37,7 @@ export const mediaDownloadSchema = mediaActionSchema
   .omit({ action: true })
   .extend({ file: z.string().min(1).max(4096) })
   .strict();
+export const mediaCompareSchema = mediaDownloadSchema.omit({ ownerId: true });
 const parse = (schema, value) => {
   const result = schema.safeParse(value);
   if (!result.success) {
@@ -78,6 +79,70 @@ async function fileBytes(path) {
   }
 }
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+
+/** Compare an explicitly selected local file with an existing authorized asset.
+ * Current publications expose their verified digest, so equal images need no
+ * download or upload. Legacy assets are compared with authenticated bytes. */
+export async function compareMedia(client, value) {
+  const input = parse(mediaCompareSchema, value),
+    bytes = await fileBytes(resolve(input.file));
+  const page = await client.get('resources', {
+    scope: input.scope,
+    collection: 'assets',
+    id: input.id,
+  });
+  const asset = page?.items?.[0];
+  if (
+    page?.scope !== input.scope ||
+    page.collection !== 'assets' ||
+    page.items?.length !== 1 ||
+    asset?.id !== input.id ||
+    page.omittedIds?.length
+  ) {
+    fail('media_unavailable', 'The selected resource is not currently available.');
+  }
+  let remoteDigest = asset.data.sha256,
+    downloaded = false;
+  if (remoteDigest === undefined || remoteDigest === null) {
+    const target = /^\/api\/v2\/media\/([a-zA-Z0-9_-]{1,128})\/([a-zA-Z0-9_-]{1,128})$/.exec(
+      asset.data.url ?? '',
+    );
+    if (!target || target[2] !== input.id) {
+      fail('invalid_response', 'The resource has an invalid authenticated media identity.');
+    }
+    const remote = await client.transport.request('/api/agents/v1/media/content', {
+      query: { scope: input.scope, ownerId: target[1], id: input.id },
+      binary: true,
+      token: await client.accessToken(),
+    });
+    if (!Buffer.isBuffer(remote) || remote.length !== asset.data.sizeBytes) {
+      fail('invalid_response', 'The resource download has an invalid size.');
+    }
+    remoteDigest = digest(remote);
+    downloaded = true;
+  }
+  if (
+    !/^[a-f0-9]{64}$/.test(remoteDigest) ||
+    !Number.isSafeInteger(asset.data.sizeBytes) ||
+    asset.data.sizeBytes < 1
+  ) {
+    fail('invalid_response', 'The resource has an invalid verified digest or size.');
+  }
+  const sha256 = digest(bytes),
+    identical = sha256 === remoteDigest && bytes.length === asset.data.sizeBytes;
+  return {
+    scope: input.scope,
+    assetId: input.id,
+    revision: asset.revision,
+    sha256,
+    remoteSha256: remoteDigest,
+    identical,
+    downloaded,
+    recommendation: identical
+      ? 'Reuse this assetId; no upload or revision is needed.'
+      : 'Bytes differ. Inspect the visual or content change before preparing an authorized replacement.',
+  };
+}
 const binding = (session) => ({
   origin: session.origin,
   connectionId: session.connection_id,

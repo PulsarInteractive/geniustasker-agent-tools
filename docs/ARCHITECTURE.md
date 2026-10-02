@@ -124,3 +124,21 @@ responses from repopulating a cache after account/profile changes, failures or
 MCP writes. Failed validation clears cached private bodies; there is no stale
 success fallback and no persistent resource cache. Returned values are cloned so
 one tool call cannot mutate another caller's cached result.
+
+## Explicit repository snapshots
+
+`documentation.mjs` validates the bounded tree and Markdown APIs. The sync
+orchestrator keeps the selection independent of projects, compares descendant
+versions, retrieves changed documents, verifies media and rechecks source
+contexts before commit. `documentation-graph.mjs` maintains qualified Graph
+records through incremental cursors and portable chunks of at most 100 records.
+References do not materialize another Memory's private source bodies.
+
+`documentation-store.mjs` owns only the configured destination's `content/`
+subdirectory. A manifest records hashes and provenance. Local edits, unknown
+files, symlinks and account/environment mismatches fail explicitly. A process
+lock, staged tree and rename journal protect concurrent or interrupted exports.
+Network failures leave the previous dated snapshot; current authorization is
+never inferred from a local file. Confirmed scope revocation removes managed
+source content at the next successful check, but cannot retract Git history or
+copies elsewhere. The explicit export is separate from the process read cache.
