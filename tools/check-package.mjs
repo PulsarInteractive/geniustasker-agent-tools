@@ -18,6 +18,13 @@ if (
 ) {
   throw Error('Release metadata must target the reviewed beta package');
 }
+if (metadata.license !== 'MIT' || !pack.files.some((entry) => entry.path === 'LICENSE')) {
+  throw Error('The public archive must include its MIT license');
+}
+const readme = await readFile(join(root, 'README.md'), 'utf8');
+if (readme.split('\n')[0] !== '# GeniusTasker CLI & MCP' || /private beta/i.test(readme)) {
+  throw Error('Use the product title and keep release details in the documentation');
+}
 const allowed =
   /^(LICENSE|LICENSES\/Apache-2\.0\.txt|THIRD_PARTY_NOTICES\.md|package\.json|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|SECURITY\.md|examples\/(?:mcp\.json|codex\.toml)|plugin\.json|mcp\.json|docs\/[A-Z]+\.md|bin\/[a-z-]+\.mjs|src\/[a-z-]+\.mjs|skills\/[a-z-]+\/SKILL\.md|skills\/[a-z-]+\/references\/[a-z-]+\.md|skills\/[a-z-]+\/agents\/openai\.yaml)$/;
 for (const entry of pack.files) {

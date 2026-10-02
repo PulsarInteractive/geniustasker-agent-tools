@@ -1,7 +1,8 @@
 # Changelog
 
-## 0.1.0-beta.4 — 2026-09-30
+## 0.1.0-beta.4 — 2026-10-02
 
+- Short npm overview, focused Memory guide and account usage tables.
 - Explain the UUID v4 identity required for Memory creation before sending an invalid request.
 - Private Memory attachments through resumable MCP/CLI uploads, bounded binary transport and explicit downloads.
 - Memory full-text search, bounded Graph neighborhoods and permission-aware references.

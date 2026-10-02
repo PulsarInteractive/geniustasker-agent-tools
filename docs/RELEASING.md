@@ -14,3 +14,10 @@ committing an npm token; it is not configured by this repository.
 Published npm versions are immutable. Use a new version for package changes.
 
 Canonical repository: https://github.com/PulsarInteractive/geniustasker-agent-tools
+
+The npm package page and unqualified installs use the `latest` tag. After verifying
+the release archive, explicitly update both the intended channel and the default
+version; do not leave `latest` pointing at a superseded license or README. Verify
+`npm view @pulsarinteractive/geniustasker dist-tags license repository.url --json`
+and inspect the actual npm page. An old published archive is immutable; tags do
+not rewrite its contents.
