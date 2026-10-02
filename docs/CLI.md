@@ -29,15 +29,19 @@ announced. No subscription purchase is performed by the CLI.
 For a remote machine, use `geniustasker auth login --flow device --no-browser`.
 For Chrome specifically, use `--browser chrome`. `--context work` creates a
 separate local session for an independent terminal; it does not grant extra quota.
-The browser offers the supported permissions, with read-only access selected by
-default. Write permissions require an explicit choice. To narrow the permissions
-offered by the browser, pass `--scope`, for example:
+For the official CLI, the browser preselects all current and future resources
+and every requested permission, including writes. Review the visible selection
+and approve it, or uncheck “All” to choose individual projects and memories and
+remove any permissions you do not need. Opening the page grants nothing, and
+existing connections keep their approved permissions.
+
+To narrow the permissions offered by the browser, pass `--scope`, for example:
 
 ```sh
 geniustasker auth login --context work --scope 'projects:read tasks:read tasks:write comments:write goals:read goals:write'
 ```
 
-The browser still requires the human to explicitly grant each permission.
+The browser still requires you to confirm the selected access.
 Revoke a session using `geniustasker auth logout --context work` or Account →
 Agent connections in the app. Do not put tokens in commands or MCP configuration.
 
