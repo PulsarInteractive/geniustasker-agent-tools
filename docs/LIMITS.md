@@ -6,7 +6,7 @@ The service reports current limits through `geniustasker capabilities --json`.
 
 ## Agent requests
 
-| Allowance                     |  Free |            Premium |                Pro |
+| Allowance                     |  Free |            Starter |                Pro |
 | ----------------------------- | ----: | -----------------: | -----------------: |
 | Requests per 60 seconds       |    30 |                120 |                300 |
 | Write requests per 60 seconds |     5 |                 20 |                 60 |
@@ -16,13 +16,26 @@ The service reports current limits through `geniustasker capabilities --json`.
 Write requests also count toward the request limit. For Free accounts, a read
 costs one monthly credit and a write costs five; both monthly limits must have
 capacity. Monthly counters reset at the beginning of the next calendar month
-in UTC. Premium appears as `Starter` in API responses; Pro appears as `Pro`.
+in UTC. The public Starter and Pro plans use `Starter` and `Pro` in API responses.
 
 These are the current service settings, not a pricing commitment. Short-window
 limits provide traffic protection and can apply approximately by location;
 clients must follow the service response. Resource limits for projects, members,
 Memory, storage and attachments are separate and still apply. Availability also
 requires account approval and an explicitly granted agent connection.
+
+## MCP and the built-in coach are separate
+
+MCP connects the AI tool you already use to your account. Its external model
+subscription and token charges stay with that tool; agent request credits are
+not model tokens. The built-in GeniusTasker coach has its own account allowance.
+Reaching an agent or coach allowance does not remove your documents or project
+access. Ordinary app traffic remains subject to its separate API limits.
+
+Each server request counts, including discovery, polling and a retry that reaches
+the admission step. A write can consume allowance even if a later domain rule
+refuses it. Replaying the same operation prevents a duplicate edit; it does not
+promise free network requests.
 
 ## When a limit is reached
 
