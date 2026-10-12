@@ -227,6 +227,25 @@ after lost responses, strict inputs, receipt validation and an official MCP
 client communicating through stdio to actual Worker/SQLite domain services.
 Compatibility with each agent host requires its own connection test.
 
+## Custom project tags
+
+Tags belong to one project and have stable IDs. Discover `tags` through
+capabilities, then read that collection before creating or assigning a label.
+Names and colours are project choices; there are no mandatory release labels.
+
+When advertised by the connected service, `tag.create`, `tag.update` and
+`tag.delete` use the same prepared-command journal as task edits. Creating a tag
+requires a new ID and `expectedRevision: null`. Updates/deletion require its
+current revision. Editable fields are `name` (2–14 characters), `textColor` and
+`backgroundColor` (integer colours). The connection needs `tasks:write` and its
+account must administer the target project. Delegation never grants that role.
+
+Assign tag **IDs**, not names, through the task's `tags` field. When adding a tag,
+preserve the task's other selected IDs. Renaming a tag preserves those links.
+Deleting a label does not delete its tasks: historical IDs may remain on them,
+while newly assigned IDs must refer to live tags in the same project. A filter
+that depends on a missing tag must not silently become an unfiltered task view.
+
 ## Agent profiles and terminal identity
 
 The initial profile works without configuration. Use independent named contexts

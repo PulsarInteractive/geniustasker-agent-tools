@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Project tag create, update and delete commands, with project permissions and
+  immutable operation retries. Requires the connected service to advertise `tag.*`.
+- Guidance for reusing tag IDs and preserving project-specific workflows.
+
 ## 0.1.0-beta.5 — 2026-10-02
 
 - Incremental repository documentation from selected Memory folders and Graphs,

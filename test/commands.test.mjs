@@ -26,6 +26,38 @@ const receipt = (input) => ({
   affectedCollections: ['tasks'],
 });
 
+test('project tag commands use revisions and cannot carry task or server-owned fields', () => {
+  const command = {
+    ...draft(),
+    kind: 'tag.create',
+    data: { name: 'Custom' },
+    operationId: randomUUID(),
+    issuedAt: Date.now(),
+  };
+  assert.equal(validateCommand(command).kind, 'tag.create');
+  assert.equal(
+    validateCommand({
+      ...command,
+      kind: 'tag.update',
+      expectedRevision: '2',
+      data: { name: 'Renamed' },
+    }).data.name,
+    'Renamed',
+  );
+  assert.equal(
+    validateCommand({ ...command, kind: 'tag.delete', expectedRevision: '3', data: {} }).kind,
+    'tag.delete',
+  );
+  for (const patch of [
+    { scope: 'memory:work' },
+    { data: { name: 'Custom', group: 'another-project' } },
+    { kind: 'tag.delete', data: { tags: [] }, expectedRevision: '3' },
+    { kind: 'tag.update', expectedRevision: null },
+  ]) {
+    assert.throws(() => validateCommand({ ...command, ...patch }), { code: 'invalid_arguments' });
+  }
+});
+
 test('Memory creation explains UUID identity locally without rejecting stable page source IDs', () => {
   const id = randomUUID();
   const command = {

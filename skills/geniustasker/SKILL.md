@@ -107,3 +107,10 @@ project/ticket and distinguish completed work, validation and remaining work.
 - To create, switch or restrict an agent identity, read [Profiles](references/profiles.md).
 - For ticket questions, progress reports or precise human approvals, read [Collaboration](references/collaboration.md).
 - Memory is a separate account resource. This project skill never assumes that a project grants Memory access. Discover capabilities and independent memory grants before using it.
+
+For project labels, read the current `tags` collection and discover available
+`tag.*` commands before editing. Reuse IDs for existing labels, preserve other
+IDs when assigning task tags, and treat labels as project choices. Do not seed
+release labels into unrelated projects. Tag management also requires the
+account's project-administration role; a `tasks:write` grant alone is insufficient.
+See [Custom project tags](../../docs/CLI.md#custom-project-tags).

@@ -279,6 +279,31 @@ export default {
       "module": "$private/VoteDraft",
       "permission": "questions:write"
     },
+    "tag.create": {
+      "create": true,
+      "fields": [
+        "name",
+        "backgroundColor",
+        "textColor"
+      ],
+      "module": "Project/ProjectCustomTag",
+      "permission": "tasks:write"
+    },
+    "tag.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Project/ProjectCustomTag",
+      "permission": "tasks:write"
+    },
+    "tag.update": {
+      "fields": [
+        "name",
+        "backgroundColor",
+        "textColor"
+      ],
+      "module": "Project/ProjectCustomTag",
+      "permission": "tasks:write"
+    },
     "task.archive": {
       "fields": [],
       "module": "Project/ProjectTask",
