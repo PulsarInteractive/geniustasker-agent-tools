@@ -440,3 +440,5 @@ shows every type and supports type/status filters. Prefer `auto`; an explicit
 Upload only approved imagery. Attaching a private image to a shared Graph makes
 it visible to that Graph's readers and requires the user's authorization.
 Read the full current record before editing and preserve its revision.
+
+For project-owned reusable task selections, see [Shared project filters](PROJECT_FILTERS.md).

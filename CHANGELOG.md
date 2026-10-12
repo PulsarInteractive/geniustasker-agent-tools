@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Shared project filter commands and criteria guide, gated by advertised service capabilities.
+
 - Project tag create, update and delete commands, with project permissions and
   immutable operation retries. Requires the connected service to advertise `tag.*`.
 - Guidance for reusing tag IDs and preserving project-specific workflows.

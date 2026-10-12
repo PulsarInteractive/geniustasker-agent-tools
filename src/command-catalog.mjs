@@ -55,6 +55,29 @@ export default {
       "module": "Project/ProjectTaskComment",
       "permission": "comments:write"
     },
+    "filter.create": {
+      "create": true,
+      "fields": [
+        "name",
+        "criteria"
+      ],
+      "module": "Project/ProjectTaskFilter",
+      "permission": "tasks:write"
+    },
+    "filter.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Project/ProjectTaskFilter",
+      "permission": "tasks:write"
+    },
+    "filter.update": {
+      "fields": [
+        "name",
+        "criteria"
+      ],
+      "module": "Project/ProjectTaskFilter",
+      "permission": "tasks:write"
+    },
     "goal.create": {
       "create": true,
       "fields": [

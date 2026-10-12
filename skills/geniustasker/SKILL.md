@@ -114,3 +114,12 @@ IDs when assigning task tags, and treat labels as project choices. Do not seed
 release labels into unrelated projects. Tag management also requires the
 account's project-administration role; a `tasks:write` grant alone is insufficient.
 See [Custom project tags](../../docs/CLI.md#custom-project-tags).
+
+## Shared project filters
+
+When capabilities advertise `filters` and `filter.*`, follow
+[Shared project filters](../../docs/PROJECT_FILTERS.md). Reuse stable filter and
+tag IDs, preserve the project’s naming, and keep layout preferences separate.
+Do not broaden a deleted, inaccessible or unsupported saved filter into all
+tasks. Only the project owner or administrator can change shared definitions;
+a delegated write scope does not bypass that role.
