@@ -1,12 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-beta.6 — 2026-10-14
 
 - Shared project filter commands and criteria guide, gated by advertised service capabilities.
-
 - Project tag create, update and delete commands, with project permissions and
   immutable operation retries. Requires the connected service to advertise `tag.*`.
 - Guidance for reusing tag IDs and preserving project-specific workflows.
+- Updated the development MCP client to 2.3.1; local stdio compatibility is tested.
 
 ## 0.1.0-beta.5 — 2026-10-02
 
