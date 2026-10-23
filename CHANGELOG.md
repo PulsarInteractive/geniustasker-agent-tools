@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.7
+
+- Add the remote ChatGPT tool catalogue and OAuth connection guide.
+- Document the separate official directory submission process.
+- Upgrade the MCP server SDK to 2.3.1 with published security fixes.
+
 ## 0.1.0-beta.6 — 2026-10-14
 
 - Shared project filter commands and criteria guide, gated by advertised service capabilities.

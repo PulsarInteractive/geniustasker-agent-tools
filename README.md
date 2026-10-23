@@ -71,3 +71,7 @@ explains the available local integration and hosted integration status.
 for this CLI, MCP server, skills and documentation.
 [Third-party notices](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/THIRD_PARTY_NOTICES.md)
 cover included components. The GeniusTasker application and backend are separate.
+
+## ChatGPT
+
+Connect the hosted service with OAuth: [setup and examples](docs/CHATGPT.md). Your computer does not need to run the CLI. Account permissions and quotas still apply. [Official directory publication](docs/OPENAI_PUBLICATION.md) is a separate review.

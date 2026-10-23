@@ -1,6 +1,6 @@
 {
   "name": "@pulsarinteractive/geniustasker",
-  "version": "0.1.0-beta.6",
+  "version": "0.1.0-beta.7",
   "private": false,
   "description": "GeniusTasker delegated CLI and local agent tools",
   "type": "module",
@@ -24,7 +24,8 @@
     "mcp.json",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md",
-    "LICENSES/"
+    "LICENSES/",
+    "remote/"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
@@ -37,9 +38,9 @@
     "verify": "npm run format:check && npm run lint && npm test && npm run check"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.1.0",
+    "@modelcontextprotocol/server": "2.3.1",
     "open": "10.2.0",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
