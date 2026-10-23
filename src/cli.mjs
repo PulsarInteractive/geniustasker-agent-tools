@@ -220,7 +220,7 @@ export function help(command = 'help') {
       flow: 'browser (default, PKCE loopback) | device (SSH/headless)',
       browser: 'default (automatic) | chrome; --no-browser prints the link without opening it',
       scope:
-        'space-separated permission ceiling; browser defaults to read-only and requires explicit write selection',
+        'space-separated permission ceiling; official login proposes all requested permissions for review before approval',
       interactive:
         'required when starting login without a terminal; never use to bypass human consent',
     },

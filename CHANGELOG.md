@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Correct CLI help to describe the official login's requested-permission defaults.
+
 ## 0.1.0-beta.10
 
 - Add project creation/settings/deletion with the distinct `projects:write` permission. Existing grants do not expand automatically.
