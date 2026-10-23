@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-beta.9 — 2026-10-23
 
 - Add on-demand workflow guides to hosted and local MCP and `workflow show` to the CLI.
 - Correct hosted archive filters to the API values `active`, `archived` and `all`.

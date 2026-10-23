@@ -7,8 +7,8 @@ are selected in the browser and enforced by the service on every request.
 ## Codex: direct MCP
 
 ```sh
-npx -y @pulsarinteractive/geniustasker@0.1.0-beta.8 auth login --context work
-codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.8 mcp --context work
+npx -y @pulsarinteractive/geniustasker@0.1.0-beta.9 auth login --context work
+codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.9 mcp --context work
 ```
 
 Restart the host as needed, then inspect its MCP list. Ask the agent to read its
