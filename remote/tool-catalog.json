@@ -66,7 +66,7 @@
   {
     "name": "tasker_resources",
     "title": "Read records",
-    "description": "Read a bounded page or exact record before modifying it. Preserve epoch/revision. Never crawl all collections. Use personal scope only for the connected owner; revoked access is unavailable.",
+    "description": "Read a bounded page or exact record before modifying it. Preserve epoch/revision. Never crawl all collections. Use personal scope only for the connected owner; revoked access is unavailable. Prefer the permission-specific read tools for new calls.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -416,7 +416,7 @@
   {
     "name": "tasker_execute_command",
     "title": "Apply the approved edit",
-    "description": "Execute the exact command returned by prepare_command after user approval. This changes account data and may delete records. After timeout retry the SAME command; after conflict read the current record and ask before preparing a replacement. Permissions, subscription and quotas are checked on the server.",
+    "description": "Execute the exact command returned by prepare_command after user approval. This changes account data and may delete records. After timeout retry the SAME command; after conflict read the current record and ask before preparing a replacement. Permissions, subscription and quotas are checked on the server. Prefer the permission-specific edit tools for new calls; this generic entry point remains for existing clients.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -517,5 +517,693 @@
     "route": "commands",
     "write": true,
     "destructive": true
+  },
+  {
+    "name": "tasker_edit_approvals",
+    "title": "Apply approved approvals changes",
+    "description": "Apply an exact immutable command returned by prepare_command for approvals, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["approval.cancel", "approval.consume", "approval.request"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["approvals:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_comments",
+    "title": "Apply approved comments changes",
+    "description": "Apply an exact immutable command returned by prepare_command for comments, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["comment.create", "comment.delete", "comment.update"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["comments:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_goals",
+    "title": "Apply approved goals changes",
+    "description": "Apply an exact immutable command returned by prepare_command for goals, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["goal.create", "goal.delete", "goal.update"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["goals:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_memory",
+    "title": "Apply approved memory changes",
+    "description": "Apply an exact immutable command returned by prepare_command for memory, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "memory.create",
+            "memory.delete",
+            "memory.edge.create",
+            "memory.edge.delete",
+            "memory.edge.update",
+            "memory.node.create",
+            "memory.node.delete",
+            "memory.node.update",
+            "memory.page.create",
+            "memory.page.delete",
+            "memory.page.update",
+            "memory.update"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_questions",
+    "title": "Apply approved questions changes",
+    "description": "Apply an exact immutable command returned by prepare_command for questions, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["question.close", "question.create"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["questions:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_tasks",
+    "title": "Apply approved tasks changes",
+    "description": "Apply an exact immutable command returned by prepare_command for tasks, after user approval. Only the listed command kinds are accepted. Preserve operationId and all fields for retries. Existing account, resource, subscription and quota checks apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "filter.create",
+            "filter.delete",
+            "filter.update",
+            "tag.create",
+            "tag.delete",
+            "tag.update",
+            "task.archive",
+            "task.create",
+            "task.report",
+            "task.restore",
+            "task.update",
+            "ticket.create",
+            "ticket.plan"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_read_goals",
+    "title": "Read goals records",
+    "description": "Read one authorized page or exact record from the listed goals collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": ["goals"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["true", "false"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["goals:read"],
+    "route": "resources"
+  },
+  {
+    "name": "tasker_read_media",
+    "title": "Read media records",
+    "description": "Read one authorized page or exact record from the listed media collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": ["assets"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["true", "false"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["media:read"],
+    "route": "resources"
+  },
+  {
+    "name": "tasker_read_memory",
+    "title": "Read memory records",
+    "description": "Read one authorized page or exact record from the listed memory collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": ["edges", "memory", "nodeIndex", "nodes", "pageIndex", "pages"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["true", "false"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "resources"
+  },
+  {
+    "name": "tasker_read_projects",
+    "title": "Read projects records",
+    "description": "Read one authorized page or exact record from the listed projects collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": ["members", "project"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["true", "false"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["projects:read"],
+    "route": "resources"
+  },
+  {
+    "name": "tasker_read_tasks",
+    "title": "Read tasks records",
+    "description": "Read one authorized page or exact record from the listed tasks collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": [
+            "comments",
+            "documentFolders",
+            "documents",
+            "filters",
+            "gitHubLinks",
+            "history",
+            "preparedLists",
+            "projectDocumentIndex",
+            "projectDocuments",
+            "questions",
+            "schedules",
+            "sprintHistory",
+            "sprints",
+            "tags",
+            "taskTemplates",
+            "tasks",
+            "workflows"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["true", "false"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read"],
+    "route": "resources"
   }
 ]

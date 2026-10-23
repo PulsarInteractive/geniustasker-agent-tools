@@ -30,3 +30,41 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
   );
   assert.ok(!tools.some((t) => /upload|local|profile|permission/.test(t.name)));
 });
+
+test('every command can request its exact permission without unrelated write grants', async () => {
+  const { default: catalog } = await import('../src/command-catalog.mjs');
+  for (const [kind, command] of Object.entries(catalog.commands)) {
+    const tool = tools.find(
+      (candidate) =>
+        candidate.name.includes('_edit_') &&
+        candidate.inputSchema.properties.kind.enum.includes(kind),
+    );
+    assert.ok(tool, kind);
+    assert.deepEqual(tool.scopes, [command.permission], kind);
+    assert.equal(tool.route, 'commands');
+    for (const accepted of tool.inputSchema.properties.kind.enum) {
+      assert.equal(catalog.commands[accepted].permission, command.permission);
+    }
+    const validate = new Ajv({ strict: false }).compile(tool.inputSchema);
+    const input = {
+      operationId: '00000000-0000-4000-8000-000000000001',
+      issuedAt: 1,
+      kind,
+      scope: 'project:example',
+      id: 'record',
+      epoch: 'epoch',
+      expectedRevision: null,
+      data: {},
+    };
+    assert.equal(validate(input), true, kind);
+    const other = Object.keys(catalog.commands).find(
+      (name) => catalog.commands[name].permission !== command.permission,
+    );
+    assert.equal(validate({ ...input, kind: other }), false, `${kind} must reject ${other}`);
+  }
+  for (const tool of tools.filter((candidate) => candidate.name.includes('_coach_'))) {
+    assert.ok(tool.scopes.includes('coaching:write'));
+    assert.equal(tool.route, 'commands');
+    assert.equal(tool.write, true);
+  }
+});
