@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.8
+
+- Explain shared account quotas across CLI, local MCP and ChatGPT.
+- Guide assistants to use the user’s language and preserve existing record text.
+- Clarify ambiguous planning dates and consent-language behavior.
+
 ## 0.1.0-beta.7
 
 - Add the remote ChatGPT tool catalogue and OAuth connection guide.

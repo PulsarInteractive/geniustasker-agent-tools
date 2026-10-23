@@ -123,3 +123,9 @@ tag IDs, preserve the project’s naming, and keep layout preferences separate.
 Do not broaden a deleted, inaccessible or unsupported saved filter into all
 tasks. Only the project owner or administrator can change shared definitions;
 a delegated write scope does not bypass that role.
+
+Respond in the user’s language. Preserve existing titles and notes unless asked
+to translate them; keep IDs, API fields and enum values unchanged. Confirm
+ambiguous dates and timezones before changing a schedule. CLI, local MCP and
+ChatGPT share the account quota: obey retry times and never switch connections
+to evade a refusal.

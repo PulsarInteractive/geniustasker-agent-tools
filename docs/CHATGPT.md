@@ -25,6 +25,12 @@ Use **read-only permissions** if you only want summaries. Write access does not 
 
 Disconnecting the plugin in ChatGPT removes its use there. Also revoke its dedicated connection from GeniusTasker's agent settings to invalidate its delegated sessions. Reconnecting requires consent again. This connector never needs your OpenAI API key.
 
+## Language and shared limits
+
+Ask in your preferred language. The assistant should explain results and errors in that language while preserving existing record text, IDs and API field values. The consent screen supports French and English; ChatGPT’s supported locale hint selects the screen language, with the browser language as fallback. Confirm dates and timezones when they are ambiguous.
+
+CLI, local MCP and hosted ChatGPT use the verified account’s current subscription and shared request/write counters. New connections, profiles or refreshed tokens do not grant a new budget. Protocol discovery and command preparation also count as requests; a tool operation can involve more than one request. Resource capacity and Coach access remain enforced by the same domain commands. A rate-limit response includes retry guidance: wait rather than switching tools or starting an automatic retry loop.
+
 ## Examples
 
 - “Use GeniusTasker to show my current project tasks, then propose priorities.”
