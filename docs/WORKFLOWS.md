@@ -3,7 +3,7 @@
 | What you want               | Guide topic  | Operations                                                                                                                 |
 | --------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | Work on a project           | `projects`   | Read project/member configuration; create/edit/archive/restore tasks; create and plan tickets in existing backlogs/sprints |
-| Prepare a shared workflow   | `projects`   | Project tags and saved filters; recurring schedule and workflow reads                                                      |
+| Prepare a shared workflow   | `projects`   | Project tags and saved filters; sprint, recurring schedule and workflow lifecycle                                          |
 | Collaborate                 | `projects`   | Comments, work reports, questions, exact action approvals and member goals                                                 |
 | Organize knowledge          | `memory`     | Independent Memory spaces, folders/documents, role-restricted content and resource references                              |
 | Connect knowledge           | `graph`      | Typed nodes and relations; authorized references across memories                                                           |
@@ -12,8 +12,8 @@
 
 Use `tasker_workflow` in MCP or `geniustasker workflow show --topic TOPIC`.
 Discover commands before editing. A readable collection does not imply a matching
-write command: project creation/settings, sprint lifecycle and membership changes
-are not currently exposed as delegated commands. Use the application for those.
+write command. See [projects and planning](PLANNING.md) for lifecycle commands.
+Membership and consent changes remain in the application.
 
 ## Example requests
 
@@ -31,6 +31,7 @@ an arbitrary chat attachment. Reuse stable asset IDs; compare content before
 replacing an image. A Graph link never grants access to its target: when access
 is removed, the node remains but linked private data becomes unavailable.
 
-Project agent contributions must be enabled by an authorized member. No tool
+Existing project agent contributions must be enabled by an authorized member.
+New projects created with projects:write start with contributions enabled. No tool
 can grant itself membership, approve an action as a human, or bypass account
 [limits](LIMITS.md).

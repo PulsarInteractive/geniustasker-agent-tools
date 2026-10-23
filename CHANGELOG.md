@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.10
+
+- Add project creation/settings/deletion with the distinct `projects:write` permission. Existing grants do not expand automatically.
+- Expose native sprint, workflow, recurring-task and project-document commands through CLI, local MCP and hosted discovery.
+- Document planning invariants and Memory folder structure, with bounded permission-specific tools and unchanged account quotas.
+
 ## 0.1.0-beta.9 — 2026-10-23
 
 - Add on-demand workflow guides to hosted and local MCP and `workflow show` to the CLI.

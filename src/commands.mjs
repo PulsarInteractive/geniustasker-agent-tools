@@ -78,13 +78,13 @@ export function validateCommand(value) {
     fail('invalid_arguments', 'The command must target the matching project or memory scope.');
   }
   if (
-    command.kind === 'memory.create' &&
+    ['memory.create', 'project.create'].includes(command.kind) &&
     (!/^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i.test(command.id) ||
       command.epoch !== command.id)
   ) {
     fail(
       'invalid_arguments',
-      'Create Memory with a UUID v4 as id, the same initial epoch, and scope memory:<id>. Keep source identifiers in page sourceId.',
+      'Create a space with a UUID v4 as id and the same initial epoch. Use project:<id> or memory:<id> as appropriate; keep source identifiers in page sourceId.',
     );
   }
   if (command.kind === 'ticket.plan' && command.id !== command.scope.slice(8)) {

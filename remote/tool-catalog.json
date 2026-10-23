@@ -289,9 +289,15 @@
             "comment.create",
             "comment.delete",
             "comment.update",
+            "document.create",
+            "document.delete",
+            "document.update",
             "filter.create",
             "filter.delete",
             "filter.update",
+            "folder.create",
+            "folder.delete",
+            "folder.update",
             "goal.create",
             "goal.delete",
             "goal.update",
@@ -307,8 +313,20 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "project.create",
+            "project.delete",
+            "project.features",
+            "project.update",
             "question.close",
             "question.create",
+            "schedule.create",
+            "schedule.delete",
+            "schedule.update",
+            "sprint.complete",
+            "sprint.create",
+            "sprint.delete",
+            "sprint.start",
+            "sprint.update",
             "tag.create",
             "tag.delete",
             "tag.update",
@@ -318,7 +336,10 @@
             "task.restore",
             "task.update",
             "ticket.create",
-            "ticket.plan"
+            "ticket.plan",
+            "workflow.create",
+            "workflow.delete",
+            "workflow.update"
           ]
         }
       },
@@ -343,9 +364,15 @@
             "comment.create",
             "comment.delete",
             "comment.update",
+            "document.create",
+            "document.delete",
+            "document.update",
             "filter.create",
             "filter.delete",
             "filter.update",
+            "folder.create",
+            "folder.delete",
+            "folder.update",
             "goal.create",
             "goal.delete",
             "goal.update",
@@ -361,8 +388,20 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "project.create",
+            "project.delete",
+            "project.features",
+            "project.update",
             "question.close",
             "question.create",
+            "schedule.create",
+            "schedule.delete",
+            "schedule.update",
+            "sprint.complete",
+            "sprint.create",
+            "sprint.delete",
+            "sprint.start",
+            "sprint.update",
             "tag.create",
             "tag.delete",
             "tag.update",
@@ -372,7 +411,10 @@
             "task.restore",
             "task.update",
             "ticket.create",
-            "ticket.plan"
+            "ticket.plan",
+            "workflow.create",
+            "workflow.delete",
+            "workflow.update"
           ]
         },
         "scope": {
@@ -437,9 +479,15 @@
             "comment.create",
             "comment.delete",
             "comment.update",
+            "document.create",
+            "document.delete",
+            "document.update",
             "filter.create",
             "filter.delete",
             "filter.update",
+            "folder.create",
+            "folder.delete",
+            "folder.update",
             "goal.create",
             "goal.delete",
             "goal.update",
@@ -455,8 +503,20 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "project.create",
+            "project.delete",
+            "project.features",
+            "project.update",
             "question.close",
             "question.create",
+            "schedule.create",
+            "schedule.delete",
+            "schedule.update",
+            "sprint.complete",
+            "sprint.create",
+            "sprint.delete",
+            "sprint.start",
+            "sprint.update",
             "tag.create",
             "tag.delete",
             "tag.update",
@@ -466,7 +526,10 @@
             "task.restore",
             "task.update",
             "ticket.create",
-            "ticket.plan"
+            "ticket.plan",
+            "workflow.create",
+            "workflow.delete",
+            "workflow.update"
           ]
         },
         "scope": {
@@ -889,9 +952,23 @@
         "kind": {
           "type": "string",
           "enum": [
+            "document.create",
+            "document.delete",
+            "document.update",
             "filter.create",
             "filter.delete",
             "filter.update",
+            "folder.create",
+            "folder.delete",
+            "folder.update",
+            "schedule.create",
+            "schedule.delete",
+            "schedule.update",
+            "sprint.complete",
+            "sprint.create",
+            "sprint.delete",
+            "sprint.start",
+            "sprint.update",
             "tag.create",
             "tag.delete",
             "tag.update",
@@ -901,7 +978,10 @@
             "task.restore",
             "task.update",
             "ticket.create",
-            "ticket.plan"
+            "ticket.plan",
+            "workflow.create",
+            "workflow.delete",
+            "workflow.update"
           ]
         },
         "scope": {
@@ -1207,6 +1287,74 @@
     "route": "resources"
   },
   {
+    "name": "tasker_edit_projects",
+    "title": "Manage projects",
+    "description": "Create, configure or delete a project with projects:write and the native owner/admin rights. New projects require all-resources consent and start with agent contributions enabled. Existing project opt-outs and memberships cannot be changed by this tool. Use command_help then prepare_command; preserve immutable operations for retry.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["project.create", "project.delete", "project.features", "project.update"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["projects:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
     "name": "tasker_workflow",
     "title": "Workflow guides",
     "description": "Read reviewed product instructions for a specific workflow before unfamiliar operations. Explains available commands, permissions, pagination and remote versus local retry behavior; does not read personal data or grant access.",
@@ -1215,7 +1363,7 @@
       "properties": {
         "topic": {
           "type": "string",
-          "enum": ["connection", "mutations", "projects", "memory", "graph"]
+          "enum": ["connection", "mutations", "projects", "memory", "graph", "planning"]
         }
       },
       "required": ["topic"],

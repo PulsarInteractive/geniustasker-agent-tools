@@ -25,19 +25,20 @@
     "projects": {
       "title": "Tasks, backlog, sprints and shared filters",
       "steps": [
-        "List projects and choose only those relevant to the request. Project agent contributions must already be enabled by an authorized member. A connector cannot grant itself access or enable its own project permissions.",
+        "List projects and choose only those relevant to the request. Existing projects must have agent contributions enabled by a human administrator. project.create requires projects:write and all-resources consent including future projects; use a new UUID v4 for id and epoch and project:<id> for scope. It creates an owned project with agent contributions enabled; type defaults to Details and icon to layers. It does not change consent or access to other projects.",
         "Read the project configuration, members, tasks and relevant sprints/workflows. Follow nextAfter with epoch and checkpoint even when a filtered page is empty. Use exact record IDs when known; archive accepts active, archived or all.",
         "Use task.create/update for ordinary task fields. Use ticket.create and ticket.plan for backlog, sprint placement and planning. Inspect command_help and the current project revision before planning; read the affected task revisions. Do not invent sprint IDs, workflow IDs or member IDs.",
         "Tags and saved filters are project-specific. Use tag.create/update/delete and filter.create/update/delete. Reuse existing names and criteria; never impose example release labels globally.",
         "Record actual progress with task.report and relevant comments. Questions and action approvals are separate workflows; an agent may request or consume an exact granted approval but cannot approve on a human behalf. Mark work complete only when the requested work is actually complete.",
-        "Capabilities are the supported operation catalogue. Do not imply that a read-only collection has a matching write command. Missing project/sprint lifecycle or membership operations must be handled in the application until explicitly exposed."
+        "Use project.update for ordinary project settings and project.features for planning switches, with projects:write and native administration rights. project.features is a full configuration: read and preserve all seven booleans and timeZone. It cannot change agent opt-in, membership, ownership or counters. project.delete requires project ownership, a current revision and an explicit user deletion request.",
+        "For sprint/workflow/recurrence lifecycle use the planning guide. For project documents use document.create/update/delete and folder.create/update/delete; these are separate from Memory. Folders use parent and documents use folder. Prevent duplicate names, preserve unrelated contents and read the current revision before moving or deleting."
       ]
     },
     "memory": {
       "title": "Memory folders, documents and resources",
       "steps": [
         "Projects and Memory are independent spaces. List memories, inspect pageIndex or the tree, then fetch specific pages. Search before adding duplicate documentation. Preserve folder parentId and stable page/block IDs.",
-        "Read the page current revision and use memory.page.create/update/delete for documents and folders. Preserve visibility/readRoles and content not requested for modification. A parent or Graph link does not bypass current document permissions.",
+        "Read the page current revision and use memory.page.create/update/delete for both documents and folders. A folder is a page with directory:true, a stable id/path and parentId; child pages reference that ID. Preserve visibility/readRoles, stable block IDs and content not requested for modification. A parent or Graph link does not bypass current document permissions.",
         "In ChatGPT use the available bounded memory/knowledge read tools and memory edit commands. Repository documentation mirroring and local file upload are CLI/local MCP operations, not hosted connector filesystem access.",
         "For media, reuse a stable asset ID. In local MCP/CLI compare content hashes before uploading a replacement, preserve references and never delete an asset still in use. Do not claim that mentioning a ChatGPT attachment has uploaded it to Memory.",
         "When a repository mirror is configured, check source freshness at a new work session and after knowledge changes. Edit authoritative Memory through MCP, then sync the mirror; generated Markdown is not the source of truth."
@@ -50,6 +51,16 @@
         "Use memory.node.create/update/delete and memory.edge.create/update/delete with current revisions. Preserve imageAssetId, detailLevel, provenance and source references unless the user requested a change.",
         "Resolve cross-space references through the authorized reference tool. If a friend removes access, the node and its own content may remain while the linked data is unavailable. Never delete the node or paste cached private data as a workaround.",
         "Explain missing linked data separately from missing nodes. Recheck access when it is restored and refresh only the relevant references. Do not infer that relation existence grants edit access."
+      ]
+    },
+    "planning": {
+      "title": "Sprint, workflow and recurring-task lifecycle",
+      "steps": [
+        "Inspect the project, its enabled features and current sprint/workflow/schedule records. tasks:write does not grant project administrator rights. Enable planning only with project.features and projects:write; preserve unrelated settings.",
+        "sprint.create and sprint.update require name, goal, start and end (ISO timestamps); goal may be omitted on create. Only Planned or Active sprints are editable, and only one may be Active. sprint.start changes a Planned sprint to Active. sprint.complete accepts carryToSprint (a Planned sprint ID or null for backlog), preserves completion history and moves unfinished work atomically. sprint.delete removes only a Planned sprint and returns its tickets to backlog.",
+        "workflow.create/update require name, category (New, InProgress or Done) and integer order. Workflow edits require native PROJECT.ADMIN. The last stage in a category cannot be removed. workflow.delete accepts replacement; it is required when tasks use that stage and must name another existing stage. Server updates affected task status and references atomically.",
+        "schedule.create/update set the recurring task fields, including period, interval, startTime, weekDay and IANA timeZoneId. Read current settings before edits; preserve owner, notifications, deadlines and dependencies. The server validates recurrence and invalidates its scheduler checkpoint. Never send nextCheck, lastCreation or disabled: these are server-managed. schedule.delete stops future occurrences, preserves existing task history and removes dependent recurrence references.",
+        "Prepare and execute the exact command once; uncertain retries reuse its immutable envelope. On conflict reread the affected records. Read back sprint/task/schedule changes and let normal application realtime subscriptions refresh the open views. Never claim a successful command proves device rendering."
       ]
     }
   }
