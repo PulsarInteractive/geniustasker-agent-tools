@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Plan tasks and shared project workflows'
+  short_description: 'Plan tasks and shared project workflows'
+  default_prompt: 'Use $geniustasker-planning for this request.'

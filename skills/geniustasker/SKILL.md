@@ -129,3 +129,20 @@ to translate them; keep IDs, API fields and enum values unchanged. Confirm
 ambiguous dates and timezones before changing a schedule. CLI, local MCP and
 ChatGPT share the account quota: obey retry times and never switch connections
 to evade a refusal.
+
+## Hosted ChatGPT versus local tools
+
+Call `tasker_workflow` for reviewed, topic-specific instructions before unfamiliar work.
+These guides are served by the connector; installing a ChatGPT connection does
+not automatically install repository skill files.
+
+When connected in ChatGPT, use its app settings to reconnect if a permission is
+missing. Do not tell the user that a CLI login will repair the ChatGPT grant.
+Hosted preparation returns `command` and `applied:false`; retain and execute that
+exact object with the appropriate edit tool. It has no local operation journal.
+Local CLI/stdio preparation saves a journal; use its retry tool/command with the
+saved operation ID. After a conflict, reread before preparing a new operation.
+
+Successful edits use the application’s normal realtime path. Verify the server
+result, but do not claim another device has displayed it unless observed. Do not
+start a polling loop or prescribe a manual refresh as the normal workflow.

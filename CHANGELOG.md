@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add on-demand workflow guides to hosted and local MCP and `workflow show` to the CLI.
+- Correct hosted archive filters to the API values `active`, `archived` and `all`.
+- Explain remote immutable-command recovery separately from the local operation journal.
+- Expand connection, permissions, product workflows and live application update documentation.
+
 ## 0.1.0-beta.8
 
 - Explain shared account quotas across CLI, local MCP and ChatGPT.

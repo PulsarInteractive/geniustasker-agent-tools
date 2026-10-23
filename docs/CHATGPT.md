@@ -46,3 +46,41 @@ CLI, local MCP and hosted ChatGPT use the verified account’s current subscript
 - The public tool catalogue is in [`remote/tool-catalog.json`](../remote/tool-catalog.json). Tools are described separately from private backend implementation.
 
 A custom connection is separate from an OpenAI directory listing. See [official publication](OPENAI_PUBLICATION.md). The CLI and local MCP remain supported independently.
+
+## If the connection only allows reading
+
+1. Open this app’s settings in ChatGPT and choose **Refresh tools** when available.
+2. Choose **Reconnect** for the connected account. Check that the correct account
+   appears on the product consent screen.
+3. The requested permissions are selected by default. Keep the ones you want,
+   including editing, then authorize. Explicitly restricted connections stay
+   restricted; old grants are never silently expanded.
+4. Ask the assistant to read its **identity** and **capabilities** again. Confirm
+   that the required permissions and write commands appear before requesting an edit.
+
+A new conversation may be needed after the tool catalogue changes. A CLI login
+is a separate connection and does not update ChatGPT’s permissions.
+
+## Guides available to the assistant
+
+The connector includes a `tasker_workflow` tool. Ask it for the relevant guide
+before an unfamiliar operation. These are reviewed instructions served directly
+by the connector; custom ChatGPT connections do not automatically install the
+skill files from this repository.
+
+See [supported workflows](WORKFLOWS.md) for examples and boundaries, and
+[CLI setup](CLI.md) for a terminal or local MCP connection. The local CLI can also
+show a guide without downloading account data:
+
+```sh
+geniustasker workflow show --topic mutations --json
+```
+
+## See changes in the application
+
+An accepted connector command changes the same data used by the application.
+The open application’s normal realtime subscription receives a version hint and
+loads the canonical change. When reconnecting after a network interruption, the
+application catches up through its existing sync system. A server receipt and a
+screen update are different observations: the assistant should verify the changed
+record, and should not claim to have seen your screen unless it actually did.
