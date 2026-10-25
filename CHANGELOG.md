@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve sessions and immutable command journals on temporary edge refusals. Respect numeric and HTTP-date Retry-After deadlines across CLI restarts, with positive jitter and no automatic replay. Recognized API permission refusals keep their existing behavior.
+
 - Correct CLI help to describe the official login's requested-permission defaults.
 
 ## 0.1.0-beta.10

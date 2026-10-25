@@ -1,3 +1,4 @@
+import { retryAt, requireRetryReady } from './recovery.mjs';
 import { randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
 import { open } from 'node:fs/promises';
@@ -203,6 +204,7 @@ export class CommandJournal {
       request: row.input,
       ...(row.receipt ? { receipt: row.receipt } : {}),
       ...(row.error ? { error: row.error } : {}),
+      ...(row.retryAt ? { retryAt: row.retryAt } : {}),
     };
   }
   async execute(value) {
@@ -211,8 +213,8 @@ export class CommandJournal {
     return store.locked(async () => {
       // Capture token and identity together under the refresh lock. A later
       // logout/login cannot turn this pending operation into another profile.
-      const session = await this.client.authorizedSession(),
-        identity = binding(session);
+      const localSession = await this.client.session(),
+        identity = binding(localSession);
       let row = await store.read();
       if (row && (row.formatVersion !== 1 || canonical(row.binding) !== canonical(identity))) {
         fail(
@@ -233,6 +235,11 @@ export class CommandJournal {
       }
       if (row?.state === 'confirmed') {
         return { source: 'local_receipt', receipt: row.receipt };
+      }
+      requireRetryReady(row?.retryAt);
+      const session = await this.client.authorizedSession();
+      if (canonical(binding(session)) !== canonical(identity)) {
+        fail('operation_identity_mismatch', 'The connection changed before transmission.');
       }
       row = { formatVersion: 1, binding: identity, input, state: 'uncertain' };
       await store.write(row);
@@ -266,7 +273,9 @@ export class CommandJournal {
         });
         // The uncertainty marker is already durable. Preserve the useful original
         // error/operation ID even if disk pressure prevents saving diagnostics.
-        await store.write({ ...row, error: result.toJSON() }).catch(() => {});
+        await store
+          .write({ ...row, retryAt: retryAt(result), error: result.toJSON() })
+          .catch(() => {});
         throw result;
       }
     }, this.client.transport.signal);

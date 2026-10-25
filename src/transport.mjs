@@ -1,5 +1,6 @@
 import { AgentError, fail } from './errors.mjs';
 import catalog from './command-catalog.mjs';
+import { edgeRefusal, retryAfterSeconds } from './recovery.mjs';
 
 export const ORIGINS = Object.freeze({
   production: 'https://api-geniustasker.pulsarinteractive.cloud',
@@ -132,6 +133,11 @@ export class Transport {
         execution: method === 'GET' ? 'not_applicable' : 'unknown',
       });
     }
+    const challenge = edgeRefusal(response, null);
+    if (response.headers.get('cf-mitigated')?.toLowerCase() === 'challenge') {
+      await response.body?.cancel().catch(() => {});
+      throw challenge;
+    }
     const chunks = [];
     let size = 0;
     try {
@@ -160,14 +166,26 @@ export class Transport {
     try {
       data = size ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : null;
     } catch {
+      const refusal = edgeRefusal(response, null);
+      if (refusal) {
+        throw refusal;
+      }
       fail('invalid_response', 'The API returned an unexpected format.', {
         status: response.status,
+        retryable: response.status === 429 || response.status >= 500,
+        retryAfterSeconds: retryAfterSeconds(response) ?? 60,
+        execution: method === 'GET' ? 'not_applicable' : 'unknown',
       });
+    }
+    const refusal = edgeRefusal(response, data);
+    if (refusal) {
+      throw refusal;
     }
     if (!response.ok) {
       const e = data?.error;
       const code = identifier(typeof e === 'string' ? e : e?.code) ?? 'api_error';
-      const retry = Number(response.headers.get('Retry-After') ?? e?.retryAfterSeconds);
+      const retry =
+        retryAfterSeconds(response, e) ?? ([429, 503].includes(response.status) ? 60 : undefined);
       throw new AgentError(code, boundedText(e?.message) ?? 'The API refused the request.', {
         status: response.status,
         retryable:
@@ -180,9 +198,7 @@ export class Transport {
             ? 'Run auth login again; check the connection in Account → Agents.'
             : 'Check permissions, availability and command help.'),
         ...(identifier(e?.requestId) ? { requestId: e.requestId } : {}),
-        ...(Number.isFinite(retry) && retry >= 0 && retry <= 86400
-          ? { retryAfterSeconds: retry }
-          : {}),
+        ...(Number.isFinite(retry) && retry >= 0 ? { retryAfterSeconds: retry } : {}),
         ...(Number.isSafeInteger(data?.interval) && data.interval > 0
           ? { interval: data.interval }
           : {}),

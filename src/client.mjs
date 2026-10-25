@@ -1,3 +1,4 @@
+import { retryAt, requireRetryReady } from './recovery.mjs';
 import { fail } from './errors.mjs';
 import { createHash } from 'node:crypto';
 import { ConditionalReadCache } from './read-cache.mjs';
@@ -80,6 +81,7 @@ export class AgentClient {
   async authorizedSession() {
     return this.store.locked(async () => {
       const session = await this.session();
+      requireRetryReady(session.retryAt);
       if (session.refreshPending) {
         fail('reauthentication_required', 'The previous renewal outcome is unknown.', {
           remediation:
@@ -112,6 +114,10 @@ export class AgentClient {
           : {}),
       });
     } catch (error) {
+      if (error?.retryable && error?.details?.execution === 'not_started') {
+        await this.store.write({ ...session, retryAt: retryAt(error), refreshPending: false });
+        throw error;
+      }
       // These two server outcomes happen before token consumption/rotation.
       // Every other refusal or lost reply retains the uncertainty marker.
       if (
@@ -139,6 +145,7 @@ export class AgentClient {
   async selectProfile(selection) {
     return this.store.locked(async () => {
       const session = await this.session();
+      requireRetryReady(session.retryAt);
       if (session.refreshPending) {
         fail('reauthentication_required', 'The previous renewal outcome is unknown.', {
           remediation:
