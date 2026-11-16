@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.13 — 2026-11-16
+
+- Add personal and project custom metrics with scoped discovery, exact aggregation, observation history, corrections and voids.
+- Link metrics to lifetime or fixed-window goals with bounded backfill, exact target comparisons and explicit notification/coach choices.
+- Provide metric and goal guides, generated command schemas and a dedicated MCP write tool. Read current service capabilities and permissions before use; availability depends on the connected deployment.
+
 ## 0.1.0-beta.12 — 2026-11-16
 
 - Add an opt-in host event adapter to CLI/local MCP with stable IDs/times, prepare-only support and the normal immutable journal. Process exit requests review, never task completion; no process/log capture or automatic polling.
