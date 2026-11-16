@@ -590,3 +590,12 @@ Add `--prepare` to journal it without sending. Keep its stable `eventId` and
 `tasker_run_event`. A `process_exited` event only requests review, with explicit
 next steps. See [host event fields, examples and recovery](../skills/geniustasker/references/host-events.md)
 before connecting a host callback; no host hook is installed automatically.
+
+### Personal focus and temporary deferral
+
+`intents read --scope project:ID` returns the connected owner's bounded
+instructions. `intents preview --file selection.json` checks exact tasks, time
+window and overlapping instructions without writing. Follow
+[the planning guide](PLANNING.md#temporary-personal-focus-and-deferral) and
+`workflow show --topic intents`, then use the ordinary immutable
+`intent.change` command flow. Availability is determined by service capabilities.

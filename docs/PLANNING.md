@@ -77,3 +77,51 @@ keep stable page and block IDs. Folder cycles are rejected by the server.
 Prepare then execute one immutable operation. Retain its ID, timestamp and body
 for uncertain retries. Read back affected collections after success. Open apps
 receive the same realtime changes as edits made in the native UI.
+
+## Temporary personal focus and deferral
+
+Read workflow `intents` before using this capability. It is available only when
+`intent.change` appears in the connected deployment's capabilities. It needs
+`tasks:read` for reads/previews, `tasks:write` for commands and the project's
+existing human-controlled agent opt-in.
+
+```sh
+geniustasker workflow show --topic intents --json
+geniustasker intents read --scope project:PROJECT_ID --json
+geniustasker intents preview --file preview.json --json
+geniustasker commands describe --kind intent.change --json
+```
+
+A preview file contains `scope` and `selection`: kind `focus` or `defer`, its
+objective, 1–20 exact open `taskIds`, `startsAt` (null means commit time), and an
+explicit `endsAt`. Duration and advance scheduling are each bounded to 14 days.
+Focus objectives are `finish`, `unblock`, `consistency`; defer uses `pause`.
+Resolve a user's local timezone before selecting dates. No recursive selector
+implicitly includes descendants.
+
+Local MCP exposes `tasker_intents` and `tasker_intent_preview`; the hosted
+connector has the same tools. A preview makes no changes. Review its full
+replacement list: overlap with part of an earlier group retires that whole
+instruction, not just the overlapping task. Ask for clarification when that
+would exceed the requested change.
+
+The command's outer `id` is the **connected human's ID** from identity. Its
+`expectedRevision` is the preview's `intentRevision`, including null only for
+an initially absent instruction aggregate. The separate `data.id` is a new
+instruction UUID. Copy `expectedIntentRevision`, `selection`, `sourceVersion`
+and `replaces` exactly from the preview and use `decision: set`. The server
+owns attribution; never include internal action or author fields.
+
+For `decision: cancel`, use the existing instruction's UUID, the latest
+aggregate revision in both revision fields, `selection: null`,
+`sourceVersion: null`, and `replaces: []`. It never revives a superseded focus.
+Use the ordinary immutable command journal on CLI/local MCP or the exact
+prepared command with `tasker_edit_tasks` in the hosted connector. Retry the
+same operation after uncertainty. A definitive conflict requires a fresh read
+and preview, not a forced overwrite.
+
+Read back through `tasker_intents`; private command receipts deliberately have
+no public changed items. These instructions do not change shared deadlines,
+status, importance, XP or agent execution claims. Reassignment, deletion and
+access changes make affected instructions stale. They belong only to the
+connected owner; another collaborator's instructions are not exposed.

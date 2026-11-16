@@ -165,6 +165,21 @@ export default {
       "module": "Project/ProjectMemberGoals",
       "permission": "goals:write"
     },
+    "intent.change": {
+      "action": "coachIntent",
+      "fields": [
+        "decision",
+        "id",
+        "expectedIntentRevision",
+        "selection",
+        "sourceVersion",
+        "replaces"
+      ],
+      "inputSchema": "GeniusTasker.CoachIntents.TaskerIntentCommand",
+      "module": "$private/TaskerCoachIntents",
+      "permission": "tasks:write",
+      "upsert": true
+    },
     "memory.create": {
       "create": true,
       "fields": [

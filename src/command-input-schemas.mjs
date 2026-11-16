@@ -1,5 +1,155 @@
 // Generated public command data schemas. Do not edit by hand.
 export default {
+  "intent.change": {
+    "type": "object",
+    "required": [
+      "decision",
+      "expectedIntentRevision",
+      "id",
+      "replaces",
+      "selection",
+      "sourceVersion"
+    ],
+    "properties": {
+      "decision": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "set"
+            ]
+          },
+          {
+            "type": "string",
+            "enum": [
+              "cancel"
+            ]
+          }
+        ]
+      },
+      "id": {
+        "type": "string"
+      },
+      "expectedIntentRevision": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 64
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "selection": {
+        "anyOf": [
+          {
+            "type": "object",
+            "required": [
+              "endsAt",
+              "kind",
+              "objective",
+              "startsAt",
+              "taskIds"
+            ],
+            "properties": {
+              "endsAt": {
+                "type": "string"
+              },
+              "kind": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "focus"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "defer"
+                    ]
+                  }
+                ]
+              },
+              "objective": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "finish"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "unblock"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "consistency"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "pause"
+                    ]
+                  }
+                ]
+              },
+              "startsAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "taskIds": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "sourceVersion": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "replaces": {
+        "type": "array",
+        "maxItems": 16,
+        "uniqueItems": true,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false
+  },
   "metric.correct": {
     "type": "object",
     "required": [

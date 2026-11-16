@@ -74,11 +74,12 @@ export function validateCommand(value) {
   if (
     Buffer.byteLength(JSON.stringify(command)) > catalog.maxCommandBytes ||
     Object.keys(command.data).some((key) => !definition.fields.includes(key)) ||
-    (definition.create ? command.expectedRevision !== null : command.expectedRevision === null)
+    (!definition.upsert &&
+      (definition.create ? command.expectedRevision !== null : command.expectedRevision === null))
   ) {
     fail(
       'invalid_arguments',
-      'Use the declared command fields and size limit. Creation requires a null revision; other commands require the current record revision.',
+      'Use the declared command fields and size limit. Creation requires a null revision; updates require the current record revision. Declared upserts use the revision returned by their dedicated read.',
     );
   }
   const prefix =

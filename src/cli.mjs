@@ -17,6 +17,7 @@ import { readChanges, watchChanges } from './changes.mjs';
 import { readMemoryTree, readMemoryMarkdown } from './documentation.mjs';
 import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
 import { previewProtocol } from './protocols.mjs';
+import { readIntents, previewIntent } from './intents.mjs';
 import { reportRunEvent } from './run-events.mjs';
 import { readResources, readMetrics } from './resources.mjs';
 import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
@@ -132,6 +133,14 @@ export const commands = {
   'projects list': {
     summary: 'Read a bounded project page; follow nextAfter even for an empty page.',
     options: ['after'],
+  },
+  'intents read': {
+    summary: 'Read personal temporary instructions for one project.',
+    options: ['scope'],
+  },
+  'intents preview': {
+    summary: 'Preview a temporary focus/defer selection from JSON without changing tasks.',
+    options: ['file'],
   },
   'protocols preview': {
     summary: 'Preview one page of a published task protocol from JSON without creating tasks.',
@@ -399,6 +408,10 @@ export async function main(
       data = await new AgentProfiles(client).restrict(await readCommandFile(options.file));
     } else if (command === 'profiles select') {
       data = await new AgentProfiles(client).select({ profileId: options.profile });
+    } else if (command === 'intents read') {
+      data = await readIntents(client, { scope: options.scope });
+    } else if (command === 'intents preview') {
+      data = await previewIntent(client, await readCommandFile(options.file));
     } else if (command === 'protocols preview') {
       data = await previewProtocol(client, await readCommandFile(options.file));
     } else if (command === 'runs event') {

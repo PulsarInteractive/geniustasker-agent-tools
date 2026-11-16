@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add bounded personal focus/defer reads and replacement previews to CLI, local MCP and the hosted tool catalogue. Explicit `intent.change` commands reuse current revisions and the immutable command journal; they do not change shared task dates, status or rewards.
+- Document whole-selection replacement, cancellation, target invalidation and the connected owner boundary. Use only when `intent.change` is advertised by the deployment capabilities.
+
 ## 0.1.0-beta.13 — 2026-11-16
 
 - Add personal and project custom metrics with scoped discovery, exact aggregation, observation history, corrections and voids.

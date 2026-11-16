@@ -43,6 +43,7 @@ import {
 } from './profiles.mjs';
 import { changesSchema, watchSchema, readChanges, watchChanges } from './changes.mjs';
 import { protocolPreviewSchema, previewProtocol } from './protocols.mjs';
+import { intentReadSchema, intentPreviewSchema, readIntents, previewIntent } from './intents.mjs';
 import { reportRunEvent, runEventToolSchema } from './run-events.mjs';
 import { resourceReadSchema, metricReadSchema, readResources, readMetrics } from './resources.mjs';
 import {
@@ -285,6 +286,18 @@ export function createMcpServer(client) {
     'Read one bounded page of current changed resources. Start with changeCursor from the final resources page. Apply revisions monotonically, process remove markers and retain nextCursor only after applying the whole page. Omissions are not complete evidence. On restart_read replace the collection from resources.',
     changesSchema,
     (input) => readChanges(client, input),
+  );
+  register(
+    'tasker_intents',
+    'Read the connected owner’s bounded temporary focus/defer instructions for one project. Requires tasks:read. No task status, deadline or claim changes. Read workflow intents first.',
+    intentReadSchema,
+    (input) => readIntents(client, input),
+  );
+  register(
+    'tasker_intent_preview',
+    'Preview exact temporary focus/defer targets and every instruction that would be replaced. Requires tasks:read. Does not write. Preserve epoch, intentRevision, sourceVersion and replaces for one explicit intent.change command; reread after a conflict.',
+    intentPreviewSchema,
+    (input) => previewIntent(client, input),
   );
   register(
     'tasker_protocol_preview',

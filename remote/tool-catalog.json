@@ -318,6 +318,7 @@
             "goal.create",
             "goal.delete",
             "goal.update",
+            "intent.change",
             "memory.create",
             "memory.delete",
             "memory.edge.create",
@@ -410,6 +411,7 @@
             "goal.create",
             "goal.delete",
             "goal.update",
+            "intent.change",
             "memory.create",
             "memory.delete",
             "memory.edge.create",
@@ -542,6 +544,7 @@
             "goal.create",
             "goal.delete",
             "goal.update",
+            "intent.change",
             "memory.create",
             "memory.delete",
             "memory.edge.create",
@@ -1029,6 +1032,7 @@
             "folder.create",
             "folder.delete",
             "folder.update",
+            "intent.change",
             "protocol.apply",
             "protocol.cancel",
             "protocol.publish",
@@ -1450,7 +1454,8 @@
             "planning",
             "protocols",
             "runs",
-            "metrics"
+            "metrics",
+            "intents"
           ]
         }
       },
@@ -1665,5 +1670,110 @@
     "route": "commands",
     "write": true,
     "destructive": true
+  },
+  {
+    "name": "tasker_intents",
+    "title": "Read temporary personal instructions",
+    "description": "Read the connected owner’s bounded focus/defer instructions in one project. Requires tasks:read. No task status, scheduling or claims change. Read workflow intents.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["scope"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]{1,128}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read"],
+    "route": "intents/read",
+    "method": "POST",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_intent_preview",
+    "title": "Preview temporary focus or deferral",
+    "description": "Preview 1–20 exact task targets and every instruction that would be replaced. Read-only. Preserve epoch, intentRevision, sourceVersion and replaces for explicit intent.change. Partial overlap replaces the whole prior instruction. Read workflow intents.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["scope", "selection"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]{1,128}$"
+        },
+        "selection": {
+          "type": "object",
+          "required": ["endsAt", "kind", "objective", "startsAt", "taskIds"],
+          "properties": {
+            "endsAt": {
+              "type": "string"
+            },
+            "kind": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": ["focus"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["defer"]
+                }
+              ]
+            },
+            "objective": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": ["finish"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["unblock"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["consistency"]
+                },
+                {
+                  "type": "string",
+                  "enum": ["pause"]
+                }
+              ]
+            },
+            "startsAt": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "taskIds": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 20,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read"],
+    "route": "intents/preview",
+    "method": "POST",
+    "write": false,
+    "destructive": false
   }
 ]
