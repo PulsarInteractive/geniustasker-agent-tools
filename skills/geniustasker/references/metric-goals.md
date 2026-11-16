@@ -12,8 +12,10 @@ Use `metrics:read` / `metrics:write`; task and ordinary goal grants do not inclu
 these permissions. Configuration also requires current project owner/admin
 rights or the connected personal owner. Use `actor.ownerId` from identity for
 `personal:<owner>`, never another account or a profile ID. The source definition
-must exist in the **same scope**, be unarchived, and express the intended unit
-and aggregation. `metricId` cannot change on an existing goal.
+must exist in the **same scope** and express the intended unit and aggregation.
+Creation and reactivation require an unarchived source; existing goals can still
+be paused or archived while their source is archived, as explained below.
+`metricId` cannot change on an existing goal.
 
 ```sh
 geniustasker metrics list --scope project:PROJECT --id METRIC_UUID --json
@@ -119,6 +121,19 @@ Each read/write uses normal permissions and budgets; no bulk loop is implied.
 `paused:true` retains progress tracking while suppressing automatic completion
 reactions. `archived:true` stops tracking; restoration rebuilds progress before
 reacting. Neither option discards evidence or clears prior completion.
+
+Archiving the **source metric** also parks its goals’ pending scans and scheduled
+checks without discarding progress. You can pause or archive an existing goal,
+and clarify its title or description while keeping it paused/archived. You
+cannot create a new goal, reactivate an archived goal, or change its target,
+comparison, completion rule or window until the source is restored. A
+`metric_paused` refusal is not a reason to reactivate the source without the
+user’s request.
+
+Restoring the source resumes a retained scan cursor or an outstanding `AtEnd`
+boundary. A partial scan cannot complete early, and an `AtEnd` goal waits until
+its boundary. Explicit goal pauses and archives remain in effect; restoration
+does not clear them or reset `completedAt`.
 
 `notifyCompleted` and `coachSignal` are explicit opt-ins; leave them false unless
 requested, and preserve existing choices on update. They describe eligibility,
