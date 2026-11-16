@@ -6,11 +6,13 @@ GeniusTasker project. Discover live capabilities first: `metrics:read` and
 include them. Project configuration also requires the owner or administrator
 and agent contributions enabled. A refusal is not permission to use private APIs.
 
-This surface manages definitions only. Creating one does not ingest
-observations, start a collector, link a goal or install a trigger. Existing
-YouTube/Spotify metrics are a separate feature. State these limits when a user
-asks for an end-to-end automation. Feature activation and package installation
-are separate: use only what the current server advertises.
+Definition creation does not itself record a value. When capabilities advertise
+`metric.record`, `metric.correct` and `metric.void`, use the
+[observation workflow](metrics-observations.md) to record real evidence and retain
+its corrections. These operations do not start a collector, link a goal or
+install a trigger. Existing YouTube/Spotify metrics are separate. Feature
+activation and package installation are separate: use only what the current
+server advertises.
 
 ## Read the right scope
 
@@ -23,6 +25,8 @@ is a separate resource choice; it does not expose other personal account data.
 geniustasker metrics list --scope personal:OWNER --json
 geniustasker metrics list --scope project:PROJECT --json
 geniustasker metrics list --scope project:PROJECT --id METRIC_UUID --json
+geniustasker metrics list --scope project:PROJECT --collection metricObservations --json
+geniustasker metrics list --scope personal:OWNER --collection personalMetricCorrections --json
 geniustasker commands describe --kind metric.create --json
 geniustasker workflow show --topic metrics --json
 ```
@@ -31,9 +35,18 @@ Use the chosen environment/context consistently, including
 `--environment production` for production data. `resources list` also supports
 `metrics` in project scopes and `personalMetrics` in the connected personal
 scope. In MCP prefer `tasker_read_metrics` with that same collection and scope.
+Select `metricObservations` / `personalMetricObservations` for the current
+observations, or `metricCorrections` / `personalMetricCorrections` for previous
+snapshots. The default CLI collection remains definitions for compatibility.
 Read one page at a time; carry `after`, `epoch` and `checkpoint` unchanged for
 continuation. Take the epoch from the returned page, including an empty one.
 Use an exact ID read before editing and preserve unmodified configuration.
+For observation/correction collections, `--metric-id METRIC_UUID` (MCP
+`metricId`) selects one exact definition. Preserve that filter on every page;
+filtered results have `changeCursor:null` and cannot start a filtered change
+stream. Date-window and compound query filters are not exposed. Do not invent
+query parameters or load every page implicitly; request further bounded pages
+only when needed and state when a result is partial.
 
 ## Choose a useful meaning
 
@@ -97,7 +110,8 @@ exact command returned by preparation and pass it to `tasker_edit_metrics`.
 After uncertainty retain the exact operation ID, time and body. Respect retry
 delays. After a revision conflict, reread and decide whether a new edit is still
 appropriate. Do not automatically replace the user's configuration or broaden
-access. A receipt proves persistence, not collection or progress toward a goal.
+access. A definition receipt proves configuration persistence, not collection or
+progress toward a goal.
 
 ## Preserve existing meaning
 
@@ -109,4 +123,4 @@ Descriptive changes do not increment measurement semantics.
 Archive through `configuration.archived:true` with a current revision when the
 definition should be retained. `metric.delete` takes empty `data` and a current
 revision; it is refused when observations exist. No bulk ingestion, history
-deletion or custom-goal operation is implied by these three commands.
+deletion or custom-goal operation is implied by these definition commands.

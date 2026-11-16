@@ -11,11 +11,16 @@ For custom measurement definitions, use `metrics list --scope project:ID --json`
 or `metrics list --scope personal:OWNER --json` (`OWNER` is identity's
 `actor.ownerId`). Current capabilities must advertise the feature and the
 separate `metrics:read` / `metrics:write` grants. `metric.create`,
-`metric.update` and `metric.delete` use the standard `commands prepare/execute/retry`
-journal. MCP exposes `tasker_read_metrics` and `tasker_edit_metrics`.
+`metric.update`, `metric.delete`, `metric.record`, `metric.correct` and
+`metric.void` use the standard `commands prepare/execute/retry` journal.
+MCP exposes `tasker_read_metrics` and `tasker_edit_metrics`.
 Read the [metric configuration guide](../skills/geniustasker/references/metrics.md)
 or `workflow show --topic metrics --json` before choosing the measurement meaning.
-These commands do not yet ingest observations, link custom goals or collect data.
+For observations or previous correction snapshots, choose `--collection`
+explicitly; definitions remain the default. Read the
+[observation guide](../skills/geniustasker/references/metrics-observations.md)
+before recording or correcting evidence. These commands do not create custom
+goal links or automatic collectors.
 
 ## Task protocols
 

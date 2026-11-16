@@ -9,7 +9,7 @@ import Ajv from 'ajv';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { CommandJournal, validateCommand, commandHelp } from '../src/commands.mjs';
-import { readResources, readMetrics } from '../src/resources.mjs';
+import { readResources, readMetrics, metricCollections } from '../src/resources.mjs';
 import { readChanges } from '../src/changes.mjs';
 import { credentials } from '../src/client.mjs';
 import { main } from '../src/cli.mjs';
@@ -224,10 +224,10 @@ test('remote metric tools require their own grants and do not admit unrelated co
   assert.ok(edit);
   assert.deepEqual(read.scopes, ['metrics:read']);
   assert.deepEqual(edit.scopes, ['metrics:write']);
-  assert.deepEqual([...read.inputSchema.properties.collection.enum].sort(), [
-    'metrics',
-    'personalMetrics',
-  ]);
+  assert.deepEqual(
+    [...read.inputSchema.properties.collection.enum].sort(),
+    [...metricCollections].sort(),
+  );
   assert.equal(read.route, 'resources');
   assert.notEqual(read.write, true);
   assert.equal(edit.route, 'commands');

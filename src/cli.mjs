@@ -73,8 +73,8 @@ export const commands = {
   },
   'metrics list': {
     summary:
-      'Read bounded custom metric definitions in one project or the connected personal scope; requires metrics:read.',
-    options: ['scope', 'id', 'after', 'epoch', 'checkpoint', 'archive'],
+      'Read one bounded page of custom metric definitions (default), observations or corrections. Select --collection; requires metrics:read.',
+    options: ['scope', 'collection', 'id', 'metric-id', 'after', 'epoch', 'checkpoint', 'archive'],
   },
   'media compare': {
     summary: 'Compare a local file with an existing resource before uploading a replacement.',
@@ -144,7 +144,17 @@ export const commands = {
   },
   'resources list': {
     summary: 'Read a project or memory collection; carry epoch/checkpoint when continuing.',
-    options: ['scope', 'collection', 'after', 'epoch', 'checkpoint', 'archive', 'id', 'path'],
+    options: [
+      'scope',
+      'collection',
+      'after',
+      'epoch',
+      'checkpoint',
+      'archive',
+      'id',
+      'path',
+      'metric-id',
+    ],
   },
   'changes list': {
     summary:
@@ -525,11 +535,13 @@ export async function main(
       const input = Object.fromEntries(
         commands[command].options
           .filter((key) => options[key] !== undefined)
-          .map((key) => [key, options[key]]),
+          .map((key) => [key === 'metric-id' ? 'metricId' : key, options[key]]),
       );
       data = await readMetrics(client, {
         ...input,
-        collection: options.scope?.startsWith('personal:') ? 'personalMetrics' : 'metrics',
+        collection:
+          options.collection ??
+          (options.scope?.startsWith('personal:') ? 'personalMetrics' : 'metrics'),
       });
     } else if (command === 'resources list' || command === 'questions answers') {
       if (
@@ -542,13 +554,13 @@ export async function main(
       ) {
         fail(
           'invalid_arguments',
-          'Use --scope project:ID or memory:ID and --collection for resources or --question for answers; personal:<connected-owner> is limited to personalMetrics. Continuation needs --epoch and --checkpoint.',
+          'Use --scope project:ID or memory:ID and --collection for resources or --question for answers; personal:<connected-owner> is limited to metric definitions, observations and corrections. Continuation needs --epoch and --checkpoint.',
         );
       }
       const input = Object.fromEntries(
         commands[command].options
           .filter((key) => options[key] !== undefined)
-          .map((key) => [key, options[key]]),
+          .map((key) => [key === 'metric-id' ? 'metricId' : key, options[key]]),
       );
       data =
         command === 'resources list'

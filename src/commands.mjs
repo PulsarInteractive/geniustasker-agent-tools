@@ -38,6 +38,15 @@ export const commandSchema = z
   })
   .strict();
 export const draftSchema = commandSchema.omit({ operationId: true, issuedAt: true });
+export const metricCommandSchema = commandSchema
+  .extend({
+    kind: z.enum(
+      Object.entries(catalog.commands)
+        .filter(([, definition]) => definition.permission === 'metrics:write')
+        .map(([kind]) => kind),
+    ),
+  })
+  .strict();
 const canonical = (value) =>
   JSON.stringify(value, (_, item) =>
     item && typeof item === 'object' && !Array.isArray(item)

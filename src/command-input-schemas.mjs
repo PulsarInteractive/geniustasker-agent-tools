@@ -1,5 +1,71 @@
 // Generated public command data schemas. Do not edit by hand.
 export default {
+  "metric.correct": {
+    "type": "object",
+    "required": [
+      "measurement",
+      "observedAt",
+      "reason"
+    ],
+    "properties": {
+      "observedAt": {
+        "type": "string"
+      },
+      "measurement": {
+        "type": "object",
+        "required": [
+          "denominator",
+          "numerator",
+          "value"
+        ],
+        "properties": {
+          "denominator": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "numerator": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": -1000000000,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false
+  },
   "metric.create": {
     "type": "object",
     "required": [
@@ -94,6 +160,87 @@ export default {
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "metric.record": {
+    "type": "object",
+    "required": [
+      "measurement",
+      "measurementVersion",
+      "metricId",
+      "observedAt",
+      "sourceKey",
+      "sourceLabel"
+    ],
+    "properties": {
+      "metricId": {
+        "type": "string"
+      },
+      "measurementVersion": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "sourceKey": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "sourceLabel": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "observedAt": {
+        "type": "string"
+      },
+      "measurement": {
+        "type": "object",
+        "required": [
+          "denominator",
+          "numerator",
+          "value"
+        ],
+        "properties": {
+          "denominator": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "numerator": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": -1000000000,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -198,6 +345,20 @@ export default {
           }
         },
         "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "metric.void": {
+    "type": "object",
+    "required": [
+      "reason"
+    ],
+    "properties": {
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
       }
     },
     "additionalProperties": false

@@ -18,6 +18,7 @@ import * as z from 'zod/v4';
 import {
   CommandJournal,
   commandSchema,
+  metricCommandSchema,
   draftSchema,
   operationIdSchema,
   commandHelp,
@@ -242,7 +243,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_read_metrics',
-    'Read one page or exact custom metric definition with metrics:read. Use metrics in project:<id> or personalMetrics in personal:<connected-owner>. Preserve epoch/revision; current grants are revalidated. Definitions do not record observations or link goals.',
+    'Read one page or exact custom metric definition, observation or correction with metrics:read. Use the matching project or personal collection; personal scope is the connected owner only. Preserve epoch/checkpoint and revisions. No implicit full history loading; corrections are previous snapshots, not additional measurements to sum.',
     metricReadSchema,
     (input) => readMetrics(client, input),
   );
@@ -327,10 +328,8 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_edit_metrics',
-    'Execute one immutable metric.create/update/delete with metrics:write under the same journal, permissions and quotas as generic commands. Read tasker_workflow metrics and command help first. Supply the complete configuration for create/update; do not invent observations or alter measurement semantics implicitly. Retry the saved operation unchanged after uncertainty.',
-    commandSchema
-      .extend({ kind: z.enum(['metric.create', 'metric.update', 'metric.delete']) })
-      .strict(),
+    'Execute one immutable metric definition or observation command with metrics:write and current native rights. Read workflow metrics and command help first. record needs a stable sourceKey and actual observedAt; correct/void target an existing observation revision and require a reason. Corrections preserve history. Same journal and quotas; retry the exact saved operation after uncertainty. Never invent measurements or bypass a duplicate source key.',
+    metricCommandSchema,
     (input) => journal.execute(input),
     true,
   );

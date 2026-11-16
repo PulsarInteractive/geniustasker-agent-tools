@@ -329,6 +329,18 @@ export default {
       "module": "Memory/$",
       "permission": "memory:write"
     },
+    "metric.correct": {
+      "action": "correctMetric",
+      "fields": [
+        "observedAt",
+        "measurement",
+        "reason"
+      ],
+      "inputSchema": "GeniusTasker.Metrics.Correct",
+      "module": "Project/ProjectMetricObservation",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricObservation"
+    },
     "metric.create": {
       "action": "configureMetric",
       "create": true,
@@ -347,6 +359,22 @@ export default {
       "permission": "metrics:write",
       "personalModule": "LocalUser/LocalUserMetricDefinition"
     },
+    "metric.record": {
+      "action": "recordMetric",
+      "create": true,
+      "fields": [
+        "metricId",
+        "measurementVersion",
+        "sourceKey",
+        "sourceLabel",
+        "observedAt",
+        "measurement"
+      ],
+      "inputSchema": "GeniusTasker.Metrics.Record",
+      "module": "Project/ProjectMetricObservation",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricObservation"
+    },
     "metric.update": {
       "action": "configureMetric",
       "fields": [
@@ -356,6 +384,16 @@ export default {
       "module": "Project/ProjectMetricDefinition",
       "permission": "metrics:write",
       "personalModule": "LocalUser/LocalUserMetricDefinition"
+    },
+    "metric.void": {
+      "action": "voidMetric",
+      "fields": [
+        "reason"
+      ],
+      "inputSchema": "GeniusTasker.Metrics.Void",
+      "module": "Project/ProjectMetricObservation",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricObservation"
     },
     "project.create": {
       "create": true,

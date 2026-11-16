@@ -14,28 +14,48 @@ export const resourceReadSchema = z
     epoch: z.string().max(4096).optional(),
     checkpoint: z.string().max(4096).optional(),
     id: z.string().min(1).max(128).optional(),
+    metricId: z
+      .string()
+      .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/)
+      .optional(),
     path: z.string().min(1).max(512).optional(),
     archive: z.enum(['active', 'archived', 'all']).optional(),
   })
   .strict();
+export const projectMetricCollections = ['metrics', 'metricObservations', 'metricCorrections'];
+export const personalMetricCollections = [
+  'personalMetrics',
+  'personalMetricObservations',
+  'personalMetricCorrections',
+];
+export const metricCollections = [...projectMetricCollections, ...personalMetricCollections];
+export const metricHistoryCollections = metricCollections.filter(
+  (collection) => collection !== 'metrics' && collection !== 'personalMetrics',
+);
 export const metricReadSchema = resourceReadSchema
   .omit({ path: true })
   .extend({
-    collection: z.enum(['metrics', 'personalMetrics']),
+    collection: z.enum(metricCollections),
   })
   .strict();
 
 /** Personal access is an explicit metric surface, never a generic account read.
  * Current owner, grant and project rights are always checked by the server. */
-export function validateResourceScope({ scope, collection }) {
+export function validateResourceScope({ scope, collection, metricId }) {
   if (
-    (scope.startsWith('personal:') && collection !== 'personalMetrics') ||
-    (collection === 'personalMetrics' && !scope.startsWith('personal:')) ||
-    (collection === 'metrics' && !scope.startsWith('project:'))
+    (scope.startsWith('personal:') && !personalMetricCollections.includes(collection)) ||
+    (personalMetricCollections.includes(collection) && !scope.startsWith('personal:')) ||
+    (projectMetricCollections.includes(collection) && !scope.startsWith('project:'))
   ) {
     fail(
       'invalid_arguments',
-      'Use project:<id> with metrics, or personal:<connected-owner> with personalMetrics. Other personal collections are not exposed.',
+      'Use metric definitions, observations or corrections in their matching project or connected personal scope. Other personal collections are not exposed.',
+    );
+  }
+  if (metricId !== undefined && !metricHistoryCollections.includes(collection)) {
+    fail(
+      'invalid_arguments',
+      'metricId filters observations or correction snapshots only; use id for an exact definition.',
     );
   }
 }
@@ -62,7 +82,7 @@ export async function readMetrics(client, input) {
   if (!parsed.success) {
     fail(
       'invalid_arguments',
-      'Read metrics or personalMetrics with the matching scope and bounded continuation.',
+      'Read a declared metric definition, observation or correction collection with the matching scope and bounded continuation.',
     );
   }
   return readResources(client, parsed.data);

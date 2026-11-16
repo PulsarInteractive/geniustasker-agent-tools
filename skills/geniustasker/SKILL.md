@@ -1,6 +1,6 @@
 ---
 name: geniustasker
-description: Read and update GeniusTasker projects, tickets, goals, comments and custom metric definitions through a connected CLI or MCP session. Use when the user asks to inspect, carry out, record or resume work tracked in GeniusTasker, or define its personal or project measurements. Discover current capabilities and keep writes inside the user request and delegated permissions.
+description: Read and update GeniusTasker projects, tickets, goals, comments and custom metrics through a connected CLI or MCP session. Use when the user asks to inspect, carry out, record or resume work tracked in GeniusTasker, or define, record and correct its personal or project measurements. Discover current capabilities and keep writes inside the user request and delegated permissions.
 ---
 
 GeniusTasker is the shared record of progress. The agent runs in the user's own
@@ -111,7 +111,7 @@ project/ticket and distinguish completed work, validation and remaining work.
 
 ## Specialized workflows
 
-- For custom personal or project measurement definitions, read [Custom metrics](references/metrics.md). Use dedicated metric grants and preserve measurement meaning; definition management does not imply observations, goal links or automatic collection.
+- For custom personal or project measurements, read [Custom metrics](references/metrics.md), then [Observations and corrections](references/metrics-observations.md) when recording evidence. Use dedicated grants, preserve event identity and meaning, and do not count correction snapshots as additional observations. Goal links and automatic collection remain separate capabilities.
 
 - For coordinated agent work on a task, read [Agent runs](references/agent-runs.md). Claim explicitly, report real observations, distinguish stale signals from blockers, and honor human takeover. For explicit host callbacks, use [host events](references/host-events.md); installation alone does not monitor your process.
 
