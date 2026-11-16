@@ -4,6 +4,26 @@ Choose either direct MCP configuration or the plugin bundle, to avoid registerin
 the same server twice. Authenticate once per chosen local context. Permissions
 are selected in the browser and enforced by the service on every request.
 
+## Choose the environment
+
+The beta CLI and shipped plugin/MCP examples default to development. Production
+access is enabled for admitted accounts and uses the same data as TestFlight.
+For production, use a separate context and include `--environment production`
+in both login and the MCP server arguments. Context names do not select an
+environment; existing development sessions stay separate. Never switch an
+environment or replace a connection just to get around an access refusal.
+
+For example, to connect a production context to a direct Codex MCP server:
+
+```sh
+npx -y @pulsarinteractive/geniustasker@0.1.0-beta.12 auth login --environment production --context tasker-beta
+codex mcp add geniustasker-production -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.12 mcp --environment production --context tasker-beta
+```
+
+Use either this configuration or the development example below for the intended
+account. If intentionally keeping both, name them distinctly and verify identity
+before working. Adding the production example does not retarget a bundled plugin.
+
 ## Codex: direct MCP
 
 ```sh
@@ -39,6 +59,9 @@ without skills, and skills can use the CLI when an MCP host is not configured.
 The root `plugin.json` and `mcp.json` follow Agent Plugins 1.0.0. The bundled MCP
 runs locally over stdio and pins a published npm version. Node and npm must be
 available in the execution environment. Authenticate the `work` context first.
+Its shipped arguments target development; for production, use a host-supported
+configuration override or the explicit direct MCP configuration above. Do not
+assume that a production login changes the plugin's environment.
 
 The repository also has `.agents/plugins/marketplace.json` for local distribution:
 

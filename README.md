@@ -19,6 +19,13 @@ Sign in in the browser, select your projects or memories, then approve the reque
 permissions. The terminal connects automatically. No token to copy.
 Installing the package does not grant application access.
 
+The beta CLI and bundled local MCP examples default to **development**.
+Production access is enabled for admitted accounts and is the environment used
+by TestFlight. To work with that data, use `--environment production` and a
+separate context at login and on subsequent commands and MCP configuration.
+See [environment selection](docs/CLI.md#install-and-connect); a context name
+alone does not change the environment.
+
 ## What you can do
 
 | Area                | Features                                                       |

@@ -13,6 +13,13 @@ Use `geniustasker whoami --json` and `geniustasker capabilities --json`, or MCP
 environment throughout the task. Never infer an account, project ID, field,
 permission or writable operation from a previous session.
 
+The beta CLI and bundled local MCP default to development. Production is enabled
+for admitted accounts and is the environment used by TestFlight. When the user
+intends that data, use an explicitly chosen production context with
+`--environment production` on login, every CLI command and MCP server arguments.
+A context name alone does not select an environment. Verify identity and do not
+switch environments or replace existing connections to work around a refusal.
+
 If not connected, tell the user to run `geniustasker auth login` in their
 terminal. They choose the projects and permissions in the application. Do not
 collect their password, copy tokens into your context, approve consent for them,

@@ -6,7 +6,10 @@ description: Read and maintain GeniusTasker Memory documents and Graph relations
 Memory belongs to the account and is independent of projects. Use the user's
 selected context and environment; discover identity and capabilities first.
 If no session exists, ask the user to run `geniustasker auth login --context work`
-in their terminal. The browser lets them select resources and permissions.
+in their terminal with the intended environment. The beta defaults to development;
+TestFlight data requires `--environment production` at login and on subsequent
+CLI/MCP invocations. Use a distinct context; its name alone does not select an
+environment. The browser lets them select resources and permissions.
 Do not collect passwords or tokens, approve your own consent, or edit credentials.
 
 ## Navigate without loading the entire corpus

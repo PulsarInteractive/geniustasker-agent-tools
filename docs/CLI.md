@@ -46,10 +46,28 @@ permissions, then approve the connection. The CLI receives a one-use code with
 PKCE; it never asks for your password. The consent page does not load the app tutorial. Decline there or use Ctrl-C to stop.
 If the browser cannot open, use the link printed in your terminal.
 
-**This beta defaults to the development environment.** Your account must be
-admitted to the beta; installing the package does not grant access. Production
-agent access is closed. Use `--environment production` only when that rollout is
-announced. No subscription purchase is performed by the CLI.
+**This beta defaults to the development environment.** Production agent access
+is enabled for admitted accounts; installation alone does not grant access in
+either environment. Account admission, project membership, subscription and
+browser consent still apply. No subscription purchase is performed by the CLI.
+
+TestFlight uses production. To work on that same application's data, choose a
+separate context and pass `--environment production` at login **and on every
+subsequent CLI or local MCP invocation**:
+
+```sh
+geniustasker auth login --environment production --context tasker-beta --browser chrome
+geniustasker whoami --environment production --context tasker-beta --json
+geniustasker projects list --environment production --context tasker-beta --json
+geniustasker mcp --environment production --context tasker-beta
+```
+
+A context name does not select an environment. Existing development sessions do
+not become production sessions, and changing an environment does not migrate
+records or expand consent. Keep the chosen environment/context in the host's
+MCP arguments too. Inspect identity before making changes; an empty project
+list is not a reason to switch accounts or environments automatically. Use the
+same flags for logout when revoking that connection.
 
 For a remote machine, use `geniustasker auth login --flow device --no-browser`.
 For Chrome specifically, use `--browser chrome`. `--context work` creates a

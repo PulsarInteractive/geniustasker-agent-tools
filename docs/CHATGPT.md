@@ -2,6 +2,12 @@
 
 Use the hosted MCP connector to work with GeniusTasker from ChatGPT. Your computer does not need to run the CLI. Access still requires an admitted GeniusTasker account.
 
+The URL below targets production, where agent access is enabled for admitted
+accounts. This is the same environment used by TestFlight. Sign in with the
+intended account and review its resource permissions. The beta CLI's development
+default does not change this hosted connector's environment, and connecting a
+custom server does not imply approval in OpenAI's public directory.
+
 ## Connect your account
 
 1. In ChatGPT on the web, open **Plugins → Add → Add custom MCP server**.
