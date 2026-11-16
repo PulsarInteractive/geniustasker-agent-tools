@@ -26,7 +26,7 @@ export const commandSchema = z
       .string()
       .max(256)
       // eslint-disable-next-line no-control-regex -- Reject control characters in untrusted input.
-      .regex(/^(project|memory):[^\u0000-\u001f]+$/u),
+      .regex(/^(project|memory|personal):[^\u0000-\u001f]+$/u),
     epoch: identifier,
     id: identifier,
     expectedRevision: z
@@ -72,12 +72,20 @@ export function validateCommand(value) {
       'Use the declared command fields and size limit. Creation requires a null revision; other commands require the current record revision.',
     );
   }
-  const prefix = definition.module.startsWith('Memory/') ? 'memory:' : 'project:';
+  const prefix =
+    command.scope.startsWith('personal:') && definition.personalModule
+      ? 'personal:'
+      : definition.module.startsWith('Memory/')
+        ? 'memory:'
+        : 'project:';
   if (
     !command.scope.startsWith(prefix) ||
     (definition.module.endsWith('/$') && command.id !== command.scope.slice(prefix.length))
   ) {
-    fail('invalid_arguments', 'The command must target the matching project or memory scope.');
+    fail(
+      'invalid_arguments',
+      'Use the matching project or memory scope. Only declared personal metric commands may target personal:<connected-owner>.',
+    );
   }
   if (
     ['memory.create', 'project.create'].includes(command.kind) &&

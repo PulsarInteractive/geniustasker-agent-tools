@@ -52,7 +52,9 @@ test('a fully granted profile accepts the current approval permission without a 
   };
   const result = await profiles.create(input);
   assert.ok(result.grant.permissions.includes('approvals:write'));
-  assert.equal(result.grant.permissions.length, 13);
+  assert.ok(result.grant.permissions.includes('metrics:read'));
+  assert.ok(result.grant.permissions.includes('metrics:write'));
+  assert.deepEqual(result.grant.permissions, catalog.grants.permissions);
   for (const permissions of [
     [...input.grant.permissions, 'unknown:write'],
     ['tasks:read', 'tasks:read'],

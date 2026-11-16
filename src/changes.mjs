@@ -4,14 +4,11 @@ import { AgentClient } from './client.mjs';
 import { Transport } from './transport.mjs';
 import catalog from './command-catalog.mjs';
 import { fail } from './errors.mjs';
+import { resourceScopeSchema, validateResourceScope } from './resources.mjs';
 
 export const changesSchema = z
   .object({
-    scope: z
-      .string()
-      .max(256)
-      // eslint-disable-next-line no-control-regex -- Reject control characters in untrusted input.
-      .regex(/^(project|memory):[^\u0000-\u001f]+$/u),
+    scope: resourceScopeSchema,
     collection: z.string().min(1).max(32),
     cursor: z.string().min(1).max(4096),
   })
@@ -59,6 +56,7 @@ function query(input, schema) {
       'Use a project or memory scope, collection and unchanged change cursor; waitSeconds must be within the supported bound.',
     );
   }
+  validateResourceScope(parsed.data);
   return parsed.data;
 }
 /** Validate the entire bounded page before a caller can adopt its next cursor. */

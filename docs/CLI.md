@@ -5,6 +5,18 @@ comment, ask questions and keep a useful handoff. Your account and project
 permissions remain the limit. GeniusTasker does not run your agent or bill its
 external model tokens.
 
+## Custom metric definitions
+
+For custom measurement definitions, use `metrics list --scope project:ID --json`
+or `metrics list --scope personal:OWNER --json` (`OWNER` is identity's
+`actor.ownerId`). Current capabilities must advertise the feature and the
+separate `metrics:read` / `metrics:write` grants. `metric.create`,
+`metric.update` and `metric.delete` use the standard `commands prepare/execute/retry`
+journal. MCP exposes `tasker_read_metrics` and `tasker_edit_metrics`.
+Read the [metric configuration guide](../skills/geniustasker/references/metrics.md)
+or `workflow show --topic metrics --json` before choosing the measurement meaning.
+These commands do not yet ingest observations, link custom goals or collect data.
+
 ## Task protocols
 
 Discover `taskTemplates`, `protocolInstances` and the `protocol.*` commands in

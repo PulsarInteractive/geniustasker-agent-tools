@@ -43,6 +43,7 @@ import {
 import { changesSchema, watchSchema, readChanges, watchChanges } from './changes.mjs';
 import { protocolPreviewSchema, previewProtocol } from './protocols.mjs';
 import { reportRunEvent, runEventToolSchema } from './run-events.mjs';
+import { resourceReadSchema, metricReadSchema, readResources, readMetrics } from './resources.mjs';
 import {
   searchSchema,
   graphSchema,
@@ -236,23 +237,14 @@ export function createMcpServer(client) {
   register(
     'tasker_resources',
     'Read a discovered project collection or memory/pages from an independent memory scope. When advertised, projectDocumentIndex lists project titles/folders and projectDocuments with id reads one document; documents contains task attachments. For Memory, pageIndex gives a light navigation list; pages with id or path fetches one document without a change cursor. Carry epoch and checkpoint from the first page; restart on context_changed.',
-    z
-      .object({
-        scope: z
-          .string()
-          .max(256)
-          // eslint-disable-next-line no-control-regex -- Reject control characters in untrusted input.
-          .regex(/^(project|memory):[^\u0000-\u001f]+$/u),
-        collection: z.string().min(1).max(32),
-        after: z.string().max(4096).optional(),
-        epoch: z.string().max(4096).optional(),
-        checkpoint: z.string().max(4096).optional(),
-        id: z.string().min(1).max(128).optional(),
-        path: z.string().min(1).max(512).optional(),
-        archive: z.enum(['active', 'archived', 'all']).optional(),
-      })
-      .strict(),
-    (input) => client.get('resources', input),
+    resourceReadSchema,
+    (input) => readResources(client, input),
+  );
+  register(
+    'tasker_read_metrics',
+    'Read one page or exact custom metric definition with metrics:read. Use metrics in project:<id> or personalMetrics in personal:<connected-owner>. Preserve epoch/revision; current grants are revalidated. Definitions do not record observations or link goals.',
+    metricReadSchema,
+    (input) => readMetrics(client, input),
   );
   register(
     'tasker_question_answers',
@@ -330,6 +322,15 @@ export function createMcpServer(client) {
     'tasker_execute_command',
     'Execute a complete immutable task/ticket/comment/goal/memory command within current grant, owner rights and project agent mode. Journals before sending. No automatic retry. A timeout may follow a commit; retry the exact saved operation.',
     commandSchema,
+    (input) => journal.execute(input),
+    true,
+  );
+  register(
+    'tasker_edit_metrics',
+    'Execute one immutable metric.create/update/delete with metrics:write under the same journal, permissions and quotas as generic commands. Read tasker_workflow metrics and command help first. Supply the complete configuration for create/update; do not invent observations or alter measurement semantics implicitly. Retry the saved operation unchanged after uncertainty.',
+    commandSchema
+      .extend({ kind: z.enum(['metric.create', 'metric.update', 'metric.delete']) })
+      .strict(),
     (input) => journal.execute(input),
     true,
   );

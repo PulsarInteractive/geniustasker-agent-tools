@@ -329,6 +329,34 @@ export default {
       "module": "Memory/$",
       "permission": "memory:write"
     },
+    "metric.create": {
+      "action": "configureMetric",
+      "create": true,
+      "fields": [
+        "configuration"
+      ],
+      "inputSchema": "GeniusTasker.Metrics.Configure",
+      "module": "Project/ProjectMetricDefinition",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricDefinition"
+    },
+    "metric.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Project/ProjectMetricDefinition",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricDefinition"
+    },
+    "metric.update": {
+      "action": "configureMetric",
+      "fields": [
+        "configuration"
+      ],
+      "inputSchema": "GeniusTasker.Metrics.Configure",
+      "module": "Project/ProjectMetricDefinition",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricDefinition"
+    },
     "project.create": {
       "create": true,
       "fields": [
@@ -749,6 +777,8 @@ export default {
       "approvals:write",
       "goals:read",
       "goals:write",
+      "metrics:read",
+      "metrics:write",
       "memory:read",
       "memory:write",
       "media:read",

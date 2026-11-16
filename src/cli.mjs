@@ -18,6 +18,7 @@ import { readMemoryTree, readMemoryMarkdown } from './documentation.mjs';
 import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
 import { previewProtocol } from './protocols.mjs';
 import { reportRunEvent } from './run-events.mjs';
+import { readResources, readMetrics } from './resources.mjs';
 import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 import { checkUpdate, installUpdate, maybeNotifyUpdate } from './update.mjs';
@@ -69,6 +70,11 @@ export const commands = {
   'memories list': {
     summary: 'List independent account memories; follow nextAfter even for an empty page.',
     options: ['after'],
+  },
+  'metrics list': {
+    summary:
+      'Read bounded custom metric definitions in one project or the connected personal scope; requires metrics:read.',
+    options: ['scope', 'id', 'after', 'epoch', 'checkpoint', 'archive'],
   },
   'media compare': {
     summary: 'Compare a local file with an existing resource before uploading a replacement.',
@@ -515,28 +521,39 @@ export async function main(
           ...(input.block === undefined ? {} : { blockId: input.block }),
         });
       }
+    } else if (command === 'metrics list') {
+      const input = Object.fromEntries(
+        commands[command].options
+          .filter((key) => options[key] !== undefined)
+          .map((key) => [key, options[key]]),
+      );
+      data = await readMetrics(client, {
+        ...input,
+        collection: options.scope?.startsWith('personal:') ? 'personalMetrics' : 'metrics',
+      });
     } else if (command === 'resources list' || command === 'questions answers') {
       if (
         !(command === 'questions answers'
           ? options.scope?.startsWith('project:')
           : // eslint-disable-next-line no-control-regex -- Reject control characters in untrusted input.
-            /^(project|memory):[^\u0000-\u001f]+$/.test(options.scope ?? '')) ||
+            /^(project|memory|personal):[^\u0000-\u001f]+$/.test(options.scope ?? '')) ||
         !(command === 'resources list' ? options.collection : options.question) ||
         (options.after && (!options.epoch || !options.checkpoint))
       ) {
         fail(
           'invalid_arguments',
-          'Use --scope project:ID or memory:ID and --collection for resources or --question for answers; continuation needs --epoch and --checkpoint.',
+          'Use --scope project:ID or memory:ID and --collection for resources or --question for answers; personal:<connected-owner> is limited to personalMetrics. Continuation needs --epoch and --checkpoint.',
         );
       }
-      data = await client.get(
-        command === 'resources list' ? 'resources' : 'answers',
-        Object.fromEntries(
-          commands[command].options
-            .filter((key) => options[key] !== undefined)
-            .map((key) => [key, options[key]]),
-        ),
+      const input = Object.fromEntries(
+        commands[command].options
+          .filter((key) => options[key] !== undefined)
+          .map((key) => [key, options[key]]),
       );
+      data =
+        command === 'resources list'
+          ? await readResources(client, input)
+          : await client.get('answers', input);
     } else if (command === 'mcp') {
       const { runMcp } = await import('./mcp.mjs');
       const server = await runMcp(client);

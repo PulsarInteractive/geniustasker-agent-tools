@@ -1,5 +1,207 @@
 // Generated public command data schemas. Do not edit by hand.
 export default {
+  "metric.create": {
+    "type": "object",
+    "required": [
+      "configuration"
+    ],
+    "properties": {
+      "configuration": {
+        "type": "object",
+        "required": [
+          "aggregation",
+          "archived",
+          "description",
+          "freshnessSeconds",
+          "key",
+          "kind",
+          "paused",
+          "precision",
+          "ratioScale",
+          "title",
+          "unit",
+          "writers"
+        ],
+        "properties": {
+          "aggregation": {
+            "type": "string",
+            "enum": [
+              "Latest",
+              "Sum",
+              "Mean",
+              "Ratio"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "freshnessSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 60,
+                "maximum": 31536000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 48,
+            "pattern": "^[a-z][a-z0-9_-]{0,47}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "Gauge",
+              "Counter",
+              "Ratio"
+            ]
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "precision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "ratioScale": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24
+          },
+          "writers": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "metric.update": {
+    "type": "object",
+    "required": [
+      "configuration"
+    ],
+    "properties": {
+      "configuration": {
+        "type": "object",
+        "required": [
+          "aggregation",
+          "archived",
+          "description",
+          "freshnessSeconds",
+          "key",
+          "kind",
+          "paused",
+          "precision",
+          "ratioScale",
+          "title",
+          "unit",
+          "writers"
+        ],
+        "properties": {
+          "aggregation": {
+            "type": "string",
+            "enum": [
+              "Latest",
+              "Sum",
+              "Mean",
+              "Ratio"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "freshnessSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 60,
+                "maximum": 31536000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 48,
+            "pattern": "^[a-z][a-z0-9_-]{0,47}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "Gauge",
+              "Counter",
+              "Ratio"
+            ]
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "precision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "ratioScale": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24
+          },
+          "writers": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
   "protocol.apply": {
     "type": "object",
     "required": [

@@ -90,10 +90,12 @@
             "history",
             "members",
             "memory",
+            "metrics",
             "nodeIndex",
             "nodes",
             "pageIndex",
             "pages",
+            "personalMetrics",
             "preparedLists",
             "project",
             "projectDocumentIndex",
@@ -315,6 +317,9 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "metric.create",
+            "metric.delete",
+            "metric.update",
             "project.create",
             "project.delete",
             "project.features",
@@ -398,6 +403,9 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "metric.create",
+            "metric.delete",
+            "metric.update",
             "project.create",
             "project.delete",
             "project.features",
@@ -521,6 +529,9 @@
             "memory.page.delete",
             "memory.page.update",
             "memory.update",
+            "metric.create",
+            "metric.delete",
+            "metric.update",
             "project.create",
             "project.delete",
             "project.features",
@@ -1407,7 +1418,8 @@
             "graph",
             "planning",
             "protocols",
-            "runs"
+            "runs",
+            "metrics"
           ]
         }
       },
@@ -1481,5 +1493,120 @@
     "method": "POST",
     "write": false,
     "destructive": false
+  },
+  {
+    "name": "tasker_read_metrics",
+    "title": "Read custom metric definitions",
+    "description": "Read one bounded page or exact custom metric definition. Use metrics for a project scope or personalMetrics for the owner personal scope. Read workflow metrics first. This does not read other personal data or observation history.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "enum": ["metrics", "personalMetrics"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "archive": {
+          "type": "string",
+          "enum": ["active", "archived", "all"]
+        }
+      },
+      "required": ["scope", "collection"],
+      "additionalProperties": false
+    },
+    "scopes": ["metrics:read"],
+    "route": "resources"
+  },
+  {
+    "name": "tasker_edit_metrics",
+    "title": "Apply custom metric definition changes",
+    "description": "Apply an exact immutable metric.create, metric.update or metric.delete command prepared for a project or the owner personal scope. Requires metrics:write and existing native ownership or project administration. This configures definitions; it does not record observations or create goal links.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["metric.create", "metric.delete", "metric.update"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["metrics:write"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
   }
 ]
