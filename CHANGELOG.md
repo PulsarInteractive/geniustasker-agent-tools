@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.0-beta.12 — 2026-11-16
+
+- Add an opt-in host event adapter to CLI/local MCP with stable IDs/times, prepare-only support and the normal immutable journal. Process exit requests review, never task completion; no process/log capture or automatic polling.
+- Clarify Memory cooperation, hosted versus local retries and server-owned latest-agent attribution; preserve concurrent contributions after explicit revision conflicts.
+
+- Agent run workflows document explicit claims, real checkpoints, fenced task patches and truthful completion across CLI and MCP.
+
+- Protocol command help now includes filtered, generated nested schemas, nullability and limits in the CLI and local MCP, with an explicit publish example.
+
+- Add task protocol preview to CLI/local MCP and the hosted tool catalogue, with a read-only POST, digest-bound pagination, explicit 20-step apply commands and a shared protocol workflow.
+
+- Explain impact-based task importance, short reasons for agent-classified Important/Critical work, preservation of human choices and the same workflow across CLI/local MCP/hosted guides. Field availability is discovered from the service; this is not a claim of Flutter notification-threshold delivery.
+- Discover updates at most once per UTC day and installed version in interactive terminals, with bounded anonymous npm checks and an opt-out. JSON, MCP, CI and local-only commands do not check automatically.
+- Add `update check` and explicit `update install` with beta/stable channel selection. Global npm installation is verified before and after the update; local/npx/managed copies receive manual guidance.
+- Keep simultaneous CLI commands and long-lived MCP servers protected from installation through per-process activity leases. Credentials and immutable operation journals are unchanged.
+
 ## 0.1.0-beta.11 — 2026-10-26
 
 - Update the transitive URI parser to its patched 3.1.9 release.

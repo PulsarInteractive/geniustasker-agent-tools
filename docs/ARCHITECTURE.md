@@ -19,19 +19,21 @@ flowchart LR
 
 ## Module responsibilities
 
-| Module                | Responsibility                                                              |
-| --------------------- | --------------------------------------------------------------------------- |
-| `cli.mjs`             | Argument validation, context/environment selection, output and exit status  |
-| `login.mjs`           | Browser PKCE consent, loopback callback validation and optional device flow |
-| `store.mjs`           | Private local files, atomic replacement and inter-process locking           |
-| `client.mjs`          | Origin-bound sessions, serialized renewal, profile selection and reads      |
-| `transport.mjs`       | Allowed origins/routes, timeouts, size limits and sanitized API failures    |
-| `commands.mjs`        | Validated command envelopes and durable immutable operation journals        |
-| `profiles.mjs`        | Bounded profile discovery, creation, restriction and selection              |
-| `changes.mjs`         | Validated incremental reads and bounded, cancellable waits                  |
-| `mcp.mjs`             | Strict tool schemas and protocol-safe responses over stdio                  |
-| `errors.mjs`          | Stable errors, safe serialization and CLI exit codes                        |
-| `command-catalog.mjs` | Generated public interface definitions and limits                           |
+| Module                | Responsibility                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `cli.mjs`             | Argument validation, context/environment selection, output and exit status           |
+| `login.mjs`           | Browser PKCE consent, loopback callback validation and optional device flow          |
+| `store.mjs`           | Private local files, atomic replacement and inter-process locking                    |
+| `client.mjs`          | Origin-bound sessions, serialized renewal, profile selection and reads               |
+| `transport.mjs`       | Allowed origins/routes, timeouts, size limits and sanitized API failures             |
+| `commands.mjs`        | Validated command envelopes and durable immutable operation journals                 |
+| `profiles.mjs`        | Bounded profile discovery, creation, restriction and selection                       |
+| `changes.mjs`         | Validated incremental reads and bounded, cancellable waits                           |
+| `mcp.mjs`             | Strict tool schemas and protocol-safe responses over stdio                           |
+| `errors.mjs`          | Stable errors, safe serialization and CLI exit codes                                 |
+| `update.mjs`          | Anonymous bounded npm discovery, daily attempt cache and explicit global npm updates |
+| `update-runtime.mjs`  | Concurrent CLI/MCP activity leases and an exclusive installation barrier             |
+| `command-catalog.mjs` | Generated public interface definitions and limits                                    |
 
 ## Authentication and renewal
 

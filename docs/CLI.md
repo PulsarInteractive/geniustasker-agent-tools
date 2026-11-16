@@ -5,6 +5,31 @@ comment, ask questions and keep a useful handoff. Your account and project
 permissions remain the limit. GeniusTasker does not run your agent or bill its
 external model tokens.
 
+## Task protocols
+
+Discover `taskTemplates`, `protocolInstances` and the `protocol.*` commands in
+capabilities before using this workflow. Protocols are versioned procedures for
+Details projects, with stable task keys, dependencies and acceptance criteria.
+
+```sh
+geniustasker workflow show --topic protocols --json
+geniustasker protocols preview --file protocol-preview.json --context work --json
+```
+
+The file contains `scope`, `protocolVersionId` and `bindings` with `instanceId`,
+matching `scope`, current `epoch`, a timezone-qualified `anchor` and primitive
+`values`. Preview performs one read-only POST with `tasks:read`, returns at most
+20 steps and never creates tasks. For another page, preserve these fields and
+add `after: nextAfter` plus the returned `digest`. Each call consumes the normal
+read budget. There is no automatic pagination or apply loop.
+
+Use `protocol.publish/start/apply/cancel` through the existing `commands prepare`
+and `commands retry` workflow only for requested changes. `protocol.apply` takes
+`digest`, `from` and `count` (1–20) with the current instance revision. `Applied`
+means the tasks exist, not that their work is done. Cancellation preserves tasks
+already created. Follow the [protocol guide](../skills/geniustasker/references/protocols.md)
+for binding, importance, permissions, recovery and hosted MCP equivalents.
+
 ## Install and connect
 
 Requires Node.js 22.13 or newer. Install the beta:
@@ -55,7 +80,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.11", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.12", "mcp", "--context", "work"]
     }
   }
 }
@@ -442,3 +467,86 @@ it visible to that Graph's readers and requires the user's authorization.
 Read the full current record before editing and preserve its revision.
 
 For project-owned reusable task selections, see [Shared project filters](PROJECT_FILTERS.md).
+
+## Updates
+
+```sh
+geniustasker update check --json
+geniustasker update check --channel stable --json
+# Close local MCP servers and let other CLI commands finish before installing.
+geniustasker update install --json
+```
+
+The default channel follows the installed version: a `-beta.N` release checks
+`beta`; a stable release checks `latest` and rejects prereleases on that tag.
+`--channel beta|stable` selects a channel for that invocation. The updater pins the
+checked version and never downgrades. Switching from beta to stable therefore
+waits for a stable version newer than the installed beta. The returned
+`installedVersion`, `availableVersion`, `channel` and `updateAvailable` explain
+that comparison.
+
+After a successful interactive command, automatic discovery makes at most one
+anonymous registry attempt per UTC day and installed version, even across
+concurrent terminals or a failed check. Its deadline is 900 ms. The notice goes
+to stderr; the command result is unchanged. MCP, `--json`, redirected output,
+CI, help and local-only inspection/preparation commands never check automatically.
+Set `GENIUSTASKER_NO_UPDATE_CHECK=1` to disable terminal discovery. Explicit checks
+remain available and have a 1.5-second deadline. No account credentials are sent
+to npm, and no GeniusTasker API quota is used.
+
+`update install` supports only the active global npm installation. It checks
+`npm root --global` against the actual package path; source checkouts, npm links,
+project dependencies, npx copies and other managed installations require their
+own update workflow. An npx pin in an MCP configuration does not change when a
+global installation is updated. The installer fixes both npm registry settings to
+`https://registry.npmjs.org`, disables lifecycle scripts, enforces Node engines,
+and verifies the installed package name/version. It never elevates privileges.
+The npm log is not copied into CLI output.
+
+An installation barrier prevents replacement while another command or local MCP
+process from this installation is active. Ordinary commands still run in
+parallel. A running MCP process must be closed, even if currently idle; restart
+it after the update. Stop older clients that predate this activity guard as well.
+Credentials and pending immutable command journals are neither read nor modified
+by the updater. An update does not replay any saved operation.
+
+The small disposable discovery markers live in
+`~/.cache/geniustasker/cli-updates`; normal checks retain only the current and
+previous UTC day, inspecting at most 64 entries per pass. Runtime activity lives
+separately under `~/.cache/geniustasker/cli-runtime/<installation-hash>/active`.
+Only records belonging to positively dead processes are reclaimed during an
+installation. Unknown files and possibly reused PIDs conservatively block it.
+Do not clear runtime activity while clients are running.
+
+If an installer is interrupted, its empty `install.lock` directory in that same
+installation-specific runtime directory remains. First confirm that every local
+GeniusTasker client and npm installer has stopped, then remove only that empty
+lock directory with `rmdir`. Do not delete credentials, journals, or active-process
+records. After `update_install_unconfirmed`, inspect the global installed version
+and package integrity before retrying; an interrupted npm operation may already
+have changed files. A successful result uses `state: installed`; an already
+current or newer installation uses `state: up_to_date`.
+
+Protocol command schemas are available offline with
+`geniustasker commands describe --kind protocol.publish --json` (also
+`protocol.start`, `protocol.apply`, `protocol.cancel`). `tasker_command_help`
+provides the same local MCP guidance. Use the required fields and nested limits;
+current authorization and semantic validation remain server-side.
+
+## Agent runs
+
+Discover the `agentRuns` collection and `run.claim`, `run.checkpoint`, `run.patch`,
+`run.finish` commands before using them. Inspect each schema with
+`geniustasker commands describe --kind run.claim --json`, then use the normal
+immutable command journal. [The run workflow](../skills/geniustasker/references/agent-runs.md)
+explains separate run/task revisions, real checkpoints, stale leases, human
+takeover and recovery. Finishing a run does not mark its task Done; no background
+agent execution or monitoring is implied.
+
+For an explicitly instrumented host, `geniustasker runs event --file event.json
+--context work --json` maps one saved real event to those same run commands.
+Add `--prepare` to journal it without sending. Keep its stable `eventId` and
+`occurredAt`; retries use the normal command journal. Local MCP exposes
+`tasker_run_event`. A `process_exited` event only requests review, with explicit
+next steps. See [host event fields, examples and recovery](../skills/geniustasker/references/host-events.md)
+before connecting a host callback; no host hook is installed automatically.

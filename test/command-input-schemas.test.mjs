@@ -1,0 +1,85 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import Ajv from 'ajv';
+import { commandHelp, describeCommands } from '../src/commands.mjs';
+import schemas from '../src/command-input-schemas.mjs';
+import { main } from '../src/cli.mjs';
+
+test('structured command help preserves protocol schemas, nullable fields and internal field exclusion', async () => {
+  assert.deepEqual(
+    Object.keys(schemas)
+      .filter((kind) => kind.startsWith('protocol.'))
+      .sort(),
+    ['protocol.apply', 'protocol.cancel', 'protocol.publish', 'protocol.start'],
+  );
+  const text = JSON.stringify(schemas);
+  assert.ok(!/x-web-core-|\$private|"action"|"\$ref"|nullable/.test(text));
+  const validate = Object.fromEntries(
+    Object.entries(schemas).map(([kind, schema]) => [
+      kind,
+      new Ajv({ strict: true }).compile(schema),
+    ]),
+  );
+  const guide = await readFile(
+    new URL('../skills/geniustasker/references/protocols.md', import.meta.url),
+    'utf8',
+  );
+  const examples = [...guide.matchAll(/```json\n([\s\S]+?)\n```/g)].map((match) =>
+    JSON.parse(match[1]),
+  );
+  const published = examples.find((value) => value.definition);
+  const preview = examples.find((value) => value.bindings);
+  assert.equal(
+    validate['protocol.publish'](published),
+    true,
+    JSON.stringify(validate['protocol.publish'].errors),
+  );
+  assert.equal(
+    validate['protocol.start']({
+      protocolVersionId: preview.protocolVersionId,
+      bindings: preview.bindings,
+    }),
+    true,
+  );
+  assert.equal(validate['protocol.apply']({ digest: 'a'.repeat(64), from: 0, count: 20 }), true);
+  assert.equal(validate['protocol.apply']({ digest: 'a'.repeat(64), from: 0, count: 21 }), false);
+  assert.equal(validate['protocol.publish']({ ...published, action: 'publishProtocol' }), false);
+  const repeated = structuredClone(published);
+  repeated.definition.steps[0].dependencies = ['previous', 'previous'];
+  assert.equal(validate['protocol.publish'](repeated), false);
+  assert.equal(validate['protocol.publish']({ definition: published.definition }), false);
+  assert.equal(validate['protocol.cancel']({}), true);
+  assert.equal(validate['protocol.cancel']({ state: 'Applied' }), false);
+  for (const [kind, schema] of Object.entries(schemas)) {
+    const help = commandHelp({ kind });
+    assert.deepEqual(help.requiredFields, schema.required);
+    assert.deepEqual(Object.keys(help.properties), help.fields);
+    assert.deepEqual(describeCommands().commands[kind], help);
+  }
+  assert.throws(() => commandHelp({ kind: 'untrusted.command' }), { code: 'invalid_arguments' });
+});
+
+test('CLI can inspect one protocol command schema without authentication or network access', async () => {
+  let stdout = '',
+    stderr = '';
+  const code = await main(['commands', 'describe', '--kind', 'protocol.apply', '--json'], {
+    stdout: {
+      write: (chunk) => {
+        stdout += chunk;
+      },
+    },
+    stderr: {
+      write: (chunk) => {
+        stderr += chunk;
+      },
+    },
+    client: { accessToken: () => assert.fail('Offline discovery must not authenticate') },
+  });
+  assert.equal(code, 0);
+  assert.equal(stderr, '');
+  const result = JSON.parse(stdout);
+  assert.equal(result.data.kind, 'protocol.apply');
+  assert.equal(result.data.properties.count.maximum, 20);
+  assert.deepEqual(result.data.requiredFields, ['count', 'digest', 'from']);
+});

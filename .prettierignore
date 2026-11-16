@@ -2,6 +2,7 @@ node_modules/
 coverage/
 package-lock.json
 src/command-catalog.mjs
+src/command-input-schemas.mjs
 tools/schemas/
 LICENSE
 LICENSES/

@@ -78,6 +78,7 @@
         "collection": {
           "type": "string",
           "enum": [
+            "agentRuns",
             "assets",
             "comments",
             "documentFolders",
@@ -97,6 +98,7 @@
             "project",
             "projectDocumentIndex",
             "projectDocuments",
+            "protocolInstances",
             "questions",
             "schedules",
             "sprintHistory",
@@ -317,8 +319,16 @@
             "project.delete",
             "project.features",
             "project.update",
+            "protocol.apply",
+            "protocol.cancel",
+            "protocol.publish",
+            "protocol.start",
             "question.close",
             "question.create",
+            "run.checkpoint",
+            "run.claim",
+            "run.finish",
+            "run.patch",
             "schedule.create",
             "schedule.delete",
             "schedule.update",
@@ -392,8 +402,16 @@
             "project.delete",
             "project.features",
             "project.update",
+            "protocol.apply",
+            "protocol.cancel",
+            "protocol.publish",
+            "protocol.start",
             "question.close",
             "question.create",
+            "run.checkpoint",
+            "run.claim",
+            "run.finish",
+            "run.patch",
             "schedule.create",
             "schedule.delete",
             "schedule.update",
@@ -507,8 +525,16 @@
             "project.delete",
             "project.features",
             "project.update",
+            "protocol.apply",
+            "protocol.cancel",
+            "protocol.publish",
+            "protocol.start",
             "question.close",
             "question.create",
+            "run.checkpoint",
+            "run.claim",
+            "run.finish",
+            "run.patch",
             "schedule.create",
             "schedule.delete",
             "schedule.update",
@@ -961,6 +987,14 @@
             "folder.create",
             "folder.delete",
             "folder.update",
+            "protocol.apply",
+            "protocol.cancel",
+            "protocol.publish",
+            "protocol.start",
+            "run.checkpoint",
+            "run.claim",
+            "run.finish",
+            "run.patch",
             "schedule.create",
             "schedule.delete",
             "schedule.update",
@@ -1236,6 +1270,7 @@
         "collection": {
           "type": "string",
           "enum": [
+            "agentRuns",
             "comments",
             "documentFolders",
             "documents",
@@ -1245,6 +1280,7 @@
             "preparedLists",
             "projectDocumentIndex",
             "projectDocuments",
+            "protocolInstances",
             "questions",
             "schedules",
             "sprintHistory",
@@ -1363,12 +1399,87 @@
       "properties": {
         "topic": {
           "type": "string",
-          "enum": ["connection", "mutations", "projects", "memory", "graph", "planning"]
+          "enum": [
+            "connection",
+            "mutations",
+            "projects",
+            "memory",
+            "graph",
+            "planning",
+            "protocols",
+            "runs"
+          ]
         }
       },
       "required": ["topic"],
       "additionalProperties": false
     },
     "scopes": []
+  },
+  {
+    "name": "tasker_protocol_preview",
+    "title": "Preview a task protocol",
+    "description": "Preview one page of a published task protocol without creating an instance or tasks. Requires tasks:read and spends the normal read budget. Keep the same version and bindings; after greater than zero requires the original digest. At most 20 steps per call. Read workflow topic protocols before applying explicit commands.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["bindings", "protocolVersionId", "scope"],
+      "properties": {
+        "after": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 199
+        },
+        "bindings": {
+          "type": "object",
+          "required": ["anchor", "epoch", "instanceId", "scope", "values"],
+          "properties": {
+            "anchor": {
+              "type": "string"
+            },
+            "epoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "instanceId": {
+              "type": "string",
+              "maxLength": 36,
+              "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+            },
+            "scope": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^project:[A-Za-z0-9_-]+$"
+            },
+            "values": {
+              "type": "object",
+              "maxProperties": 24,
+              "additionalProperties": {}
+            }
+          },
+          "additionalProperties": false
+        },
+        "digest": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "protocolVersionId": {
+          "type": "string",
+          "maxLength": 36
+        },
+        "scope": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^project:[A-Za-z0-9_-]+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read"],
+    "route": "protocols/preview",
+    "method": "POST",
+    "write": false,
+    "destructive": false
   }
 ]

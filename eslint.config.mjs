@@ -3,7 +3,14 @@ import globals from 'globals';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
-  { ignores: ['node_modules/**', 'coverage/**', 'src/command-catalog.mjs'] },
+  {
+    ignores: [
+      'node_modules/**',
+      'coverage/**',
+      'src/command-catalog.mjs',
+      'src/command-input-schemas.mjs',
+    ],
+  },
   {
     files: ['**/*.mjs'],
     extends: [js.configs.recommended],

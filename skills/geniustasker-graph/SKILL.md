@@ -10,6 +10,16 @@ do not load every graph at startup. Search nodes, inspect `nodeIndex`, then use
 `tasker_graph` around a selected node. Respect `truncated`: an incomplete
 neighborhood cannot prove a relation is absent. Read full records before edits.
 
+Graph creation, node/edge changes and delegated Graph reads/search/exploration
+require the acting user's Starter or Pro plan as well as the existing resource
+grant. A paid space owner does not upgrade another reader. Document pages,
+attachments and document references remain independent capabilities.
+On `memory_graph_premium_required`, stop Graph calls; another tool, profile or
+connection is not a workaround. After downgrade, the user can still inspect
+existing content through ordinary application sync and personal-data export.
+Offer document-only work when it satisfies the request; do not copy Graph data
+into pages to evade the restriction.
+
 Each node owns its title, type, notes and optional resource thumbnail. Each edge
 has a source, target, typed relation and certainty. Prefer precise relation names
 and mark proposed connections as proposals. Preserve existing identities instead

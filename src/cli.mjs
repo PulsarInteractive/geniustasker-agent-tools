@@ -11,15 +11,27 @@ import { CredentialStore } from './store.mjs';
 import { ORIGINS, originOf, Transport } from './transport.mjs';
 import { AgentClient } from './client.mjs';
 import { deviceLogin, browserLogin } from './login.mjs';
-import { CommandJournal, describeCommands, readCommandFile } from './commands.mjs';
+import { CommandJournal, describeCommands, commandHelp, readCommandFile } from './commands.mjs';
 import { AgentProfiles } from './profiles.mjs';
 import { readChanges, watchChanges } from './changes.mjs';
 import { readMemoryTree, readMemoryMarkdown } from './documentation.mjs';
 import { searchMemory, exploreGraph, resolveMemory } from './knowledge.mjs';
+import { previewProtocol } from './protocols.mjs';
+import { reportRunEvent } from './run-events.mjs';
 import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
+import { checkUpdate, installUpdate, maybeNotifyUpdate } from './update.mjs';
+import { acquireRuntime } from './update-runtime.mjs';
 
 export const commands = {
+  'update check': {
+    summary: 'Check the official npm registry for this installation channel; no account access.',
+    options: ['channel'],
+  },
+  'update install': {
+    summary: 'Explicitly update a global npm installation when no CLI or MCP process is active.',
+    options: ['channel'],
+  },
   'workflow show': { summary: 'Read a reviewed workflow guide; no network.', options: ['topic'] },
   'auth login': {
     summary: 'Open browser sign-in and choose access. No tutorial or token to copy.',
@@ -115,6 +127,15 @@ export const commands = {
     summary: 'Read a bounded project page; follow nextAfter even for an empty page.',
     options: ['after'],
   },
+  'protocols preview': {
+    summary: 'Preview one page of a published task protocol from JSON without creating tasks.',
+    options: ['file'],
+  },
+  'runs event': {
+    summary:
+      'Journal one real host event and send it once; --prepare only saves it. No process monitoring.',
+    options: ['file', 'prepare'],
+  },
   'resources list': {
     summary: 'Read a project or memory collection; carry epoch/checkpoint when continuing.',
     options: ['scope', 'collection', 'after', 'epoch', 'checkpoint', 'archive', 'id', 'path'],
@@ -136,7 +157,7 @@ export const commands = {
   },
   'commands describe': {
     summary: 'Show contract-derived command fields and JSON schemas; no network.',
-    options: [],
+    options: ['kind'],
   },
   'commands prepare': {
     summary: 'Save an immutable operation from a JSON draft without sending it.',
@@ -166,7 +187,7 @@ export const commands = {
   help: { summary: 'Describe commands and stable output conventions.', options: [] },
 };
 const globalOptions = ['json', 'context', 'environment', 'origin', 'allow-local', 'help'];
-const flags = new Set(['json', 'allow-local', 'help', 'interactive', 'no-browser']);
+const flags = new Set(['json', 'allow-local', 'help', 'interactive', 'no-browser', 'prepare']);
 export function parse(argv) {
   const options = {},
     words = [];
@@ -256,8 +277,15 @@ export async function main(
     fetchImpl,
     signal,
     openBrowserImpl = openConsent,
+    updateFetchImpl,
+    updateCacheDirectory,
+    updateEnvironment,
+    updateNpmImpl,
+    updateInstalledDirectory,
+    runtimeDirectory,
   } = {},
 ) {
+  let releaseRuntime;
   try {
     const { command, options } = parse(argv);
     const emit = (data) =>
@@ -268,6 +296,20 @@ export async function main(
       emit(help(command));
       return 0;
     }
+    if (command === 'update check' || command === 'update install') {
+      emit(
+        await (command === 'update check' ? checkUpdate : installUpdate)({
+          channel: options.channel,
+          fetchImpl: updateFetchImpl,
+          signal,
+          npmImpl: updateNpmImpl,
+          installedDirectory: updateInstalledDirectory,
+          runtimeDirectory,
+        }),
+      );
+      return 0;
+    }
+    releaseRuntime = await acquireRuntime(runtimeDirectory);
     if (options.environment && !Object.hasOwn(ORIGINS, options.environment)) {
       fail('invalid_arguments', 'Environment must be production or development.');
     }
@@ -341,10 +383,16 @@ export async function main(
       data = await new AgentProfiles(client).restrict(await readCommandFile(options.file));
     } else if (command === 'profiles select') {
       data = await new AgentProfiles(client).select({ profileId: options.profile });
+    } else if (command === 'protocols preview') {
+      data = await previewProtocol(client, await readCommandFile(options.file));
+    } else if (command === 'runs event') {
+      data = await reportRunEvent(client, await readCommandFile(options.file), {
+        prepareOnly: options.prepare === true,
+      });
     } else if (command === 'workflow show') {
       data = workflow({ topic: options.topic });
     } else if (command === 'commands describe') {
-      data = describeCommands();
+      data = options.kind ? commandHelp({ kind: options.kind }) : describeCommands();
     } else if (command === 'commands prepare') {
       data = await new CommandJournal(client).prepare(await readCommandFile(options.file));
     } else if (command === 'commands execute') {
@@ -499,13 +547,30 @@ export async function main(
       if (signal?.aborted) {
         close();
       }
+      // The stdio server outlives main(). Keep its lease until process exit;
+      // replacing files while a host could call a tool is unsafe.
+      releaseRuntime = undefined;
       return 0; // stdout belongs exclusively to JSON-RPC.
     }
     emit(data);
+    await maybeNotifyUpdate({
+      command,
+      options,
+      isTTY,
+      stdout,
+      stderr,
+      signal,
+      fetchImpl: updateFetchImpl,
+      cacheDirectory: updateCacheDirectory,
+      env: updateEnvironment,
+    });
     return 0;
   } catch (error) {
     const safe = safeError(error);
     stderr.write(JSON.stringify({ formatVersion: 1, ok: false, error: safe.toJSON() }) + '\n');
     return exitCode(safe);
+  } finally {
+    // Cleanup cannot turn a confirmed remote receipt into a reported failure.
+    await releaseRuntime?.().catch(() => {});
   }
 }

@@ -2,6 +2,7 @@
 
 | What you want               | Guide topic  | Operations                                                                                                                 |
 | --------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Reuse a task procedure      | `protocols`  | Inspect immutable versions, bind variables, preview and explicitly materialize bounded batches                             |
 | Work on a project           | `projects`   | Read project/member configuration; create/edit/archive/restore tasks; create and plan tickets in existing backlogs/sprints |
 | Prepare a shared workflow   | `projects`   | Project tags and saved filters; sprint, recurring schedule and workflow lifecycle                                          |
 | Collaborate                 | `projects`   | Comments, work reports, questions, exact action approvals and member goals                                                 |
@@ -14,6 +15,13 @@ Use `tasker_workflow` in MCP or `geniustasker workflow show --topic TOPIC`.
 Discover commands before editing. A readable collection does not imply a matching
 write command. See [projects and planning](PLANNING.md) for lifecycle commands.
 Membership and consent changes remain in the application.
+
+For importance, use the `projects` guide and
+[the classification workflow](../skills/geniustasker/references/importance.md).
+The four values are `Minor`, `Normal`, `Important` and `Critical`. Importance is
+impact, independently of urgency or hierarchy. Agents justify the two higher
+levels and preserve human classifications. Check live field availability before
+using them; these fields do not establish a particular notification or Flutter UI.
 
 ## Example requests
 
@@ -35,3 +43,9 @@ Existing project agent contributions must be enabled by an authorized member.
 New projects created with projects:write start with contributions enabled. No tool
 can grant itself membership, approve an action as a human, or bypass account
 [limits](LIMITS.md).
+
+Read [Task protocols](../skills/geniustasker/references/protocols.md) for exact preview, binding and immutable recovery examples.
+
+For real agent claims, checkpoints, scoped task patches and completion, read
+[Agent runs](../skills/geniustasker/references/agent-runs.md). A recorded run does
+not start or monitor an external agent automatically.

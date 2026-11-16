@@ -1,6 +1,6 @@
 {
   "name": "@pulsarinteractive/geniustasker",
-  "version": "0.1.0-beta.11",
+  "version": "0.1.0-beta.12",
   "private": false,
   "description": "GeniusTasker delegated CLI and local agent tools",
   "type": "module",
@@ -46,7 +46,7 @@
     "@eslint/js": "10.0.1",
     "@modelcontextprotocol/client": "2.3.1",
     "ajv": "8.20.0",
-    "eslint": "10.11.0",
+    "eslint": "10.15.0",
     "globals": "17.12.0",
     "prettier": "3.9.9"
   },

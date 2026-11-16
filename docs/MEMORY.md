@@ -1,5 +1,14 @@
 # Memory and Graph
 
+Graph creation, node/edge changes and Graph reads through CLI/MCP/connectors
+require Starter or Pro for the acting user, plus the normal resource permissions.
+The space owner's plan does not grant a collaborator this capability. Document
+pages, attachments and document references retain their independent access.
+`memory_graph_premium_required` is a subscription refusal, not a reason to switch
+tools or profiles. After downgrade, ordinary application sync and account export
+remain available for existing data. Discover the current server capabilities;
+package installation alone does not activate a server release.
+
 Memory stores structured documents independently of projects. Graph connects
 nodes and links them to a page or a stable document block. These commands require
 the matching deployed service capabilities; check `geniustasker capabilities --json` before using them.

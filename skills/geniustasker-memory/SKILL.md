@@ -44,11 +44,16 @@ A new memory uses one UUID v4 for root ID, scope suffix and initial epoch. Updat
 and deletes use a freshly read revision. Destructive changes require the user's
 actual authorization; read access never implies write access.
 
-Prepare a complete immutable operation using `tasker_prepare_command`, then send
-it with `tasker_retry_command` and the returned operation ID. CLI equivalents are
-`commands prepare --file draft.json` and `commands retry --operation ID`.
-After a timeout retry the exact retained operation. After a revision conflict,
-reread and prepare a new edit. Never change the body under an existing ID.
+Prepare a complete immutable operation using `tasker_prepare_command`. In local
+MCP, execute it with `tasker_retry_command` and the returned operation ID; the CLI
+equivalents are `commands prepare --file draft.json` and
+`commands retry --operation ID`. Hosted ChatGPT has no local operation journal:
+retain the returned command object and send it through the discovered Memory edit
+tool (`tasker_edit_memory`), unchanged after an uncertain result. Do not call a
+local-only retry tool in the connector. After a revision conflict, reread and
+reconcile the other contribution before preparing a new operation; never replace
+the complete current page with an older snapshot. See the multi-agent procedure
+in [focused knowledge workflows](references/knowledge-workflows.md).
 
 For authorized imports, keep a resumable local journal and source hashes; split
 pages to the advertised bounds, avoid duplicates, preserve editorial authority,
@@ -63,6 +68,11 @@ deployments may not expose them. Nodes and edges live in a memory scope. Read
 `nodeIndex` for navigation and `nodes`/`edges` for full records. Use `tasker_graph`
 (`graph explore`) around a selected node rather than reading the entire graph.
 `truncated` means the result is incomplete. Never infer absent relations from it.
+
+Graph creation, edits and delegated Graph reads/search/exploration require
+Starter or Pro for the acting user, plus the resource grant. Documents and their
+attachments remain independent. On `memory_graph_premium_required`, stop Graph
+calls; do not switch tools, profiles or copy it into documents to bypass the tier.
 
 Each node owns its editable text; references contain only scope, pageId and an
 optional blockId. Use `tasker_reference` (`memory resolve`) for linked content.

@@ -5,6 +5,7 @@ import { open } from 'node:fs/promises';
 import { join } from 'node:path';
 import * as z from 'zod/v4';
 import catalog from './command-catalog.mjs';
+import commandInputSchemas from './command-input-schemas.mjs';
 import { CredentialStore } from './store.mjs';
 import { AgentError, fail, safeError } from './errors.mjs';
 
@@ -96,9 +97,29 @@ export function validateCommand(value) {
   }
   return command;
 }
+export const commandHelpSchema = z.object({ kind: z.enum(Object.keys(catalog.commands)) }).strict();
+export function commandHelp(input) {
+  const { kind } = checked(commandHelpSchema, input);
+  const definition = catalog.commands[kind];
+  const schema = commandInputSchemas[kind];
+  return {
+    kind,
+    ...definition,
+    ...(schema
+      ? {
+          requiredFields: schema.required,
+          properties: schema.properties,
+          dataSchema: schema,
+        }
+      : {}),
+  };
+}
 export function describeCommands() {
   return {
     ...catalog,
+    commands: Object.fromEntries(
+      Object.keys(catalog.commands).map((kind) => [kind, commandHelp({ kind })]),
+    ),
     envelope: z.toJSONSchema(commandSchema),
     draft: z.toJSONSchema(draftSchema),
     recovery:
@@ -141,6 +162,28 @@ const binding = (session) => ({
   profileId: session.profile_id,
   sessionId: session.session_id,
 });
+function checkSavedCommand(row, input, identity) {
+  if (row && (row.formatVersion !== 1 || canonical(row.binding) !== canonical(identity))) {
+    fail(
+      'operation_identity_mismatch',
+      'This operation belongs to another connection, profile, session or environment.',
+      {
+        remediation:
+          'Inspect it locally and reread current records. Do not replay it through a replacement login.',
+      },
+    );
+  }
+  if (row && canonical(row.input) !== canonical(input)) {
+    fail(
+      'idempotency_mismatch',
+      'The operation ID already belongs to a different immutable request.',
+      {
+        status: 409,
+        remediation: 'Use commands inspect, then retry the saved operation.',
+      },
+    );
+  }
+}
 const receiptSchema = z
   .object({
     operationId: operationIdSchema,
@@ -184,13 +227,22 @@ export class CommandJournal {
       operationId: randomUUID(),
       issuedAt: Date.now(),
     });
+    return this.prepareExact(input);
+  }
+  /** Hosts already have stable event IDs/times. Preserve their exact command,
+   * including an existing uncertain or confirmed journal, without sending it. */
+  async prepareExact(value) {
+    const input = validateCommand(value);
     const identity = binding(await this.client.session()),
       store = this.store(input.operationId);
-    await store.locked(
-      () => store.write({ formatVersion: 1, binding: identity, input, state: 'prepared' }),
-      this.client.transport.signal,
-    );
-    return { operationId: input.operationId, state: 'prepared', request: input };
+    return store.locked(async () => {
+      const row = await store.read();
+      checkSavedCommand(row, input, identity);
+      if (!row) {
+        await store.write({ formatVersion: 1, binding: identity, input, state: 'prepared' });
+      }
+      return { operationId: input.operationId, state: row?.state ?? 'prepared', request: input };
+    }, this.client.transport.signal);
   }
   async inspect(id) {
     const row = await this.store(id).read();
@@ -216,23 +268,7 @@ export class CommandJournal {
       const localSession = await this.client.session(),
         identity = binding(localSession);
       let row = await store.read();
-      if (row && (row.formatVersion !== 1 || canonical(row.binding) !== canonical(identity))) {
-        fail(
-          'operation_identity_mismatch',
-          'This operation belongs to another connection, profile, session or environment.',
-          {
-            remediation:
-              'Inspect it locally and reread current records. Do not replay it through a replacement login.',
-          },
-        );
-      }
-      if (row && canonical(row.input) !== canonical(input)) {
-        fail(
-          'idempotency_mismatch',
-          'The operation ID already belongs to a different immutable request.',
-          { status: 409, remediation: 'Use commands inspect, then retry the saved operation.' },
-        );
-      }
+      checkSavedCommand(row, input, identity);
       if (row?.state === 'confirmed') {
         return { source: 'local_receipt', receipt: row.receipt };
       }

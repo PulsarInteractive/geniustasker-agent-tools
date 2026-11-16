@@ -1,6 +1,6 @@
 ---
 name: geniustasker-planning
-description: Use when the user asks to plan GeniusTasker tickets in a backlog or sprint, manage projects/sprints/recurrences/documents, customize project tags or saved filters, or review task dependencies.
+description: Use when the user asks to plan GeniusTasker tickets, reuse a task protocol, manage projects/sprints/recurrences/documents, customize project tags or saved filters, or review task dependencies.
 ---
 
 # Plan tasks and shared project workflows
@@ -9,6 +9,11 @@ Inspect identity and capabilities, then read `tasker_workflow` with
 `topic: planning` for the current transport and product instructions.
 
 Read the project configuration, relevant tasks and existing sprint/workflow IDs.
+For reusable multi-task procedures, read [Task protocols](../geniustasker/references/protocols.md)
+and `tasker_workflow` with `topic: protocols`. Preview creates no work; applying
+the requested procedure uses explicit journaled batches with current revisions.
+When creating or reassessing tasks, use [task importance](../geniustasker/references/importance.md)
+to distinguish impact from urgency and preserve human-owned classifications.
 Use ticket.plan for placement changes and preserve its root and per-task revision
 checks. Project tags and saved filters are shared configuration; do not turn an
 example label into a global requirement for every project.

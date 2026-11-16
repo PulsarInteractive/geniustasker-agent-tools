@@ -1,0 +1,470 @@
+// Generated public command data schemas. Do not edit by hand.
+export default {
+  "protocol.apply": {
+    "type": "object",
+    "required": [
+      "count",
+      "digest",
+      "from"
+    ],
+    "properties": {
+      "digest": {
+        "type": "string",
+        "maxLength": 64,
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "from": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 199
+      },
+      "count": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 20
+      }
+    },
+    "additionalProperties": false
+  },
+  "protocol.cancel": {
+    "type": "object",
+    "required": [],
+    "properties": {},
+    "additionalProperties": false
+  },
+  "protocol.publish": {
+    "type": "object",
+    "required": [
+      "definition",
+      "previousVersionId"
+    ],
+    "properties": {
+      "definition": {
+        "type": "object",
+        "required": [
+          "description",
+          "formatVersion",
+          "name",
+          "steps",
+          "variables"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "formatVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "required": [
+                "acceptance",
+                "delivery",
+                "dependencies",
+                "description",
+                "dueAfterDays",
+                "importance",
+                "importanceReason",
+                "key",
+                "kind",
+                "ownerVariable",
+                "parent",
+                "title"
+              ],
+              "properties": {
+                "acceptance": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 10,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "delivery": {
+                  "type": "object",
+                  "required": [
+                    "animation",
+                    "push",
+                    "recap"
+                  ],
+                  "properties": {
+                    "animation": {
+                      "type": "string",
+                      "enum": [
+                        "inherit",
+                        "silent",
+                        "request"
+                      ]
+                    },
+                    "push": {
+                      "type": "string",
+                      "enum": [
+                        "inherit",
+                        "silent",
+                        "request"
+                      ]
+                    },
+                    "recap": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "dependencies": {
+                  "type": "array",
+                  "maxItems": 20,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 600
+                },
+                "dueAfterDays": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 3650
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "importance": {
+                  "type": "string",
+                  "enum": [
+                    "Minor",
+                    "Normal",
+                    "Important",
+                    "Critical"
+                  ]
+                },
+                "importanceReason": {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                "key": {
+                  "type": "string",
+                  "maxLength": 48,
+                  "pattern": "^[a-z][a-z0-9_-]{0,47}$"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "Ticket",
+                    "Epic",
+                    "Subtask"
+                  ]
+                },
+                "ownerVariable": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 48
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "parent": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 48
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 200
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "variables": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "type": "object",
+              "required": [
+                "key",
+                "kind",
+                "label",
+                "required"
+              ],
+              "properties": {
+                "defaultValue": {},
+                "key": {
+                  "type": "string",
+                  "maxLength": 48,
+                  "pattern": "^[a-z][a-z0-9_-]{0,47}$"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "text",
+                    "number",
+                    "boolean",
+                    "user",
+                    "date"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "required": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "previousVersionId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 36
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
+  "protocol.start": {
+    "type": "object",
+    "required": [
+      "bindings",
+      "protocolVersionId"
+    ],
+    "properties": {
+      "protocolVersionId": {
+        "type": "string",
+        "maxLength": 36
+      },
+      "bindings": {
+        "type": "object",
+        "required": [
+          "anchor",
+          "epoch",
+          "instanceId",
+          "scope",
+          "values"
+        ],
+        "properties": {
+          "anchor": {
+            "type": "string"
+          },
+          "epoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "instanceId": {
+            "type": "string",
+            "maxLength": 36,
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^project:[A-Za-z0-9_-]+$"
+          },
+          "values": {
+            "type": "object",
+            "maxProperties": 24,
+            "additionalProperties": {}
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "run.checkpoint": {
+    "type": "object",
+    "required": [
+      "state",
+      "summary"
+    ],
+    "properties": {
+      "state": {
+        "type": "string",
+        "enum": [
+          "Working",
+          "Waiting",
+          "NeedsReview"
+        ]
+      },
+      "summary": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "nextSteps": {
+        "type": "string",
+        "maxLength": 4000
+      },
+      "evidence": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "required": [
+            "label",
+            "url"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "url": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "leaseSeconds": {
+        "type": "integer",
+        "minimum": 60,
+        "maximum": 900
+      }
+    },
+    "additionalProperties": false
+  },
+  "run.claim": {
+    "type": "object",
+    "required": [
+      "summary",
+      "task",
+      "taskRevision"
+    ],
+    "properties": {
+      "task": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "summary": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "leaseSeconds": {
+        "type": "integer",
+        "minimum": 60,
+        "maximum": 900
+      }
+    },
+    "additionalProperties": false
+  },
+  "run.finish": {
+    "type": "object",
+    "required": [
+      "state",
+      "summary"
+    ],
+    "properties": {
+      "state": {
+        "type": "string",
+        "enum": [
+          "Completed",
+          "Failed",
+          "Cancelled"
+        ]
+      },
+      "summary": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "nextSteps": {
+        "type": "string",
+        "maxLength": 4000
+      },
+      "evidence": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "required": [
+            "label",
+            "url"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "url": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "run.patch": {
+    "type": "object",
+    "required": [
+      "patch",
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "patch": {
+        "type": "object",
+        "additionalProperties": {}
+      }
+    },
+    "additionalProperties": false
+  }
+};

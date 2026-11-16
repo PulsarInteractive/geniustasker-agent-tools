@@ -33,6 +33,12 @@ Installing the package does not grant application access.
 Availability follows your account, the permissions you approve and the service's
 current capabilities. [Memory & Graph guide](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md).
 
+In a terminal, the CLI checks for a newer release at most once per UTC day and
+installed version. It never installs automatically. Use `geniustasker update check
+--json` to check explicitly, and `geniustasker update install` to update a global
+npm installation after closing other CLI commands and local MCP servers.
+See [updates and managed installations](docs/CLI.md#updates).
+
 ## Connect your AI assistant
 
 For a stdio MCP host, use this after signing in:
@@ -42,7 +48,7 @@ For a stdio MCP host, use this after signing in:
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.11", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.12", "mcp", "--context", "work"]
     }
   }
 }

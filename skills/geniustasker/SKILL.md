@@ -104,6 +104,11 @@ project/ticket and distinguish completed work, validation and remaining work.
 
 ## Specialized workflows
 
+- For coordinated agent work on a task, read [Agent runs](references/agent-runs.md). Claim explicitly, report real observations, distinguish stale signals from blockers, and honor human takeover. For explicit host callbacks, use [host events](references/host-events.md); installation alone does not monitor your process.
+
+- To reuse or publish a multi-task procedure, read [Task protocols](references/protocols.md). Preview the chosen version and bindings before explicitly materializing bounded batches.
+- For task importance, read [Impact and human-owned classification](references/importance.md). Read the existing value first; urgency, hierarchy and rewards do not determine importance.
+- For CLI version checks or an explicitly requested package update, read [CLI updates](references/updates.md). An update is not a repair for missing account permissions or a reason to replay pending operations.
 - To create, switch or restrict an agent identity, read [Profiles](references/profiles.md).
 - For ticket questions, progress reports or precise human approvals, read [Collaboration](references/collaboration.md).
 - Memory is a separate account resource. This project skill never assumes that a project grants Memory access. Discover capabilities and independent memory grants before using it.
