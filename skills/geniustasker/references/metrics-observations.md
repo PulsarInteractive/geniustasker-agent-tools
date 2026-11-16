@@ -7,6 +7,50 @@ personal data belongs to the connected owner, while project observations use
 the definition's writer policy. A grant never bypasses project opt-in or
 membership. Do not add yourself to `writers` to work around a refusal.
 
+## Read the consolidated result
+
+Read the metric definition (`metrics` / `personalMetrics`) and inspect
+`data.summary` before requesting observation history. This server-maintained
+summary updates atomically with the source observation; it excludes voided
+observations and all historical correction snapshots. It is lifetime-only.
+A title such as “Weekly revenue” does not turn its summary into a current-week
+aggregate. Period windows, custom goal links and triggers are separate
+capabilities; do not claim they were calculated or installed.
+
+- `activeCount` counts current, non-voided observations. It is distinct from
+  `observationCount`, which retains the count of recorded source observations.
+- `sumUnits`, `numeratorUnits` and `denominatorUnits` are exact integer **strings**
+  in units of `10^-configuration.precision`. For precision 2, `"425"` means
+  4.25 units. Do not parse large totals as JavaScript `Number` or send these
+  strings back as new observations; keep exact integer/decimal arithmetic when
+  calculation is necessary.
+- `value` is a nullable decimal **string**, already formatted at the configured
+  precision. Mean and Ratio round half away from zero for display. It is not a
+  JSON number or an unrounded threshold result. Use it for presentation without
+  another floating-point conversion; do not infer exact threshold satisfaction
+  from its rounded digits.
+- `latest` identifies the latest active evidence with `observationId`,
+  `observedAt` and `measurement`. Gauge/Latest uses observation time, not arrival
+  time. A late older sample can change a Sum, Mean or Ratio without becoming the
+  latest observation. A correction or void can change which evidence is latest.
+
+For an empty active set, `value` and `latest` are null. This is “no active
+measurement,” not zero. A measured zero can instead have `activeCount > 0` and
+`value:"0.00"`. A completely missing `summary` on a legacy definition means
+unknown, not an empty set: never fabricate zero fields or reconstruct and write
+the summary through client commands. If a write returns
+`metric_summary_rebuild_required` (503), retain its immutable operation and
+report that server repair is required; do not keep retrying or create another
+metric to bypass it.
+
+Freshness compares `summary.latest.observedAt` with the current time and
+`configuration.freshnessSeconds`. Do not use definition `updated`, correction
+arrival time or the time you fetched the page to claim fresh evidence. A null
+freshness setting means no expected cadence was configured, not that all data
+is always fresh. If latest is null, there is no active evidence to assess.
+Late arrivals retain their source date; never replace it with now to make a
+summary appear current.
+
 ## Choose the actual evidence
 
 | Definition kind | `measurement` meaning                                                               |

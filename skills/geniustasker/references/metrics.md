@@ -50,6 +50,14 @@ only when needed and state when a result is partial.
 
 ## Choose a useful meaning
 
+For an existing metric's consolidated result, first read the definition's
+`summary` with `metrics` or `personalMetrics`. This avoids scanning observations
+just to obtain a total. The server updates it atomically with each accepted
+record, correction or void. It covers the metric's **entire recorded lifetime**,
+not a week, month or rolling window, even if the title mentions a period.
+For exact numeric fields, missing values and freshness, read
+[the summary rules](metrics-observations.md#read-the-consolidated-result).
+
 | Meaning                                         | Configuration      | Avoid                                            |
 | ----------------------------------------------- | ------------------ | ------------------------------------------------ |
 | Current level, such as audience size            | `Gauge` + `Latest` | Summing repeated cumulative totals               |
