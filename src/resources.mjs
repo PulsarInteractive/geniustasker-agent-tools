@@ -22,16 +22,25 @@ export const resourceReadSchema = z
     archive: z.enum(['active', 'archived', 'all']).optional(),
   })
   .strict();
-export const projectMetricCollections = ['metrics', 'metricObservations', 'metricCorrections'];
+export const projectMetricCollections = [
+  'metrics',
+  'metricObservations',
+  'metricCorrections',
+  'metricGoals',
+];
 export const personalMetricCollections = [
   'personalMetrics',
   'personalMetricObservations',
   'personalMetricCorrections',
+  'personalMetricGoals',
 ];
 export const metricCollections = [...projectMetricCollections, ...personalMetricCollections];
-export const metricHistoryCollections = metricCollections.filter(
-  (collection) => collection !== 'metrics' && collection !== 'personalMetrics',
-);
+export const metricHistoryCollections = [
+  'metricObservations',
+  'metricCorrections',
+  'personalMetricObservations',
+  'personalMetricCorrections',
+];
 export const metricReadSchema = resourceReadSchema
   .omit({ path: true })
   .extend({
@@ -49,13 +58,13 @@ export function validateResourceScope({ scope, collection, metricId }) {
   ) {
     fail(
       'invalid_arguments',
-      'Use metric definitions, observations or corrections in their matching project or connected personal scope. Other personal collections are not exposed.',
+      'Use metric definitions, observations, corrections or linked goals in their matching project or connected personal scope. Other personal collections are not exposed.',
     );
   }
   if (metricId !== undefined && !metricHistoryCollections.includes(collection)) {
     fail(
       'invalid_arguments',
-      'metricId filters observations or correction snapshots only; use id for an exact definition.',
+      'metricId filters observations or correction snapshots only; use id for an exact definition or goal.',
     );
   }
 }
@@ -82,7 +91,7 @@ export async function readMetrics(client, input) {
   if (!parsed.success) {
     fail(
       'invalid_arguments',
-      'Read a declared metric definition, observation or correction collection with the matching scope and bounded continuation.',
+      'Read a declared metric definition, observation, correction or linked-goal collection with the matching scope and bounded continuation.',
     );
   }
   return readResources(client, parsed.data);

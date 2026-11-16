@@ -359,6 +359,34 @@ export default {
       "permission": "metrics:write",
       "personalModule": "LocalUser/LocalUserMetricDefinition"
     },
+    "metric.goal.create": {
+      "action": "configureMetricGoal",
+      "create": true,
+      "fields": [
+        "configuration"
+      ],
+      "inputSchema": "GeniusTasker.MetricGoals.ConfigureGoal",
+      "module": "Project/ProjectMetricGoal",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricGoal"
+    },
+    "metric.goal.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Project/ProjectMetricGoal",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricGoal"
+    },
+    "metric.goal.update": {
+      "action": "configureMetricGoal",
+      "fields": [
+        "configuration"
+      ],
+      "inputSchema": "GeniusTasker.MetricGoals.ConfigureGoal",
+      "module": "Project/ProjectMetricGoal",
+      "permission": "metrics:write",
+      "personalModule": "LocalUser/LocalUserMetricGoal"
+    },
     "metric.record": {
       "action": "recordMetric",
       "create": true,

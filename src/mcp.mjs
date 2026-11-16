@@ -243,7 +243,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_read_metrics',
-    'Read one page or exact custom metric definition, observation or correction with metrics:read. Use the matching project or personal collection; personal scope is the connected owner only. Preserve epoch/checkpoint and revisions. No implicit full history loading; corrections are previous snapshots, not additional measurements to sum.',
+    'Read one page or exact custom metric definition, observation, correction or linked goal with metrics:read. Use the matching project or personal collection; personal scope is the connected owner only. Preserve epoch/checkpoint and revisions. No implicit full history loading; corrections are previous snapshots, not additional measurements to sum. Goal Pending means partial progress; only Ready can establish reached.',
     metricReadSchema,
     (input) => readMetrics(client, input),
   );
@@ -328,7 +328,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_edit_metrics',
-    'Execute one immutable metric definition or observation command with metrics:write and current native rights. Read workflow metrics and command help first. record needs a stable sourceKey and actual observedAt; correct/void target an existing observation revision and require a reason. Corrections preserve history. Same journal and quotas; retry the exact saved operation after uncertainty. Never invent measurements or bypass a duplicate source key.',
+    'Execute one immutable metric definition, observation or linked-goal command with metrics:write and current native rights. Read workflow metrics and command help first. record needs a stable sourceKey and actual observedAt; correct/void target an existing observation revision and require a reason. Corrections preserve history. metric.goal.* uses full configuration, a decimal-string target and a same-scope metric; no arbitrary agent execution. Same journal and quotas; retry the exact saved operation after uncertainty. Never invent measurements or bypass a duplicate source key.',
     metricCommandSchema,
     (input) => journal.execute(input),
     true,

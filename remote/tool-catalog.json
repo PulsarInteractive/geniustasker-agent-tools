@@ -91,6 +91,7 @@
             "members",
             "memory",
             "metricCorrections",
+            "metricGoals",
             "metricObservations",
             "metrics",
             "nodeIndex",
@@ -98,6 +99,7 @@
             "pageIndex",
             "pages",
             "personalMetricCorrections",
+            "personalMetricGoals",
             "personalMetricObservations",
             "personalMetrics",
             "preparedLists",
@@ -331,6 +333,9 @@
             "metric.correct",
             "metric.create",
             "metric.delete",
+            "metric.goal.create",
+            "metric.goal.delete",
+            "metric.goal.update",
             "metric.record",
             "metric.update",
             "metric.void",
@@ -420,6 +425,9 @@
             "metric.correct",
             "metric.create",
             "metric.delete",
+            "metric.goal.create",
+            "metric.goal.delete",
+            "metric.goal.update",
             "metric.record",
             "metric.update",
             "metric.void",
@@ -549,6 +557,9 @@
             "metric.correct",
             "metric.create",
             "metric.delete",
+            "metric.goal.create",
+            "metric.goal.delete",
+            "metric.goal.update",
             "metric.record",
             "metric.update",
             "metric.void",
@@ -1516,8 +1527,8 @@
   },
   {
     "name": "tasker_read_metrics",
-    "title": "Read custom metrics and observations",
-    "description": "Read one bounded page or exact metric definition, observation or correction in the matching project or connected personal collection. Preserve epoch/checkpoint; never implicitly load all history. Corrections are previous snapshots, not extra measurements to aggregate. Read workflow metrics first. No other personal data is exposed.",
+    "title": "Read custom metrics, observations and goals",
+    "description": "Read one bounded page or exact metric definition, observation, correction or linked goal in the matching project or connected personal collection. Preserve epoch/checkpoint; never implicitly load all history. Corrections are previous snapshots, not extra measurements to aggregate. Goal Pending means partial progress; Ready can establish reached from exact evidence. Read workflow metrics first. No other personal data is exposed.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1530,9 +1541,11 @@
           "type": "string",
           "enum": [
             "metricCorrections",
+            "metricGoals",
             "metricObservations",
             "metrics",
             "personalMetricCorrections",
+            "personalMetricGoals",
             "personalMetricObservations",
             "personalMetrics"
           ]
@@ -1578,7 +1591,7 @@
   {
     "name": "tasker_edit_metrics",
     "title": "Apply custom metric changes",
-    "description": "Apply one exact immutable metric command within metrics:write and current native rights. Definition changes require administration; observations require the configured writer rights. record uses stable sourceKey and observedAt; correct/void require an existing observation revision and reason. Preserve the same command after uncertainty; never mint a new source event to bypass a duplicate. No goal links or automatic collectors are created.",
+    "description": "Apply one exact immutable metric command within metrics:write and current native rights. Definition and linked-goal changes require administration; observations require the configured writer rights. record uses stable sourceKey and observedAt; correct/void require an existing observation revision and reason. Preserve the same command after uncertainty; never mint a new source event to bypass a duplicate. Only metric.goal.* explicitly links a same-scope metric with a decimal-string target and full configuration. No automatic collector or arbitrary agent execution is started.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1596,6 +1609,9 @@
             "metric.correct",
             "metric.create",
             "metric.delete",
+            "metric.goal.create",
+            "metric.goal.delete",
+            "metric.goal.update",
             "metric.record",
             "metric.update",
             "metric.void"

@@ -73,7 +73,7 @@ export const commands = {
   },
   'metrics list': {
     summary:
-      'Read one bounded page of custom metric definitions (default), observations or corrections. Select --collection; requires metrics:read.',
+      'Read one bounded page of custom metric definitions (default), observations, corrections or linked goals. Select --collection; requires metrics:read.',
     options: ['scope', 'collection', 'id', 'metric-id', 'after', 'epoch', 'checkpoint', 'archive'],
   },
   'media compare': {

@@ -9,8 +9,9 @@ and agent contributions enabled. A refusal is not permission to use private APIs
 Definition creation does not itself record a value. When capabilities advertise
 `metric.record`, `metric.correct` and `metric.void`, use the
 [observation workflow](metrics-observations.md) to record real evidence and retain
-its corrections. These operations do not start a collector, link a goal or
-install a trigger. Existing YouTube/Spotify metrics are separate. Feature
+its corrections. These operations do not start a collector or link a goal.
+When requested and advertised, use the separate [metric goal workflow](metric-goals.md)
+to evaluate a target against the same scope’s metric. Existing YouTube/Spotify metrics are separate. Feature
 activation and package installation are separate: use only what the current
 server advertises.
 
@@ -37,7 +38,8 @@ Use the chosen environment/context consistently, including
 scope. In MCP prefer `tasker_read_metrics` with that same collection and scope.
 Select `metricObservations` / `personalMetricObservations` for the current
 observations, or `metricCorrections` / `personalMetricCorrections` for previous
-snapshots. The default CLI collection remains definitions for compatibility.
+snapshots. Linked goals use `metricGoals` / `personalMetricGoals`; these accept
+an exact goal `id`, not the history-only `metricId` filter. The default CLI collection remains definitions for compatibility.
 Read one page at a time; carry `after`, `epoch` and `checkpoint` unchanged for
 continuation. Take the epoch from the returned page, including an empty one.
 Use an exact ID read before editing and preserve unmodified configuration.

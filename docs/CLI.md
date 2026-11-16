@@ -12,15 +12,20 @@ or `metrics list --scope personal:OWNER --json` (`OWNER` is identity's
 `actor.ownerId`). Current capabilities must advertise the feature and the
 separate `metrics:read` / `metrics:write` grants. `metric.create`,
 `metric.update`, `metric.delete`, `metric.record`, `metric.correct` and
-`metric.void` use the standard `commands prepare/execute/retry` journal.
+`metric.void`, plus the discoverable `metric.goal.create/update/delete` commands,
+use the standard `commands prepare/execute/retry` journal.
 MCP exposes `tasker_read_metrics` and `tasker_edit_metrics`.
 Read the [metric configuration guide](../skills/geniustasker/references/metrics.md)
 or `workflow show --topic metrics --json` before choosing the measurement meaning.
 For observations or previous correction snapshots, choose `--collection`
 explicitly; definitions remain the default. Read the
 [observation guide](../skills/geniustasker/references/metrics-observations.md)
-before recording or correcting evidence. These commands do not create custom
-goal links or automatic collectors.
+before recording or correcting evidence. For linked goals, select `metricGoals`
+or `personalMetricGoals` and read the [metric goal guide](../skills/geniustasker/references/metric-goals.md).
+A goal is a separate explicit command; definitions and observations never create
+one implicitly. Goal thresholds are decimal strings, fixed windows use source
+observation time, and `Pending` progress is not final. None of these commands
+starts an automatic collector or executes an external agent.
 
 ## Task protocols
 

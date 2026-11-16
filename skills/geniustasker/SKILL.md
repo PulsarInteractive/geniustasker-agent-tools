@@ -111,7 +111,7 @@ project/ticket and distinguish completed work, validation and remaining work.
 
 ## Specialized workflows
 
-- For custom personal or project measurements, read [Custom metrics](references/metrics.md), then [Observations and corrections](references/metrics-observations.md) when recording evidence. Use dedicated grants, preserve event identity and meaning, and do not count correction snapshots as additional observations. Goal links and automatic collection remain separate capabilities.
+- For custom personal or project measurements, read [Custom metrics](references/metrics.md), then [Observations and corrections](references/metrics-observations.md) when recording evidence. Use dedicated grants, preserve event identity and meaning, and do not count correction snapshots as additional observations. For an explicitly requested goal, read [Metric goal evaluation](references/metric-goals.md) and discover metric.goal.* before creating the link. Automatic collection remains a separate capability.
 
 - For coordinated agent work on a task, read [Agent runs](references/agent-runs.md). Claim explicitly, report real observations, distinguish stale signals from blockers, and honor human takeover. For explicit host callbacks, use [host events](references/host-events.md); installation alone does not monitor your process.
 

@@ -167,6 +167,194 @@ export default {
     },
     "additionalProperties": false
   },
+  "metric.goal.create": {
+    "type": "object",
+    "required": [
+      "configuration"
+    ],
+    "properties": {
+      "configuration": {
+        "type": "object",
+        "required": [
+          "archived",
+          "coachSignal",
+          "comparison",
+          "completion",
+          "description",
+          "metricId",
+          "notifyCompleted",
+          "paused",
+          "target",
+          "title",
+          "window"
+        ],
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "coachSignal": {
+            "type": "boolean"
+          },
+          "comparison": {
+            "type": "string",
+            "enum": [
+              "AtLeast",
+              "AtMost"
+            ]
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "OnReach",
+              "AtEnd"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "metricId": {
+            "type": "string"
+          },
+          "notifyCompleted": {
+            "type": "boolean"
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 32,
+            "pattern": "^-?[0-9]{1,24}(\\.[0-9]{1,6})?$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "window": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "end",
+                  "start"
+                ],
+                "properties": {
+                  "end": {
+                    "type": "string"
+                  },
+                  "start": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "metric.goal.update": {
+    "type": "object",
+    "required": [
+      "configuration"
+    ],
+    "properties": {
+      "configuration": {
+        "type": "object",
+        "required": [
+          "archived",
+          "coachSignal",
+          "comparison",
+          "completion",
+          "description",
+          "metricId",
+          "notifyCompleted",
+          "paused",
+          "target",
+          "title",
+          "window"
+        ],
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "coachSignal": {
+            "type": "boolean"
+          },
+          "comparison": {
+            "type": "string",
+            "enum": [
+              "AtLeast",
+              "AtMost"
+            ]
+          },
+          "completion": {
+            "type": "string",
+            "enum": [
+              "OnReach",
+              "AtEnd"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "metricId": {
+            "type": "string"
+          },
+          "notifyCompleted": {
+            "type": "boolean"
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 32,
+            "pattern": "^-?[0-9]{1,24}(\\.[0-9]{1,6})?$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "window": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "end",
+                  "start"
+                ],
+                "properties": {
+                  "end": {
+                    "type": "string"
+                  },
+                  "start": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
   "metric.record": {
     "type": "object",
     "required": [

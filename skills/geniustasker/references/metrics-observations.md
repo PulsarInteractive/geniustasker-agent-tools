@@ -14,8 +14,9 @@ Read the metric definition (`metrics` / `personalMetrics`) and inspect
 summary updates atomically with the source observation; it excludes voided
 observations and all historical correction snapshots. It is lifetime-only.
 A title such as “Weekly revenue” does not turn its summary into a current-week
-aggregate. Period windows, custom goal links and triggers are separate
-capabilities; do not claim they were calculated or installed.
+aggregate. Requested [metric goals](metric-goals.md) have their own lifetime or
+fixed-window evaluation. Discover that separate capability before using it; an
+observation command never creates a goal or installs an arbitrary trigger.
 
 - `activeCount` counts current, non-voided observations. It is distinct from
   `observationCount`, which retains the count of recorded source observations.
