@@ -103,6 +103,7 @@ test('project guidance is served intact by real local MCP without credentials or
   }
   for (const kind of [
     'protocol.publish',
+    'project.configureInstructions',
     'task.create',
     'task.update',
     'task.lock',

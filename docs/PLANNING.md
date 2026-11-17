@@ -73,16 +73,17 @@ For a blocked task or an authorized manual lock, read
 [task locks and current availability](TASK_LOCKS.md). Locked is an effective
 availability state, independent of canonical progress and a known pause.
 
-| Operation         | Commands                                                       | Required access                                                                            |
-| ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| New project       | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |
-| Project settings  | `project.update`, `project.features`                           | `projects:write`, native project administration                                            |
-| Delete project    | `project.delete`                                               | `projects:write`, project ownership                                                        |
-| Sprint lifecycle  | `sprint.create/update/start/complete/delete`                   | `tasks:write`, native sprint management                                                    |
-| Workflow stages   | `workflow.create/update/delete`                                | `tasks:write`, native project administration                                               |
-| Recurring tasks   | `schedule.create/update/delete`                                | `tasks:write`, native schedule rights                                                      |
-| Project documents | `document.create/update/delete`, `folder.create/update/delete` | `tasks:write`, native content rights                                                       |
-| Memory folders    | `memory.page.create/update/delete` with `directory: true`      | `memory:write`, Memory content rights                                                      |
+| Operation          | Commands                                                       | Required access                                                                            |
+| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| New project        | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |
+| Project settings   | `project.update`, `project.features`                           | `projects:write`, native project administration                                            |
+| Agent instructions | `project.configureInstructions`                                | `projects:write`, actual project owner, agent contributions already enabled                |
+| Delete project     | `project.delete`                                               | `projects:write`, project ownership                                                        |
+| Sprint lifecycle   | `sprint.create/update/start/complete/delete`                   | `tasks:write`, native sprint management                                                    |
+| Workflow stages    | `workflow.create/update/delete`                                | `tasks:write`, native project administration                                               |
+| Recurring tasks    | `schedule.create/update/delete`                                | `tasks:write`, native schedule rights                                                      |
+| Project documents  | `document.create/update/delete`, `folder.create/update/delete` | `tasks:write`, native content rights                                                       |
+| Memory folders     | `memory.page.create/update/delete` with `directory: true`      | `memory:write`, Memory content rights                                                      |
 
 Existing credentials retain their original permissions. Reconnect and approve
 `projects:write` to use project administration. A grant restricted to selected
@@ -98,6 +99,27 @@ and `expectedRevision: null`. `project.create` accepts a title, optional key,
 type and icon; omitted type/icon default to `Details` and `layers`.
 Keep the returned revision for subsequent edits. Other commands require the
 latest target revision. Never manufacture a revision from a local timestamp.
+
+For an explicit request to set up or revise project agent instructions, first
+discover `project.configureInstructions` in the connected service and command
+help. Read `project` to preserve existing guidance, its current revision and
+`agentsEnabled`. Only the actual project owner can use this command; project
+administration alone is insufficient. Existing consent must include
+`projects:write` and this project. A disabled project requires the separate human
+configuration flow; the command cannot enable itself or change any grant.
+
+Send the complete intended replacement as `data: {"instructions": "..."}`,
+targeting the project ID with its current epoch and revision. The limit is
+12,000 characters; tabs and line breaks are allowed, other ASCII controls are
+rejected, and the server trims leading/trailing whitespace. Empty text explicitly
+clears the instructions, so use it only for an intended removal. Preserve
+unrelated human guidance; do not copy credentials or unrelated private context.
+Retain the exact operation after uncertainty. After success, read the same
+project and confirm `agentInstructions` plus unchanged `agentsEnabled`.
+These instructions guide authorized work; they cannot grant new permissions.
+This source addition is pending release/deployment: older clients reject this
+command. If unavailable, explain the gap and keep the prepared text rather than
+using private account APIs or disguising it as an ordinary project update.
 
 `project.features` replaces the planning configuration. Read the project first
 and map these fields; preserve values unrelated to the user's request:

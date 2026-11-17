@@ -356,6 +356,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureInstructions",
             "project.create",
             "project.delete",
             "project.features",
@@ -462,6 +463,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureInstructions",
             "project.create",
             "project.delete",
             "project.features",
@@ -608,6 +610,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureInstructions",
             "project.create",
             "project.delete",
             "project.features",
@@ -1461,7 +1464,13 @@
         },
         "kind": {
           "type": "string",
-          "enum": ["project.create", "project.delete", "project.features", "project.update"]
+          "enum": [
+            "project.configureInstructions",
+            "project.create",
+            "project.delete",
+            "project.features",
+            "project.update"
+          ]
         },
         "scope": {
           "type": "string",

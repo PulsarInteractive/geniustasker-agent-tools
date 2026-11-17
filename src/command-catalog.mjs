@@ -481,6 +481,15 @@ export default {
       "permission": "metrics:write",
       "personalModule": "LocalUser/LocalUserMetricObservation"
     },
+    "project.configureInstructions": {
+      "action": "configureAgentInstructions",
+      "fields": [
+        "instructions"
+      ],
+      "inputSchema": "GeniusTasker.Contracts.AgentProjectInstructions",
+      "module": "Project/$",
+      "permission": "projects:write"
+    },
     "project.create": {
       "create": true,
       "fields": [

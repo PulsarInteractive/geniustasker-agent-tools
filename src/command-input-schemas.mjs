@@ -783,6 +783,20 @@ export default {
     },
     "additionalProperties": false
   },
+  "project.configureInstructions": {
+    "type": "object",
+    "required": [
+      "instructions"
+    ],
+    "properties": {
+      "instructions": {
+        "type": "string",
+        "maxLength": 12000,
+        "pattern": "^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]*$"
+      }
+    },
+    "additionalProperties": false
+  },
   "protocol.apply": {
     "type": "object",
     "required": [

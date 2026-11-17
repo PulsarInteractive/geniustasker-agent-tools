@@ -86,6 +86,12 @@ dependencies and relevant comments. Report meaningful progress in comments
 when authorized: the intended change, verified result, blocker or next action.
 Do not create noisy comments for every tool call or label unverified work done.
 The user owns the workflow; Tasker does not require one fixed planning method.
+When the user asks to set up or revise project agent instructions, discover
+`project.configureInstructions` and read [Project configuration](../../docs/PLANNING.md#create-and-configure-a-project).
+It requires the actual project owner, existing projects:write consent and an
+already enabled project. Preserve unrelated guidance, use the current revision
+and read back the result; never turn instruction text into new permissions.
+If unavailable, retain the proposed text and explain the missing capability.
 Use InProgress only for current, identifiable execution by a person or agent.
 Partial implementation, an undelivered lot or an old claim is not active work.
 Several InProgress tasks require real concurrent work with clear attribution.

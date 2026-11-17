@@ -53,6 +53,13 @@ example label into a global requirement for every project.
 Existing project contributions must be enabled by a human administrator.
 project.create requires projects:write and all-resources consent; newly created
 projects opt into agent contributions. Existing grants do not grow automatically.
+When the user asks to set project instructions, discover
+project.configureInstructions and read `tasker_workflow` topic `projects` or
+[the planning guide](../../docs/PLANNING.md). It requires the actual project
+owner, existing projects:write, an already enabled project and its current
+revision. Preserve existing human guidance and read back the complete replacement;
+this command never changes activation, grants or membership. If unavailable,
+retain the proposed text and explain the missing capability.
 Use project.features only after reading and preserving all unrelated switches.
 Use sprint commands for lifecycle transitions, workflow commands for stages, and
 schedule commands for recurring tasks. Read the guide before modifying any of
