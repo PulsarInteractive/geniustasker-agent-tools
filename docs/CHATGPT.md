@@ -29,6 +29,23 @@ Read current records before changing them. ChatGPT can discover allowed actions,
 
 Use **read-only permissions** if you only want summaries. Write access does not grant administration, billing, permission management or access to another person's private data. Existing account limits apply to ChatGPT and the CLI together; connecting another tool does not create a fresh quota.
 
+When the connected server advertises `tasker_changes`, it can read one bounded
+change page per call using the normal shared read budget. Start with the
+`changeCursor` returned by the final eligible resource page; filtered checklist
+or metric inventories have no change cursor. Preserve the cursor exactly for
+the same scope, collection, archive selection and access context. Apply items
+and removals before saving `nextCursor`. Follow it while `hasMore` is true;
+otherwise respect `pollAfterSeconds` without starting an unbounded polling loop.
+A reset-required refusal means restarting the bounded inventory, not inventing
+a cursor or adding filters.
+
+For task availability, explicitly select the capability-advertised `taskState`
+version: v2 only when `taskStateVersions` includes it, otherwise v1 when
+advertised. Omission preserves the legacy response. Absent, Unknown or incomplete
+availability never means a task is available. Any advanced task checkpoint,
+including a removal without a dependent snapshot, invalidates old availability;
+reread the relevant task before starting or completing it.
+
 Disconnecting the plugin in ChatGPT removes its use there. Also revoke its dedicated connection from GeniusTasker's agent settings to invalidate its delegated sessions. Reconnecting requires consent again. This connector never needs your OpenAI API key.
 
 ## Language and shared limits

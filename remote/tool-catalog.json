@@ -2310,5 +2310,84 @@
     "write": true,
     "destructive": true,
     "idempotent": true
+  },
+  {
+    "name": "tasker_changes",
+    "title": "Read one bounded change page",
+    "description": "One call reads one bounded page and spends the normal read budget. Use the opaque changeCursor from a completed eligible resources inventory, or the previous nextCursor, for the same scope, collection, archive selection and access context. Filtered taskId/metricId inventories have no change cursor. Never invent or modify a cursor or add filters; after a reset-required refusal restart the bounded inventory. Follow nextCursor while hasMore; otherwise honor pollAfterSeconds and avoid unbounded polling. Explicit taskState opt-in follows capabilities: v2 only when taskStateVersions includes v2, otherwise v1 when advertised. Omission is legacy; absent or Unknown task availability never means available. A checkpoint advance, including remove without a snapshot, invalidates previous task availability decisions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "The exact scope used to obtain this cursor; never move a cursor between projects or accounts.",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "collection": {
+          "type": "string",
+          "description": "The exact permitted collection used to obtain this cursor.",
+          "minLength": 1,
+          "maxLength": 32,
+          "enum": [
+            "agentRuns",
+            "assets",
+            "checklist",
+            "comments",
+            "documentFolders",
+            "documents",
+            "edges",
+            "filters",
+            "gitHubLinks",
+            "goals",
+            "history",
+            "members",
+            "memory",
+            "metricCorrections",
+            "metricGoals",
+            "metricObservations",
+            "metrics",
+            "nodeIndex",
+            "nodes",
+            "pageIndex",
+            "pages",
+            "personalMetricCorrections",
+            "personalMetricGoals",
+            "personalMetricObservations",
+            "personalMetrics",
+            "preparedLists",
+            "project",
+            "projectDocumentIndex",
+            "projectDocuments",
+            "protocolInstances",
+            "questions",
+            "schedules",
+            "sprintHistory",
+            "sprints",
+            "tags",
+            "taskTemplates",
+            "tasks",
+            "workflows"
+          ]
+        },
+        "cursor": {
+          "type": "string",
+          "description": "Opaque server continuation. Preserve every byte; no timestamps, offsets, hand-built cursors or cursors from filtered inventories.",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "taskState": {
+          "type": "string",
+          "enum": ["v1", "v2"],
+          "description": "Tasks only. Explicitly keep the capability-supported availability version used for task reads; v1 omits Paused snapshots, v2 includes pause metadata. Omit on older services."
+        }
+      },
+      "required": ["scope", "collection", "cursor"],
+      "additionalProperties": false
+    },
+    "scopes": [],
+    "route": "changes",
+    "write": false,
+    "destructive": false
   }
 ]

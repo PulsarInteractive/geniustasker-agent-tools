@@ -77,3 +77,35 @@ test('every command can request its exact permission without unrelated write gra
     assert.equal(tool.write, true);
   }
 });
+
+test('hosted changes accepts one bounded opaque continuation with explicit task-state opt-in', () => {
+  const changes = tools.find((tool) => tool.name === 'tasker_changes');
+  assert.ok(changes);
+  assert.equal(changes.route, 'changes');
+  assert.equal(changes.write, false);
+  assert.equal(changes.destructive, false);
+  assert.deepEqual(changes.scopes, []);
+  assert.deepEqual([...changes.inputSchema.required].sort(), ['collection', 'cursor', 'scope']);
+  assert.deepEqual(changes.inputSchema.properties.taskState.enum, ['v1', 'v2']);
+  const validate = new Ajv({ strict: false }).compile(changes.inputSchema);
+  const base = { scope: 'project:work', collection: 'tasks', cursor: 'opaque+/=continuation' };
+  for (const input of [base, { ...base, taskState: 'v1' }, { ...base, taskState: 'v2' }]) {
+    assert.equal(validate(input), true);
+  }
+  for (const input of [
+    { ...base, cursor: '' },
+    { ...base, cursor: 'x'.repeat(4097) },
+    { ...base, scope: '' },
+    { ...base, collection: 'unknown' },
+    { ...base, taskState: 'v3' },
+    ...['after', 'archive', 'taskId', 'metricId', 'limit', 'pollSeconds'].map((key) => ({
+      ...base,
+      [key]: 'not-a-change-filter',
+    })),
+  ]) {
+    assert.equal(validate(input), false);
+  }
+  assert.match(changes.description, /one bounded page/i);
+  assert.match(changes.description, /pollAfterSeconds/);
+  assert.match(changes.description, /normal read budget/);
+});
