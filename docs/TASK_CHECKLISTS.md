@@ -9,7 +9,10 @@ Use a checklist for small, checkable steps of the same deliverable. Create a
 separate ticket when a step needs an independent owner, dependency, deadline or
 effort estimate. Do not hide independently planned work inside checkbox text.
 Preserve the user's existing breakdown; configure it when requested or within
-the authorized task planning scope, without expanding the deliverable.
+the authorized task planning scope, without expanding the deliverable. For
+example, “verify the form” and “check its error state” can be steps of the same
+form fix; a review assigned to a different owner belongs in its own ticket.
+Do not split a checklist into tickets merely to raise task counts or rewards.
 
 ## Read the relevant task
 
@@ -63,7 +66,16 @@ Save one immutable command before sending and replay that same operation after
 an uncertain reply. A new operation after a definitive conflict needs fresh
 reads. A successful checklist edit changes parent totals/revision, so reread
 before the next run operation or parent edit. Respect current authorization,
-archived-task restrictions, storage admission and the 50-item limit.
+storage admission and the 50-item limit.
+
+Archived tasks allow authorized reading, but checklist writes are refused. Do
+not restore a task merely to bypass that refusal; restoration must itself belong
+to the requested work. An unarchived Done task can have its checklist corrected
+without reopening it: unchecking leaves Done and its completion history intact.
+If the correction reveals unfinished acceptance work, reconcile the task's
+progress explicitly within the authorized work; never imply the checkbox
+performed a reopening. Paused tasks keep their reason, next steps and pause time
+through checklist edits, even when the checklist reaches 100%.
 
 Checking a case records that small step only. It gives no XP or push, and 100%
 does not mark the task Done. Editing, checking, moving or clearing a checklist
