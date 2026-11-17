@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-beta.14 — 2026-11-17
 
 - Add generated task create/update help and task/run lock commands without expanding task permissions. Guides distinguish canonical progress from current availability, preserve dependency locks after manual unlock and require the live run path for a claimed task. Availability and deployment remain server-authoritative.
 - Read task availability only through explicit `taskState: "v1"` / `--task-state v1` after capability discovery. Legacy reads retain their old response shape. Validate optional task snapshots without treating an absent or incomplete source as available.

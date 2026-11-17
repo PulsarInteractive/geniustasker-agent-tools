@@ -53,6 +53,10 @@ the dependent task's row revision does not change and no dependent delta is
 sent. The snapshot head can be newer than a change page's historical checkpoint.
 Keep those values separate; never rewrite one from the other. Discard older
 availability decisions when the source changes and reread the relevant task.
+Any advanced task-module head or checkpoint invalidates older availability,
+including a delta containing only `remove` with no dependent snapshot. There
+is no dependent fanout. Before starting or completing work, reread that exact
+task with the advertised opt-in and use its current availability.
 The client revalidates cached resource reads with the server; historical output
 and a command receipt are not a present permission or availability grant.
 
