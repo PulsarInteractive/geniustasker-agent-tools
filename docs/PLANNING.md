@@ -7,7 +7,8 @@ Inspect `capabilities` and the current record before preparing a command.
 ## Progress and effort
 
 Use the task's actual progress: `New` means not yet started, `InProgress` means
-current, identifiable execution, and `Done` means the intended work and
+current, identifiable execution, `Paused` records a known interruption, and
+`Done` means the intended work and
 acceptance criteria are verified. Partly implemented code, an undelivered lot
 or unfinished acceptance criteria do not by themselves establish active work.
 Creating a plan, assigning an owner or claiming an agent run does not itself
@@ -25,11 +26,12 @@ tasks because their reports or lease are stale.
 
 For a known pause or interruption of work you control, preserve descriptions,
 comments and verified results, and record a useful reason plus the concrete
-point at which work should resume. A dedicated `Paused` lifecycle is being
-implemented; it is not yet delivered by this guidance. Until the connected
-service exposes the exact pause/resume contract, record the interruption in
-an authorized note and explain the missing transition. Do not invent a command,
-send an unsupported enum or relabel started work as New or Done. A manual lock
+point at which work should resume. Read [explicit pause/resume](TASK_PAUSES.md)
+and discover `task.pause/resume` or the live run equivalents before use. These
+are local source additions, not yet published or deployed. Until the service
+supports them, retain an authorized note and explain the missing transition.
+Use dedicated commands to pause/resume; never patch status or relabel started
+work as New or Done. Resume explicitly only for actual execution. A manual lock
 requires an actual obstacle, not merely switching to another work item.
 Silence, an absent heartbeat or lease expiry is not proof of interruption.
 
@@ -69,7 +71,7 @@ permissions, live references and lifecycle rules remain server-authoritative.
 
 For a blocked task or an authorized manual lock, read
 [task locks and current availability](TASK_LOCKS.md). Locked is an effective
-availability state, not a fourth canonical progress value.
+availability state, independent of canonical progress and a known pause.
 
 | Operation         | Commands                                                       | Required access                                                                            |
 | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |

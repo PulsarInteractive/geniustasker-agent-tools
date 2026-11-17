@@ -7,6 +7,9 @@ export default {
     "dependencyCount",
     "incomplete",
     "manualReason",
+    "pauseNextSteps",
+    "pauseReason",
+    "pausedAt",
     "progress",
     "source",
     "status"
@@ -40,6 +43,36 @@ export default {
         }
       ]
     },
+    "pauseNextSteps": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pauseReason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pausedAt": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "progress": {
       "oneOf": [
         {
@@ -52,6 +85,12 @@ export default {
           "type": "string",
           "enum": [
             "InProgress"
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "Paused"
           ]
         },
         {
@@ -94,6 +133,12 @@ export default {
           "type": "string",
           "enum": [
             "InProgress"
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "Paused"
           ]
         },
         {

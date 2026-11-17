@@ -8,3 +8,4 @@ LICENSE
 LICENSES/
 src/feedback-contract.mjs
 src/task-availability-contract.mjs
+src/task-state-legacy-contract.mjs

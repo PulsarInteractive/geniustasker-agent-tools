@@ -32,9 +32,11 @@ event and report that refusal rather than starting an unauthorized replacement.
 Working checkpoints describe current identifiable execution, not merely partial
 implementation. Multiple task InProgress states require actual concurrent work.
 If the host knows work was interrupted, retain its reason and resumption point;
-these events do not themselves pause or resume the task. The dedicated Paused
-contract is forthcoming, so never invent a status/command or reset started work
-to New. An expired lease or silence alone is not an observed interruption.
+these events do not themselves pause or resume the task. Discover the separate
+[run.pause/run.resume commands](../../../docs/TASK_PAUSES.md) before use, retaining
+current run/task revisions and an exact operation. These additions are local
+source, not yet published/deployed. Never patch status or reset started work to
+New. An expired lease or silence alone is not an observed interruption.
 
 ## Save the event before sending
 

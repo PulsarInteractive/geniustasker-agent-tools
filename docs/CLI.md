@@ -583,14 +583,16 @@ current authorization and semantic validation remain server-side.
 
 ## Agent runs
 
-Task create/update and manual lock input schemas are available through
-`commands describe --kind task.create` (or `task.update`, `task.lock`,
-`task.unlock`, `run.lock`, `run.unlock`). Read
-[task locks and current availability](TASK_LOCKS.md) before a lock or unlock.
-These source additions are not a claim of npm publication or production rollout.
-Use `--task-state v1` on task resource/change/watch reads only after the tasks
-collection advertises `taskState: "v1"` in capabilities. Omission preserves the
-legacy response shape; the client does not silently request the new projection.
+Task create/update, manual lock and explicit pause input schemas are available
+through `commands describe --kind task.create` (or `task.update`, `task.lock`,
+`task.unlock`, `run.lock`, `run.unlock`, `task.pause`, `task.resume`, `run.pause`,
+`run.resume`). Read [task locks](TASK_LOCKS.md) and [pause/resume](TASK_PAUSES.md)
+before use. Pause/v2 are local source additions, not yet published or deployed.
+Use `--task-state v2` on task resource/change/watch reads only after the tasks
+collection advertises v2 in `taskStateVersions`. Otherwise select v1 only when
+`taskState: "v1"` is advertised. V1 omits the snapshot for Paused tasks; an absent
+snapshot never establishes availability. Omission preserves the legacy response
+shape; the client does not silently request a projection or discover capabilities.
 
 Discover the `agentRuns` collection and `run.claim`, `run.checkpoint`, `run.patch`,
 `run.finish` commands before using them. Inspect each schema with
@@ -620,3 +622,16 @@ window and overlapping instructions without writing. Follow
 ## Feedback
 
 Use [the feedback guide](FEEDBACK.md) for authorized bug reports, feature suggestions, screenshots and final decisions. Availability follows current server capabilities, grants and plan. Preparing a report does not send it; submit after the user’s reporting instruction or agreement.
+
+## Task checklists
+
+Read [checklist commands and recovery](TASK_CHECKLISTS.md) before using these
+local, not yet published/deployed additions. Discover checklist and commands
+first. Read one task with `resources list --scope project:ID --collection
+checklist --task-id TASK_ID`, or one item with `--id ITEM_ID`. Preserve taskId,
+epoch and checkpoint during pagination; filtered lists have no changeCursor.
+The same taskId field is available through local MCP tasker_resources and hosted
+MCP tasker_resources/tasker_read_tasks.
+Inspect exact schemas with `commands describe --kind checklist.create` (also
+update/move/remove or run.checklist under a live claim). Checking is an explicit
+boolean, never a toggle or automatic task completion.

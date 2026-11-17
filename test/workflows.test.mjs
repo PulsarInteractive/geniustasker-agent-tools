@@ -47,7 +47,7 @@ test('hosted archive filters use the API values, not boolean strings', () => {
     const canReadTasks = tool.inputSchema.properties.collection.enum.includes('tasks');
     assert.equal(Object.hasOwn(tool.inputSchema.properties, 'taskState'), canReadTasks);
     if (canReadTasks) {
-      assert.deepEqual(tool.inputSchema.properties.taskState.enum, ['v1']);
+      assert.deepEqual(tool.inputSchema.properties.taskState.enum, ['v1', 'v2']);
       assert.equal(tool.inputSchema.required.includes('taskState'), false);
     }
   }
@@ -81,7 +81,7 @@ test('project guidance is served intact by real local MCP without credentials or
   for (const name of ['tasker_resources', 'tasker_changes', 'tasker_watch']) {
     const tool = listed.find((item) => item.name === name);
     assert.ok(tool, name);
-    assert.equal(tool.inputSchema.properties.taskState.const, 'v1');
+    assert.deepEqual(tool.inputSchema.properties.taskState.enum, ['v1', 'v2']);
     assert.equal(tool.inputSchema.required.includes('taskState'), false);
   }
   assert.equal(
@@ -91,7 +91,7 @@ test('project guidance is served intact by real local MCP without credentials or
     ),
     false,
   );
-  for (const topic of ['projects', 'planning', 'protocols', 'runs']) {
+  for (const topic of ['projects', 'planning', 'protocols', 'runs', 'checklist']) {
     const result = await client.callTool({
       name: 'tasker_workflow',
       arguments: { topic },
@@ -109,6 +109,15 @@ test('project guidance is served intact by real local MCP without credentials or
     'task.unlock',
     'run.lock',
     'run.unlock',
+    'task.pause',
+    'task.resume',
+    'run.pause',
+    'run.resume',
+    'checklist.create',
+    'checklist.update',
+    'checklist.move',
+    'checklist.remove',
+    'run.checklist',
   ]) {
     const help = await client.callTool({ name: 'tasker_command_help', arguments: { kind } });
     assert.notEqual(help.isError, true);

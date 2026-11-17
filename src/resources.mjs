@@ -3,9 +3,9 @@ import { fail } from './errors.mjs';
 import { validTaskAvailabilityPage } from './task-availability.mjs';
 
 export const taskStateSchema = z
-  .literal('v1')
+  .enum(['v1', 'v2'])
   .describe(
-    'Explicit opt-in for tasks only, after capabilities.collections[id=tasks].taskState advertises v1. Omit on older deployments; absence does not mean available.',
+    'Explicit task-only opt-in after discovery: choose v2 when capabilities.collections[id=tasks].taskStateVersions includes v2, otherwise v1 only when taskState advertises v1. Omit on older deployments. A missing snapshot never means available; v1 omits snapshots for Paused tasks.',
   );
 
 export const resourceScopeSchema = z
@@ -21,6 +21,7 @@ export const resourceReadSchema = z
     epoch: z.string().max(4096).optional(),
     checkpoint: z.string().max(4096).optional(),
     id: z.string().min(1).max(128).optional(),
+    taskId: z.string().min(1).max(128).optional(),
     metricId: z
       .string()
       .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/)
@@ -50,7 +51,7 @@ export const metricHistoryCollections = [
   'personalMetricCorrections',
 ];
 export const metricReadSchema = resourceReadSchema
-  .omit({ path: true, taskState: true })
+  .omit({ path: true, taskState: true, taskId: true })
   .extend({
     collection: z.enum(metricCollections),
   })
@@ -58,7 +59,10 @@ export const metricReadSchema = resourceReadSchema
 
 /** Personal access is an explicit metric surface, never a generic account read.
  * Current owner, grant and project rights are always checked by the server. */
-export function validateResourceScope({ scope, collection, metricId, taskState }) {
+export function validateResourceScope({ scope, collection, metricId, taskState, taskId }) {
+  if (taskId !== undefined && collection !== 'checklist') {
+    fail('invalid_arguments', 'taskId filters the checklist collection only.');
+  }
   if (taskState !== undefined && collection !== 'tasks') {
     fail('invalid_arguments', 'taskState is available only for the tasks collection.');
   }
@@ -89,6 +93,9 @@ export async function readResources(client, input) {
   }
   const requested = parsed.data;
   validateResourceScope(requested);
+  if (requested.collection === 'checklist' && !requested.taskId && !requested.id) {
+    fail('invalid_arguments', 'Read a checklist with its taskId or one exact item id.');
+  }
   if (requested.after && (!requested.epoch || !requested.checkpoint)) {
     fail(
       'invalid_arguments',

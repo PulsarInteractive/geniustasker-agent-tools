@@ -76,7 +76,18 @@ const checked = (schema, value) => {
   }
   return parsed.data;
 };
-/** Validate the public envelope, generated field allowlist and resource scope. */
+const dataValidators = new Map();
+function validateCommandData(kind, data) {
+  const schema = commandInputSchemas[kind];
+  if (!schema) {
+    return;
+  }
+  if (!dataValidators.has(kind)) {
+    dataValidators.set(kind, z.fromJSONSchema(schema));
+  }
+  checked(dataValidators.get(kind), data);
+}
+/** Validate the public envelope, generated data schema and resource scope. */
 export function validateCommand(value) {
   const command = checked(commandSchema, value),
     definition = catalog.commands[command.kind];
@@ -91,6 +102,7 @@ export function validateCommand(value) {
       'Use the declared command fields and size limit. Creation requires a null revision; updates require the current record revision. Declared upserts use the revision returned by their dedicated read.',
     );
   }
+  validateCommandData(command.kind, command.data);
   const prefix =
     command.scope.startsWith('personal:') && definition.personalModule
       ? 'personal:'

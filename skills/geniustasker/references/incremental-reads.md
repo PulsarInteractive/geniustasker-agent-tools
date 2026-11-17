@@ -5,8 +5,10 @@ For task availability, first follow the capability opt-in in
 checkpoint invalidates older availability decisions even when the delta is
 only a `remove` and contains no snapshot for the dependent task. Dependents do
 not receive synthetic deltas. Before starting or completing a task, reread its
-exact ID with the advertised `taskState: "v1"` option and check the current
-snapshot; absence or incomplete/Unknown is not permission to proceed. Keep
+exact ID with explicitly selected `taskState: "v2"` when the tasks collection's
+`taskStateVersions` advertises v2, otherwise v1 only when `taskState` advertises
+v1, and check the current snapshot. V1 omits snapshots for Paused tasks; absence
+or incomplete/Unknown is not permission to proceed. Keep
 snapshot source heads separate from historical change-window checkpoints.
 
 After a complete resource read, retain its final `changeCursor`. Use

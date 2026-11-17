@@ -79,7 +79,12 @@ test('official MCP client discovers strict tools and reads pages over real stdio
         }),
       );
     } else if (url.pathname.endsWith('/capabilities')) {
-      response.end(JSON.stringify({ writesAvailable: false, collections: [{ id: 'tasks' }] }));
+      response.end(
+        JSON.stringify({
+          writesAvailable: false,
+          collections: [{ id: 'tasks', taskState: 'v1', taskStateVersions: ['v1', 'v2'] }],
+        }),
+      );
     } else if (url.pathname.endsWith('/projects')) {
       response.end(JSON.stringify({ items: [], nextAfter: 'next-visible-scan' }));
     } else if (url.pathname.endsWith('/answers')) {
@@ -182,6 +187,7 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   );
   const cap = await client.callTool({ name: 'tasker_capabilities', arguments: {} });
   assert.equal(cap.structuredContent.data.writesAvailable, false);
+  assert.deepEqual(cap.structuredContent.data.collections[0].taskStateVersions, ['v1', 'v2']);
   const projects = await client.callTool({ name: 'tasker_projects', arguments: {} });
   assert.equal(projects.structuredContent.data.nextAfter, 'next-visible-scan');
   const page = await client.callTool({
@@ -196,14 +202,38 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   });
   assert.equal(page.structuredContent.data.items[0].id, 'task-1');
   assert.ok(requests.at(-1).includes('checkpoint=c'));
+  for (const name of ['tasker_resources']) {
+    for (const taskState of ['v1', 'v2']) {
+      const result = await client.callTool({
+        name,
+        arguments: { scope: 'project:one', collection: 'tasks', taskState },
+      });
+      assert.notEqual(result.isError, true);
+      assert.ok(requests.at(-1).includes('taskState=' + taskState));
+      assert.equal(
+        Object.hasOwn(result.structuredContent.data.items[0], 'taskAvailability'),
+        false,
+      );
+    }
+  }
+  for (const name of ['tasker_resources']) {
+    const result = await client.callTool({
+      name,
+      arguments: { scope: 'project:one', collection: 'checklist', taskId: 'task-1' },
+    });
+    assert.notEqual(result.isError, true);
+    assert.ok(requests.at(-1).includes('taskId=task-1'));
+  }
+
   for (const name of ['tasker_changes', 'tasker_watch']) {
     const delta = await client.callTool({
       name,
-      arguments: { scope: 'project:one', collection: 'tasks', cursor: 'initial' },
+      arguments: { scope: 'project:one', collection: 'tasks', cursor: 'initial', taskState: 'v2' },
     });
     const result = delta.structuredContent.data;
     assert.equal((result.page ?? result).items[0].kind, 'remove');
     assert.ok(requests.at(-1).includes('cursor=initial'));
+    assert.ok(requests.at(-1).includes('taskState=v2'));
   }
   const answers = await client.callTool({
     name: 'tasker_question_answers',

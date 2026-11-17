@@ -227,6 +227,7 @@ export const commands = {
       'path',
       'metric-id',
       'task-state',
+      'task-id',
     ],
   },
   'changes list': {
@@ -678,7 +679,13 @@ export async function main(
         commands[command].options
           .filter((key) => options[key] !== undefined)
           .map((key) => [
-            key === 'metric-id' ? 'metricId' : key === 'task-state' ? 'taskState' : key,
+            key === 'metric-id'
+              ? 'metricId'
+              : key === 'task-state'
+                ? 'taskState'
+                : key === 'task-id'
+                  ? 'taskId'
+                  : key,
             options[key],
           ]),
       );

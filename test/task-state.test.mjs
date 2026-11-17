@@ -7,7 +7,17 @@ import { readResources } from '../src/resources.mjs';
 import { readChanges, watchChanges } from '../src/changes.mjs';
 import { fixture } from './helpers.mjs';
 
-const kinds = ['task.create', 'task.update', 'task.lock', 'task.unlock', 'run.lock', 'run.unlock'];
+const transitions = [
+  'task.lock',
+  'task.unlock',
+  'run.lock',
+  'run.unlock',
+  'task.pause',
+  'task.resume',
+  'run.pause',
+  'run.resume',
+];
+const kinds = ['task.create', 'task.update', ...transitions];
 const query = { scope: 'project:work', collection: 'tasks' };
 const availability = (patch = {}) => ({
   progress: 'New',
@@ -57,8 +67,48 @@ test('generated task help describes creation, partial edits and exact lock data 
     true,
   );
   assert.equal(check['task.create']({}), false);
+  for (const kind of ['task.create', 'task.update']) {
+    const base = kind === 'task.create' ? { title: 'Valid title' } : {};
+    assert.equal(check[kind]({ ...base, description: 'x'.repeat(600) }), true);
+    assert.equal(check[kind]({ ...base, description: 'x'.repeat(601) }), false);
+    assert.equal(check[kind]({ ...base, description: 'x'.repeat(618) }), false);
+  }
+  assert.match(
+    JSON.stringify(commandHelp({ kind: 'task.update' }).properties.status),
+    /cannot pause or resume/,
+  );
+  for (const kind of ['task.pause', 'run.pause']) {
+    const base = kind.startsWith('run.') ? { taskRevision: '7' } : {};
+    assert.equal(
+      check[kind]({
+        ...base,
+        reason: 'Switching to the requested investigation',
+        nextSteps: 'Resume the saved test run',
+      }),
+      true,
+    );
+    assert.equal(
+      check[kind]({ ...base, reason: 'x'.repeat(500), nextSteps: 'x'.repeat(2000) }),
+      true,
+    );
+    for (const data of [
+      { reason: '', nextSteps: 'next' },
+      { reason: 'reason', nextSteps: '' },
+      { reason: 'x'.repeat(501), nextSteps: 'next' },
+      { reason: 'reason', nextSteps: 'x'.repeat(2001) },
+      { reason: 'reason' },
+      { nextSteps: 'next' },
+    ]) {
+      assert.equal(check[kind]({ ...base, ...data }), false);
+    }
+  }
+  assert.equal(check['run.pause']({ reason: 'reason', nextSteps: 'next' }), false);
+  assert.equal(check['task.resume']({}), true);
+  assert.equal(check['task.resume']({ status: 'InProgress' }), false);
+  assert.equal(check['run.resume']({ taskRevision: '7' }), true);
+  assert.equal(check['run.resume']({}), false);
   assert.equal(check['task.update']({}), true);
-  for (const status of ['New', 'InProgress', 'Done', null]) {
+  for (const status of ['New', 'InProgress', 'Paused', 'Done', null]) {
     assert.equal(check['task.update']({ status }), true);
   }
   for (const estimateDays of [0.1, 1, 60, null]) {
@@ -142,10 +192,13 @@ test('manual task and claimed-run locks keep targets, revisions and exact envelo
     });
   });
   const journal = new CommandJournal(f.client);
-  for (const kind of ['task.lock', 'task.unlock', 'run.lock', 'run.unlock']) {
+  for (const kind of transitions) {
     const data = {
       ...(kind.startsWith('run.') ? { taskRevision: '7' } : {}),
       ...(kind.endsWith('.lock') ? { reason: 'Waiting for the test device.' } : {}),
+      ...(kind.endsWith('.pause')
+        ? { reason: 'Switching to another authorized task', nextSteps: 'Resume the saved check' }
+        : {}),
     };
     const draft = {
       kind,
@@ -156,10 +209,7 @@ test('manual task and claimed-run locks keep targets, revisions and exact envelo
       data,
     };
     const prepared = await journal.prepare(draft);
-    assert.equal(
-      requests.size,
-      ['task.lock', 'task.unlock', 'run.lock', 'run.unlock'].indexOf(kind),
-    );
+    assert.equal(requests.size, transitions.indexOf(kind));
     await assert.rejects(journal.retry(prepared.operationId), { code: 'network_unavailable' });
     await journal.retry(prepared.operationId);
     assert.equal((await journal.retry(prepared.operationId)).source, 'local_receipt');
@@ -326,6 +376,12 @@ test('CLI resources, changes and bounded watch preserve an explicit task-state c
         ]);
     if (!expected) {
       delete page.items[0].taskAvailability;
+    } else if (expected === 'v2') {
+      Object.assign(page.items[0].taskAvailability, {
+        pauseReason: null,
+        pauseNextSteps: null,
+        pausedAt: null,
+      });
     }
     return Response.json(page);
   });
@@ -334,7 +390,7 @@ test('CLI resources, changes and bounded watch preserve an explicit task-state c
     ['changes', 'list'],
     ['changes', 'watch'],
   ]) {
-    for (const taskState of [undefined, 'v1']) {
+    for (const taskState of [undefined, 'v1', 'v2']) {
       expected = taskState;
       let stdout = '',
         stderr = '';
@@ -370,7 +426,7 @@ test('CLI resources, changes and bounded watch preserve an explicit task-state c
       assert.equal(status, 0, stderr);
       const result = JSON.parse(stdout).data;
       const page = command[1] === 'watch' ? result.page : result;
-      assert.equal(Object.hasOwn(page.items[0], 'taskAvailability'), taskState === 'v1');
+      assert.equal(Object.hasOwn(page.items[0], 'taskAvailability'), taskState !== undefined);
     }
   }
 });
@@ -382,7 +438,11 @@ test('task-state versions and collection mismatches fail before authentication; 
     { authenticated: false },
   );
   for (const read of [readResources, readChanges, watchChanges]) {
-    for (const invalid of [{ taskState: 'v2' }, { taskState: 'v1', collection: 'comments' }]) {
+    for (const invalid of [
+      { taskState: 'v3' },
+      { taskState: 'v1', collection: 'comments' },
+      { taskState: 'v2', collection: 'comments' },
+    ]) {
       await assert.rejects(
         read(unauthenticated.client, {
           ...query,
@@ -412,4 +472,115 @@ test('task-state versions and collection mismatches fail before authentication; 
   await assert.rejects(readChanges(f.client, { ...query, cursor: 'previous' }), {
     code: 'invalid_response',
   });
+});
+
+test('v2 reads require all nullable pause fields, preserve independent locks and never reinterpret v1 absence', async (t) => {
+  let snapshot = availability({
+    progress: 'Paused',
+    status: 'Paused',
+    dependencyCount: 0,
+    blockingIds: [],
+    pauseReason: 'Known interruption',
+    pauseNextSteps: 'Resume verification',
+    pausedAt: '2026-11-17T12:00:00.000Z',
+  });
+  let progress = 'Paused';
+  const f = await fixture(t, async (url) => {
+    const item = {
+      id: 'dependent',
+      revision: '7',
+      data: { status: progress },
+      ...(snapshot === undefined ? {} : { taskAvailability: snapshot }),
+    };
+    return Response.json(
+      url.pathname.endsWith('/resources')
+        ? { ...resourcePage(), items: [item] }
+        : changePage([{ ...item, kind: 'upsert' }]),
+    );
+  });
+  for (const read of [readResources, readChanges]) {
+    const input = {
+      ...query,
+      ...(read === readChanges ? { cursor: 'previous' } : {}),
+      taskState: 'v2',
+    };
+    const paused = structuredClone(snapshot);
+    assert.equal((await read(f.client, input)).items[0].taskAvailability.progress, 'Paused');
+    snapshot = { ...paused, status: 'Locked', manualReason: 'Waiting for access' };
+    assert.equal((await read(f.client, input)).items[0].taskAvailability.status, 'Locked');
+    for (const field of ['pauseReason', 'pauseNextSteps', 'pausedAt']) {
+      snapshot = { ...paused };
+      delete snapshot[field];
+      await assert.rejects(read(f.client, input), { code: 'invalid_response' });
+    }
+    snapshot = { ...paused, pauseReason: null, pauseNextSteps: null, pausedAt: null };
+    assert.equal((await read(f.client, input)).items[0].taskAvailability.pauseReason, null);
+    await assert.rejects(read(f.client, { ...input, taskState: 'v1' }), {
+      code: 'invalid_response',
+    });
+    snapshot = availability();
+    await assert.rejects(read(f.client, input), { code: 'invalid_response' });
+    // Even a syntactically v1 snapshot is invalid beside a known Paused task.
+    await assert.rejects(read(f.client, { ...input, taskState: 'v1' }), {
+      code: 'invalid_response',
+    });
+    snapshot = undefined;
+    for (const taskState of [undefined, 'v1', 'v2']) {
+      const result = await read(f.client, { ...input, taskState });
+      assert.equal(Object.hasOwn(result.items[0], 'taskAvailability'), false);
+      assert.equal(result.items[0].data.status, 'Paused');
+    }
+    progress = 'InProgress';
+    snapshot = availability();
+    assert.deepEqual(
+      (await read(f.client, { ...input, taskState: 'v1' })).items[0].taskAvailability,
+      snapshot,
+    );
+    snapshot = paused;
+    progress = 'Paused';
+  }
+});
+
+test('v2, v1 and legacy resource cache validators remain distinct without capability requests', async (t) => {
+  const calls = new Map();
+  const f = await fixture(t, async (url) => {
+    assert.equal(url.pathname, '/api/agents/v1/resources');
+    const version = url.searchParams.get('taskState') ?? 'legacy';
+    const page = resourcePage();
+    page.etag = version + '-etag';
+    if (version === 'legacy') {
+      delete page.items[0].taskAvailability;
+    }
+    if (version === 'v2') {
+      Object.assign(page.items[0].taskAvailability, {
+        pauseReason: null,
+        pauseNextSteps: null,
+        pausedAt: null,
+      });
+    }
+    const previous = calls.get(version) ?? 0;
+    assert.equal(url.searchParams.get('ifNoneMatch'), previous ? page.etag : null);
+    calls.set(version, previous + 1);
+    return Response.json(previous ? { ...page, items: [], notModified: true } : page);
+  });
+  for (let i = 0; i < 2; i++) {
+    for (const taskState of [undefined, 'v1', 'v2']) {
+      const result = await readResources(f.client, { ...query, taskState });
+      assert.equal(Object.hasOwn(result.items[0], 'taskAvailability'), taskState !== undefined);
+      if (taskState) {
+        assert.equal(
+          Object.hasOwn(result.items[0].taskAvailability, 'pauseReason'),
+          taskState === 'v2',
+        );
+      }
+    }
+  }
+  assert.deepEqual(
+    [...calls.entries()],
+    [
+      ['legacy', 2],
+      ['v1', 2],
+      ['v2', 2],
+    ],
+  );
 });

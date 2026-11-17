@@ -31,6 +31,48 @@ export default {
       "module": "Project/ProjectTaskComment",
       "permission": "approvals:write"
     },
+    "checklist.create": {
+      "action": "createChecklistItem",
+      "create": true,
+      "fields": [
+        "task",
+        "title"
+      ],
+      "inputSchema": "GeniusTasker.Checklists.Create",
+      "module": "Project/ProjectTaskChecklistItem",
+      "permission": "tasks:write"
+    },
+    "checklist.move": {
+      "action": "moveChecklistItem",
+      "fields": [
+        "task",
+        "neighborId",
+        "neighborRevision"
+      ],
+      "inputSchema": "GeniusTasker.Checklists.Move",
+      "module": "Project/ProjectTaskChecklistItem",
+      "permission": "tasks:write"
+    },
+    "checklist.remove": {
+      "action": "removeChecklistItem",
+      "fields": [
+        "task"
+      ],
+      "inputSchema": "GeniusTasker.Checklists.Remove",
+      "module": "Project/ProjectTaskChecklistItem",
+      "permission": "tasks:write"
+    },
+    "checklist.update": {
+      "action": "updateChecklistItem",
+      "fields": [
+        "task",
+        "title",
+        "checked"
+      ],
+      "inputSchema": "GeniusTasker.Checklists.Update",
+      "module": "Project/ProjectTaskChecklistItem",
+      "permission": "tasks:write"
+    },
     "comment.create": {
       "create": true,
       "fields": [
@@ -544,6 +586,18 @@ export default {
       "module": "$private/VoteDraft",
       "permission": "questions:write"
     },
+    "run.checklist": {
+      "action": "checklistRunTask",
+      "fields": [
+        "taskRevision",
+        "itemId",
+        "itemRevision",
+        "change"
+      ],
+      "inputSchema": "GeniusTasker.Runs.Checklist",
+      "module": "Project/ProjectAgentRun",
+      "permission": "tasks:write"
+    },
     "run.checkpoint": {
       "action": "checkpointRun",
       "fields": [
@@ -599,6 +653,26 @@ export default {
         "patch"
       ],
       "inputSchema": "GeniusTasker.Runs.Patch",
+      "module": "Project/ProjectAgentRun",
+      "permission": "tasks:write"
+    },
+    "run.pause": {
+      "action": "pauseRunTask",
+      "fields": [
+        "taskRevision",
+        "reason",
+        "nextSteps"
+      ],
+      "inputSchema": "GeniusTasker.Runs.Pause",
+      "module": "Project/ProjectAgentRun",
+      "permission": "tasks:write"
+    },
+    "run.resume": {
+      "action": "resumeRunTask",
+      "fields": [
+        "taskRevision"
+      ],
+      "inputSchema": "GeniusTasker.Runs.Resume",
       "module": "Project/ProjectAgentRun",
       "permission": "tasks:write"
     },
@@ -781,6 +855,16 @@ export default {
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },
+    "task.pause": {
+      "action": "pauseTask",
+      "fields": [
+        "reason",
+        "nextSteps"
+      ],
+      "inputSchema": "GeniusTasker.TaskPlanning.PauseTask",
+      "module": "Project/ProjectTask",
+      "permission": "tasks:write"
+    },
     "task.report": {
       "fields": [
         "phase",
@@ -794,6 +878,13 @@ export default {
     },
     "task.restore": {
       "fields": [],
+      "module": "Project/ProjectTask",
+      "permission": "tasks:write"
+    },
+    "task.resume": {
+      "action": "resumeTask",
+      "fields": [],
+      "inputSchema": "GeniusTasker.TaskPlanning.ResumeTask",
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },

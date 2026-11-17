@@ -14,7 +14,14 @@ test('structured command help preserves protocol schemas, nullable fields and in
     ['protocol.apply', 'protocol.cancel', 'protocol.publish', 'protocol.start'],
   );
   const text = JSON.stringify(schemas);
-  assert.ok(!/x-web-core-|\$private|"action"|"\$ref"|nullable/.test(text));
+  assert.ok(!/x-web-core-|\$private|"\$ref"|nullable/.test(text));
+  for (const [kind, schema] of Object.entries(schemas)) {
+    assert.equal(Object.hasOwn(schema.properties, 'action'), false);
+    // The generated nested checklist discriminant is intentionally public.
+    if (kind !== 'run.checklist') {
+      assert.ok(!JSON.stringify(schema).includes('"action"'));
+    }
+  }
   const validate = Object.fromEntries(
     Object.entries(schemas).map(([kind, schema]) => [
       kind,

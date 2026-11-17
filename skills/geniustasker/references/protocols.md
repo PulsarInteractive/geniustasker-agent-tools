@@ -163,9 +163,11 @@ steps with current identifiable execution InProgress; multiple steps need real
 parallel work and clear actors. Partial code or remaining delivery work alone
 does not qualify. If a started step is knowingly interrupted, preserve its work
 and record the reason and resumption point. Follow
-[current progress guidance](../../../docs/PLANNING.md#progress-and-effort) for
-the forthcoming Paused lifecycle; do not invent its wire or reset started work
-to New. An old lease is not evidence that another worker stopped.
+[explicit pause/resume](../../../docs/TASK_PAUSES.md): discover task.pause/resume
+or the live run equivalents before use. These additions are local source, not
+yet published/deployed. Never patch status or reset started work to New; resume
+only for real renewed execution. If unsupported, retain an authorized note.
+An old lease is not evidence that another worker stopped.
 
 CLI example for inspection, without creation:
 

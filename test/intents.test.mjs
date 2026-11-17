@@ -106,7 +106,14 @@ test('only the declared intent aggregate supports initial null and current non-n
         id: 'owner',
         expectedRevision: revision,
         kind: 'intent.change',
-        data: {},
+        data: {
+          decision: 'set',
+          id: intent,
+          expectedIntentRevision: revision,
+          selection: input.selection,
+          sourceVersion: preview.sourceVersion,
+          replaces: [],
+        },
       }).expectedRevision,
       revision,
     );

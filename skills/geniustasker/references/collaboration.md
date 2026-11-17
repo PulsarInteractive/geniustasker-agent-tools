@@ -26,14 +26,17 @@ independent authorized work; do not invent approval or repeatedly poll rapidly.
 
 Use the discovered `task.report` command with `tasks:write`, an open unarchived
 agent-enabled task and its current revision. Pick `Working`, `NeedsInformation`
-or `NeedsReview`; Tasker keeps its usual New/InProgress/Done lifecycle. Describe
+or `NeedsReview`; a report is separate from explicit task pause/resume. Describe
 what changed in `summary` (up to 2,000 UTF-16 units). `nextSteps` is required for
 information/review requests (up to 4,000 units). Include up to eight explicitly
 labeled HTTPS evidence links; never include credentials, signed private URLs or
 claim that an author-provided link is independent verification.
 
 The phase and attributed, immutable discussion receipt commit together. A report
-moves an open ticket to InProgress, not Done. Read `workPhase` and `lastWorkReport`
+on older deployments moves an open ticket to InProgress, not Done. In the local
+pause extension only Working requests InProgress; NeedsInformation/NeedsReview
+preserve current progress, and Working cannot resume Paused. This source behavior
+is not yet deployed. Read `workPhase` and `lastWorkReport`
 on the task, and `workReport` on its comment. Reuse the exact saved operation after
 an uncertain response. Correct a published report with a new report, not by
 rewriting history. Human users can moderate/delete comments, so a missing receipt
@@ -44,9 +47,11 @@ permission or count as approval. Use a question when a human answer is needed.
 That status side effect matters on existing deployments: do not use task.report
 as a generic note for inactive work or to summarize every partially implemented
 lot. InProgress requires current identifiable execution. For a known
-interruption, use an authorized ordinary comment to preserve the reason and
-resumption point until the exact Paused lifecycle is available; do not invent
-its wire or reset started work to New. Waiting for information is not evidence
+interruption, discover [task.pause/run.pause](../../../docs/TASK_PAUSES.md) and
+retain a reason and next steps; use explicit resume only when execution resumes.
+These additions are local source, not yet published/deployed. If absent, retain
+an authorized ordinary comment and explain the missing transition. Never patch
+status or reset started work to New. Waiting for information is not evidence
 that a worker is currently executing, and a stale lease is not proof they stopped.
 
 ## Request and consume a precise human decision

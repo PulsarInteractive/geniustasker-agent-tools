@@ -1,13 +1,14 @@
 # Task locks and current availability
 
-These commands and reads are in unreleased source. They are not evidence of an
-npm publication, enabled production deployment or app release. Discover the
+Pause commands and v2 reads are local source additions, not evidence of a
+published client, enabled production deployment or app release. Discover the
 connected service's capabilities and command help before using them. Keep the
 same account, scope and current permission grants.
 
 ## Progress is separate from availability
 
-Canonical task progress stays `New`, `InProgress` or `Done`. Follow
+Canonical progress includes `New`, `InProgress`, `Paused` and `Done` in the pause
+extension. Read [explicit pause/resume](TASK_PAUSES.md) before using it. Follow
 [progress and effort guidance](PLANNING.md#progress-and-effort); never send
 `status: "Locked"` in `task.update` or `run.patch`.
 
@@ -15,7 +16,7 @@ An unfinished task is effectively Locked while it has a manual reason, an
 unfinished live prerequisite, or both. Unlocking manually removes only the
 manual reason. It does not delete dependencies, finish a prerequisite or grant
 permission to start blocked work. When the last cause disappears, the retained
-New/InProgress progress becomes visible. A lock is not progress, a completion,
+New/InProgress/Paused progress becomes visible. A lock is not progress, a completion,
 an agent run's Waiting state or a private focus/defer instruction.
 Revealing retained InProgress after unlock does not prove execution resumed;
 check the actual worker's current activity. A known interruption needs its
@@ -28,20 +29,24 @@ deletion. Do not remove prerequisites or force Done to obtain an available task.
 
 ## Read the current source
 
-First read capabilities. Only when the `collections` entry with `id: "tasks"`
-advertises `taskState: "v1"`, explicitly select `taskState: "v1"` in MCP task
-resource/change/watch reads, or `--task-state v1` with CLI `resources list`,
-`changes list` and `changes watch`. This signal works with read-only task grants;
+First read capabilities. When the `collections` entry with `id: "tasks"` lists
+`"v2"` in `taskStateVersions`, explicitly select `taskState: "v2"` in MCP task
+resource/change/watch reads, or `--task-state v2` with CLI `resources list`,
+`changes list` and `changes watch`. Otherwise choose v1 only when that collection
+advertises `taskState: "v1"`. These signals work with read-only task grants;
 permission to lock is not needed for availability reads. Keep the choice on
 continuations and bounded watches. The client never adds it automatically.
 Omit it on older deployments. Without the option the server returns the legacy
 shape with no availability snapshot, preserving published beta.13 compatibility.
+V1 omits the snapshot entirely for a Paused task, preserving beta.14's strict
+parser. Absence is unknown; never treat it as resumed or available.
 
 Task resource entries and task change `upsert` entries can carry a separate
 `taskAvailability` snapshot. It contains `progress`, effective `status`,
 `manualReason`, `dependencyCount`, up to 20 `blockingIds`, `blockersTruncated`,
 `incomplete` and `source: {epoch, authorizationEpoch, head}`. Removal entries
-have no snapshot. Other collections do not expose this task projection.
+have no snapshot. V2 also requires nullable `pauseReason`, `pauseNextSteps` and
+`pausedAt`. Other collections do not expose this task projection.
 
 `Unknown`, `incomplete: true` or an absent snapshot is not proof of availability.
 The server bounds dependency resolution to 1000 distinct prerequisites per

@@ -1,5 +1,87 @@
 // Generated public command data schemas. Do not edit by hand.
 export default {
+  "checklist.create": {
+    "type": "object",
+    "required": [
+      "task",
+      "title"
+    ],
+    "properties": {
+      "task": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      }
+    },
+    "additionalProperties": false
+  },
+  "checklist.move": {
+    "type": "object",
+    "required": [
+      "neighborId",
+      "neighborRevision",
+      "task"
+    ],
+    "properties": {
+      "task": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "neighborId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "neighborRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      }
+    },
+    "additionalProperties": false
+  },
+  "checklist.remove": {
+    "type": "object",
+    "required": [
+      "task"
+    ],
+    "properties": {
+      "task": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "additionalProperties": false
+  },
+  "checklist.update": {
+    "type": "object",
+    "required": [
+      "task"
+    ],
+    "properties": {
+      "task": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "checked": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false
+  },
   "intent.change": {
     "type": "object",
     "required": [
@@ -1023,6 +1105,154 @@ export default {
     },
     "additionalProperties": false
   },
+  "run.checklist": {
+    "type": "object",
+    "required": [
+      "change",
+      "itemId",
+      "itemRevision",
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "itemId": {
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "itemRevision": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "change": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "task",
+              "title"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "createChecklistItem"
+                ]
+              },
+              "task": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "task"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "updateChecklistItem"
+                ]
+              },
+              "checked": {
+                "type": "boolean"
+              },
+              "task": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "neighborId",
+              "neighborRevision",
+              "task"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "moveChecklistItem"
+                ]
+              },
+              "neighborId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "neighborRevision": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "task": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "task"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "removeChecklistItem"
+                ]
+              },
+              "task": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
   "run.checkpoint": {
     "type": "object",
     "required": [
@@ -1200,6 +1430,46 @@ export default {
     },
     "additionalProperties": false
   },
+  "run.pause": {
+    "type": "object",
+    "required": [
+      "nextSteps",
+      "reason",
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "nextSteps": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    },
+    "additionalProperties": false
+  },
+  "run.resume": {
+    "type": "object",
+    "required": [
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      }
+    },
+    "additionalProperties": false
+  },
   "run.unlock": {
     "type": "object",
     "required": [
@@ -1302,9 +1572,10 @@ export default {
             "enum": [
               "New",
               "InProgress",
+              "Paused",
               "Done"
             ],
-            "description": "Actual canonical progress: New means to do, InProgress means work has started, Done requires verified intended completion. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
+            "description": "Actual canonical progress: New means to do, InProgress means identifiable work is currently executing, Paused means a known interruption with a saved reason and next steps, Done requires verified intended completion. Use task.pause/task.resume or the live run equivalents for pause transitions; a status patch cannot pause or resume. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
           },
           {
             "type": "null"
@@ -1426,6 +1697,34 @@ export default {
     },
     "additionalProperties": false
   },
+  "task.pause": {
+    "type": "object",
+    "required": [
+      "nextSteps",
+      "reason"
+    ],
+    "properties": {
+      "reason": {
+        "type": "string",
+        "description": "Observed reason why active work is being paused. This is not a dependency lock.",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "nextSteps": {
+        "type": "string",
+        "description": "Concrete next action and useful context for resuming the existing work.",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    },
+    "additionalProperties": false
+  },
+  "task.resume": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false,
+    "required": []
+  },
   "task.unlock": {
     "type": "object",
     "properties": {},
@@ -1517,9 +1816,10 @@ export default {
             "enum": [
               "New",
               "InProgress",
+              "Paused",
               "Done"
             ],
-            "description": "Actual canonical progress: New means to do, InProgress means work has started, Done requires verified intended completion. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
+            "description": "Actual canonical progress: New means to do, InProgress means identifiable work is currently executing, Paused means a known interruption with a saved reason and next steps, Done requires verified intended completion. Use task.pause/task.resume or the live run equivalents for pause transitions; a status patch cannot pause or resume. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
           },
           {
             "type": "null"

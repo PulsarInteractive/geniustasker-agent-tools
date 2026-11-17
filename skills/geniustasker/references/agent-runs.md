@@ -67,11 +67,18 @@ Partially written code or an undelivered lot does not establish activity.
 Concurrent InProgress tasks need actual parallel workers and clear attribution.
 For a known interruption or switch away from work you control, record the real
 reason and concrete resumption point while preserving descriptions and history.
-The dedicated Paused task contract is forthcoming: discover its exact wire
-before use, never invent a status/command or reset started work to New. A run's
-Waiting report is a separate fact, not an automatic task pause. A manual lock
-requires a real obstacle. Use current run/task fences for any supported task
-transition; an expired claim cannot be bypassed through direct task commands.
+Discover [explicit pause/resume](../../../docs/TASK_PAUSES.md) before use: these
+additions are local source, not yet published/deployed. Under your live claim,
+run.pause targets the run revision with {taskRevision,reason,nextSteps};
+run.resume uses {taskRevision}. Reason is 1–500 characters and nextSteps 1–2000,
+both useful and nonempty after trimming. Pause sets the task Paused and the run
+Waiting; explicit resume requests InProgress and Working only when execution
+resumes. Neither extends the lease or releases the claim. A normal Waiting
+checkpoint is a separate report, not an automatic task pause. Never patch status
+to enter/leave Paused or reset started work to New. Locked is an independent real
+obstacle. Preserve current run/task fences; an expired claim cannot be bypassed
+through direct task commands. If unsupported, retain an authorized note and
+explain the missing transition.
 
 Only the creating user/profile may report on the run. A new profile is a new
 identity, not a way to resume an uncertain write. Original immutable operations
