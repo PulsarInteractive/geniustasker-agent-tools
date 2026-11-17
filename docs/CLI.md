@@ -583,6 +583,15 @@ current authorization and semantic validation remain server-side.
 
 ## Agent runs
 
+Task create/update and manual lock input schemas are available through
+`commands describe --kind task.create` (or `task.update`, `task.lock`,
+`task.unlock`, `run.lock`, `run.unlock`). Read
+[task locks and current availability](TASK_LOCKS.md) before a lock or unlock.
+These source additions are not a claim of npm publication or production rollout.
+Use `--task-state v1` on task resource/change/watch reads only after the tasks
+collection advertises `taskState: "v1"` in capabilities. Omission preserves the
+legacy response shape; the client does not silently request the new projection.
+
 Discover the `agentRuns` collection and `run.claim`, `run.checkpoint`, `run.patch`,
 `run.finish` commands before using them. Inspect each schema with
 `geniustasker commands describe --kind run.claim --json`, then use the normal

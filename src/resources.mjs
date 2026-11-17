@@ -1,5 +1,12 @@
 import * as z from 'zod/v4';
 import { fail } from './errors.mjs';
+import { validTaskAvailabilityPage } from './task-availability.mjs';
+
+export const taskStateSchema = z
+  .literal('v1')
+  .describe(
+    'Explicit opt-in for tasks only, after capabilities.collections[id=tasks].taskState advertises v1. Omit on older deployments; absence does not mean available.',
+  );
 
 export const resourceScopeSchema = z
   .string()
@@ -20,6 +27,7 @@ export const resourceReadSchema = z
       .optional(),
     path: z.string().min(1).max(512).optional(),
     archive: z.enum(['active', 'archived', 'all']).optional(),
+    taskState: taskStateSchema.optional(),
   })
   .strict();
 export const projectMetricCollections = [
@@ -42,7 +50,7 @@ export const metricHistoryCollections = [
   'personalMetricCorrections',
 ];
 export const metricReadSchema = resourceReadSchema
-  .omit({ path: true })
+  .omit({ path: true, taskState: true })
   .extend({
     collection: z.enum(metricCollections),
   })
@@ -50,7 +58,10 @@ export const metricReadSchema = resourceReadSchema
 
 /** Personal access is an explicit metric surface, never a generic account read.
  * Current owner, grant and project rights are always checked by the server. */
-export function validateResourceScope({ scope, collection, metricId }) {
+export function validateResourceScope({ scope, collection, metricId, taskState }) {
+  if (taskState !== undefined && collection !== 'tasks') {
+    fail('invalid_arguments', 'taskState is available only for the tasks collection.');
+  }
   if (
     (scope.startsWith('personal:') && !personalMetricCollections.includes(collection)) ||
     (personalMetricCollections.includes(collection) && !scope.startsWith('personal:')) ||
@@ -84,7 +95,12 @@ export async function readResources(client, input) {
       'Continuation requires the unchanged epoch and checkpoint returned with the first page.',
     );
   }
-  return client.get('resources', requested);
+  const result = await client.get('resources', requested);
+  if (!validTaskAvailabilityPage(result, requested.collection, requested.taskState)) {
+    client.invalidateReads?.();
+    fail('invalid_response', 'The task availability snapshot was invalid; read the task again.');
+  }
+  return result;
 }
 export async function readMetrics(client, input) {
   const parsed = metricReadSchema.safeParse(input);

@@ -153,6 +153,7 @@ test('a later poll stops on revoked access and preserves the last fully read con
     firstAt = 0;
   const f = await fixture(t, async (url) => {
     calls++;
+    assert.equal(url.searchParams.get('taskState'), 'v1');
     if (calls === 1) {
       firstAt = performance.now();
       return Response.json(page());
@@ -165,7 +166,7 @@ test('a later poll stops on revoked access and preserves the last fully read con
     );
   });
   await assert.rejects(
-    watchChanges(f.client, { ...query, waitSeconds: 8 }),
+    watchChanges(f.client, { ...query, taskState: 'v1', waitSeconds: 8 }),
     (error) => error.code === 'invalid_agent_token' && error.details.nextCursor === 'next',
   );
   assert.equal(calls, 2);

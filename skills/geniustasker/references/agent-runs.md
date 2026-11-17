@@ -81,6 +81,15 @@ permissions, human-owned importance, dependencies and task lifecycle rules.
 Do not send internal fields, arbitrary mutations or a stale task snapshot.
 A human edit changes the revision; reread and reconcile instead of overwriting.
 
+For an authorized manual blocker under your claim, use `run.lock` with
+`data: {taskRevision, reason}` or `run.unlock` with `data: {taskRevision}`.
+The envelope targets the run and its revision; taskRevision comes from a fresh
+task read. Read both records after success. Discover these unreleased commands
+before use and follow [task locks](../../../docs/TASK_LOCKS.md). Never fall back
+to task.lock/unlock, patch a manual lock field or set status Locked to evade the
+claim. Removing a manual reason does not remove unfinished prerequisites or
+establish that unknown availability is free.
+
 ## Distinguish silence, waiting and completion
 
 - `Waiting` is an explicit agent report requiring information or another action.

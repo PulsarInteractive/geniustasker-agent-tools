@@ -74,8 +74,12 @@ A child kind and its parent must form a supported Epic → Ticket → Subtask ch
 The optional step `estimateDays` is in the unreleased source contract; installed
 npm beta.13 and older deployments may not expose it. Send it only when current
 command help supports it. Use a finite working-day effort from `0.1` through `60`,
-or null for unknown. See [effort guidance](../../../docs/PLANNING.md#progress-and-effort)
-before choosing a value. The example does not prescribe an estimate.
+or null for unknown. When authoring a new or explicitly revised protocol,
+actively check each step's effort and supply an estimate if its scope is known,
+preserving human choices. If unknown, keep null, explain the missing assumption
+in the plan and reassess after clarification; never manufacture a value merely
+to fill the field. See [effort guidance](../../../docs/PLANNING.md#progress-and-effort).
+The example does not prescribe an estimate.
 For a legacy version whose steps omit this field, preserve omission in the
 saved definition and preview: adding null changes the immutable content and can
 change its digest. Publish an explicitly requested new version for changed

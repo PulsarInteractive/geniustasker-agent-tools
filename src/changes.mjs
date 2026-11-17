@@ -4,13 +4,15 @@ import { AgentClient } from './client.mjs';
 import { Transport } from './transport.mjs';
 import catalog from './command-catalog.mjs';
 import { fail } from './errors.mjs';
-import { resourceScopeSchema, validateResourceScope } from './resources.mjs';
+import { resourceScopeSchema, taskStateSchema, validateResourceScope } from './resources.mjs';
+import { taskAvailabilitySchema, validTaskAvailabilityPage } from './task-availability.mjs';
 
 export const changesSchema = z
   .object({
     scope: resourceScopeSchema,
     collection: z.string().min(1).max(32),
     cursor: z.string().min(1).max(4096),
+    taskState: taskStateSchema.optional(),
   })
   .strict();
 export const watchSchema = changesSchema
@@ -35,6 +37,7 @@ const changePageSchema = z
             id: z.string().min(1),
             revision,
             data: z.record(z.string(), z.unknown()),
+            taskAvailability: taskAvailabilitySchema.optional(),
           })
           .strict(),
         z
@@ -65,6 +68,7 @@ export async function readChanges(client, input) {
     page = await client.get('changes', requested);
   if (
     !changePageSchema.safeParse(page).success ||
+    !validTaskAvailabilityPage(page, requested.collection, requested.taskState) ||
     page.scope !== requested.scope ||
     page.collection !== requested.collection
   ) {

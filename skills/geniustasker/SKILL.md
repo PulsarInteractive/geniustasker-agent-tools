@@ -87,10 +87,19 @@ when authorized: the intended change, verified result, blocker or next action.
 Do not create noisy comments for every tool call or label unverified work done.
 The user owns the workflow; Tasker does not require one fixed planning method.
 Use New/to do, InProgress and Done for actual work state, not promised progress
-or an agent process exit. Before estimating or changing task progress, read
+or an agent process exit. On every authorized task creation or taking charge of
+existing work, check `estimateDays`: supply a working-effort estimate when the
+scope supports one, preserving human choices. If unknown, keep null, explain
+what is missing and reassess after clarification. Do the same for each step of
+a new or explicitly revised protocol; never invent an estimate or rewrite a
+published version or saved retry. Read
 [Task progress and estimated effort](../../docs/PLANNING.md#progress-and-effort).
-An estimate is working effort; unknown is null. Preserve human estimates and
-reassess them when the requested scope changes, without inventing precision.
+Reassess effort when the requested scope changes, without inventing precision
+or replacing a human estimate without authorization.
+For task availability or manual blocking, read
+[Task locks](../../docs/TASK_LOCKS.md). Locked is separate from stored progress;
+manual unlock cannot clear unfinished prerequisites. A live claim requires
+run.lock/run.unlock rather than an unfenced direct task change.
 
 Discover command kinds/fields through capabilities and `commands describe`.
 Creation uses a new record ID and null revision. Other commands use the revision

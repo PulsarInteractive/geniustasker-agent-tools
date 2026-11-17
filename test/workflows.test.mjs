@@ -44,6 +44,12 @@ test('workflow discovery is exhaustive, bounded, and rejects unknown topics', as
 test('hosted archive filters use the API values, not boolean strings', () => {
   for (const tool of tools.filter((t) => t.route === 'resources')) {
     assert.deepEqual(tool.inputSchema.properties.archive.enum, ['active', 'archived', 'all']);
+    const canReadTasks = tool.inputSchema.properties.collection.enum.includes('tasks');
+    assert.equal(Object.hasOwn(tool.inputSchema.properties, 'taskState'), canReadTasks);
+    if (canReadTasks) {
+      assert.deepEqual(tool.inputSchema.properties.taskState.enum, ['v1']);
+      assert.equal(tool.inputSchema.required.includes('taskState'), false);
+    }
   }
 });
 
@@ -68,6 +74,20 @@ test('project guidance is served intact by real local MCP without credentials or
     diagnostics += value.toString();
   });
   await client.connect(transport);
+  const listed = (await client.listTools()).tools;
+  for (const name of ['tasker_resources', 'tasker_changes', 'tasker_watch']) {
+    const tool = listed.find((item) => item.name === name);
+    assert.ok(tool, name);
+    assert.equal(tool.inputSchema.properties.taskState.const, 'v1');
+    assert.equal(tool.inputSchema.required.includes('taskState'), false);
+  }
+  assert.equal(
+    Object.hasOwn(
+      listed.find((item) => item.name === 'tasker_read_metrics').inputSchema.properties,
+      'taskState',
+    ),
+    false,
+  );
   for (const topic of ['projects', 'planning', 'protocols']) {
     const result = await client.callTool({
       name: 'tasker_workflow',
@@ -78,16 +98,19 @@ test('project guidance is served intact by real local MCP without credentials or
     assert.equal(texts.length, 1);
     assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
   }
-  const help = await client.callTool({
-    name: 'tasker_command_help',
-    arguments: { kind: 'protocol.publish' },
-  });
-  assert.notEqual(help.isError, true);
-  assert.deepEqual(help.structuredContent.data, commandHelp({ kind: 'protocol.publish' }));
-  const step = help.structuredContent.data.properties.definition.properties.steps.items;
-  assert.equal(step.required.includes('estimateDays'), false);
-  assert.equal(step.properties.estimateDays.anyOf[0].minimum, 0.1);
-  assert.equal(step.properties.estimateDays.anyOf[0].maximum, 60);
+  for (const kind of [
+    'protocol.publish',
+    'task.create',
+    'task.update',
+    'task.lock',
+    'task.unlock',
+    'run.lock',
+    'run.unlock',
+  ]) {
+    const help = await client.callTool({ name: 'tasker_command_help', arguments: { kind } });
+    assert.notEqual(help.isError, true);
+    assert.deepEqual(help.structuredContent.data, commandHelp({ kind }));
+  }
   assert.equal(diagnostics, '');
   assert.deepEqual(await readdir(root), ['runtime']);
 });

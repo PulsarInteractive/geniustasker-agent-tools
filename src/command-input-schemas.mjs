@@ -1161,6 +1161,26 @@ export default {
     },
     "additionalProperties": false
   },
+  "run.lock": {
+    "type": "object",
+    "required": [
+      "reason",
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false
+  },
   "run.patch": {
     "type": "object",
     "required": [
@@ -1179,5 +1199,433 @@ export default {
       }
     },
     "additionalProperties": false
+  },
+  "run.unlock": {
+    "type": "object",
+    "required": [
+      "taskRevision"
+    ],
+    "properties": {
+      "taskRevision": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      }
+    },
+    "additionalProperties": false
+  },
+  "task.create": {
+    "type": "object",
+    "required": [
+      "title"
+    ],
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Task title, 3 through 200 characters after server trimming. Required on creation.",
+        "minLength": 3,
+        "maxLength": 200
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Optional short description, at most 600 characters. Omission preserves existing content on update; null clears it.",
+            "maxLength": 600
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "importance": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Minor",
+              "Normal",
+              "Important",
+              "Critical"
+            ],
+            "description": "Impact, independent of urgency or task type. New tasks default to Normal. Important/Critical require a useful importanceReason. An agent cannot replace a human-owned classification; null follows the existing Normal fallback."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "importanceReason": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Explanation of impact, trimmed by the server, at most 400 characters. Important/Critical require a nonempty reason. Omission preserves the saved explanation; null or empty clears it subject to current importance rules.",
+            "maxLength": 400
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "type": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Task",
+              "Critical",
+              "NewFeature",
+              "Question"
+            ],
+            "description": "Task classification. New tasks default to Task. Critical here is a task type, not an importance estimate; null retains existing schema compatibility."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "owner": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Existing approved project member user ID, or null for unassigned. The server may assign the creator when their task-edit rights are limited to owned tasks. Omission preserves the owner on update."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "status": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "New",
+              "InProgress",
+              "Done"
+            ],
+            "description": "Actual canonical progress: New means to do, InProgress means work has started, Done requires verified intended completion. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "enableDueDate": {
+        "type": "boolean",
+        "description": "Enable the separately supplied deadline. New tasks default to false; an effort estimate does not select or enable a deadline."
+      },
+      "dueDate": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Deadline as an ISO date-time, from 2000-01-01 inclusive to 2100-01-01 exclusive, or null to clear it. Supply an explicit timezone. Omission preserves the existing date."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "estimateDays": {
+        "anyOf": [
+          {
+            "type": "number",
+            "description": "Approximate effort in working days: 0.1 is one tenth and 1 is one working day. Finite 0.1 through 60, or null for unknown. Not elapsed time, a deadline, or AI runtime. Omission preserves the current estimate; preserve human estimates unless revising them is authorized.",
+            "minimum": 0.1,
+            "maximum": 60
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "quantity": {
+        "anyOf": [
+          {
+            "type": "number",
+            "description": "Optional nonnegative task quantity, independent of working-day effort. Omission preserves the current quantity; null clears it.",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "quantityUnit": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Optional quantity unit, trimmed by the server, at most 20 characters. Omission preserves it; null clears it.",
+            "maxLength": 20
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "autoArchive": {
+        "type": "boolean",
+        "description": "Whether completed tasks may be archived by the existing schedule. New tasks default to false. This does not complete or immediately archive a task."
+      },
+      "autoArchiveDays": {
+        "type": "integer",
+        "description": "Day component of the existing automatic archive delay, integer 0 through 31. New tasks default to 14.",
+        "minimum": 0,
+        "maximum": 31
+      },
+      "autoArchiveHours": {
+        "type": "integer",
+        "description": "Hour component of the existing automatic archive delay, integer 0 through 24. New tasks default to 0.",
+        "minimum": 0,
+        "maximum": 24
+      },
+      "dependencies": {
+        "anyOf": [
+          {
+            "type": "array",
+            "description": "Prerequisite task IDs from this project, at most 1000. Omission preserves the list; null or [] clears it. The server validates live references, self-links and cycles and removes duplicate IDs. Do not remove dependencies to bypass blocked work.",
+            "maxItems": 1000,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "tags": {
+        "anyOf": [
+          {
+            "type": "array",
+            "description": "Existing project tag IDs, at most 50. Omission preserves the list; null or [] clears it. The server validates same-project references and removes duplicate IDs.",
+            "maxItems": 50,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
+  "task.lock": {
+    "type": "object",
+    "required": [
+      "reason"
+    ],
+    "properties": {
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false
+  },
+  "task.unlock": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false,
+    "required": []
+  },
+  "task.update": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Replacement task title, 3 through 200 characters after server trimming. Omission preserves the saved title; null is not a valid title.",
+        "minLength": 3,
+        "maxLength": 200
+      },
+      "description": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Optional short description, at most 600 characters. Omission preserves existing content on update; null clears it.",
+            "maxLength": 600
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "importance": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Minor",
+              "Normal",
+              "Important",
+              "Critical"
+            ],
+            "description": "Impact, independent of urgency or task type. New tasks default to Normal. Important/Critical require a useful importanceReason. An agent cannot replace a human-owned classification; null follows the existing Normal fallback."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "importanceReason": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Explanation of impact, trimmed by the server, at most 400 characters. Important/Critical require a nonempty reason. Omission preserves the saved explanation; null or empty clears it subject to current importance rules.",
+            "maxLength": 400
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "type": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Task",
+              "Critical",
+              "NewFeature",
+              "Question"
+            ],
+            "description": "Task classification. New tasks default to Task. Critical here is a task type, not an importance estimate; null retains existing schema compatibility."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "owner": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Existing approved project member user ID, or null for unassigned. The server may assign the creator when their task-edit rights are limited to owned tasks. Omission preserves the owner on update."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "status": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "New",
+              "InProgress",
+              "Done"
+            ],
+            "description": "Actual canonical progress: New means to do, InProgress means work has started, Done requires verified intended completion. New tasks default to New. Domain dependency, hierarchy and permission rules still apply. Null is accepted by the existing task schema but does not establish a known progress state. No Locked value belongs to this field."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "enableDueDate": {
+        "type": "boolean",
+        "description": "Enable the separately supplied deadline. New tasks default to false; an effort estimate does not select or enable a deadline."
+      },
+      "dueDate": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Deadline as an ISO date-time, from 2000-01-01 inclusive to 2100-01-01 exclusive, or null to clear it. Supply an explicit timezone. Omission preserves the existing date."
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "estimateDays": {
+        "anyOf": [
+          {
+            "type": "number",
+            "description": "Approximate effort in working days: 0.1 is one tenth and 1 is one working day. Finite 0.1 through 60, or null for unknown. Not elapsed time, a deadline, or AI runtime. Omission preserves the current estimate; preserve human estimates unless revising them is authorized.",
+            "minimum": 0.1,
+            "maximum": 60
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "quantity": {
+        "anyOf": [
+          {
+            "type": "number",
+            "description": "Optional nonnegative task quantity, independent of working-day effort. Omission preserves the current quantity; null clears it.",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "quantityUnit": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "Optional quantity unit, trimmed by the server, at most 20 characters. Omission preserves it; null clears it.",
+            "maxLength": 20
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "autoArchive": {
+        "type": "boolean",
+        "description": "Whether completed tasks may be archived by the existing schedule. New tasks default to false. This does not complete or immediately archive a task."
+      },
+      "autoArchiveDays": {
+        "type": "integer",
+        "description": "Day component of the existing automatic archive delay, integer 0 through 31. New tasks default to 14.",
+        "minimum": 0,
+        "maximum": 31
+      },
+      "autoArchiveHours": {
+        "type": "integer",
+        "description": "Hour component of the existing automatic archive delay, integer 0 through 24. New tasks default to 0.",
+        "minimum": 0,
+        "maximum": 24
+      },
+      "dependencies": {
+        "anyOf": [
+          {
+            "type": "array",
+            "description": "Prerequisite task IDs from this project, at most 1000. Omission preserves the list; null or [] clears it. The server validates live references, self-links and cycles and removes duplicate IDs. Do not remove dependencies to bypass blocked work.",
+            "maxItems": 1000,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "tags": {
+        "anyOf": [
+          {
+            "type": "array",
+            "description": "Existing project tag IDs, at most 50. Omission preserves the list; null or [] clears it. The server validates same-project references and removes duplicate IDs.",
+            "maxItems": 50,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": []
   }
 };

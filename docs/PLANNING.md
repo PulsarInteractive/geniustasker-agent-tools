@@ -20,9 +20,19 @@ to hours without the user's working-day convention. Deadlines and protocol
 `dueAfterDays` are separate scheduling choices, never automatic conversions of
 estimated effort.
 
-Use `null` when the effort is unknown. Base estimates on the actual scope and
-known assumptions; do not manufacture values to fill every task. Preserve an
-existing human estimate unless its revision is within the user's request.
+Whenever creating a task or taking charge of existing work, actively check
+`estimateDays`; do not wait for a separate request to consider effort. Supply
+an estimate within the authorized work when the scope and known assumptions
+support one. Apply the same check to each step of a new or explicitly revised
+protocol. Preserve an existing human estimate or deliberate choice unless its
+revision is within the user's request.
+
+Use `null` when the effort is unknown. Explain the useful missing assumption in
+the planning response or an authorized progress note, then reassess after that
+uncertainty is clarified. There is no separate estimate-reason API field. Do
+not manufacture a value to fill a task, convert elapsed AI time into effort,
+or silently replace unknown with a default day. A request to reuse a published
+protocol does not authorize rewriting its steps, digest or saved retries.
 When the scope or understanding changes, reassess the effort and explain a
 proposed or authorized revision. Do not silently replace another person's
 estimate with elapsed agent time or a faster model's runtime.
@@ -33,8 +43,13 @@ beta.13 or the connected deployment supports those additions. Inspect current
 command help and capabilities before sending them. An older deployment can
 reject the new field or values below `0.25`; explain the limitation and retain
 the intended estimate rather than rounding it or changing transports to bypass
-validation. Task create/update help may provide only field names until its
-detailed input schema is available.
+validation. Unreleased task create/update help now includes generated field
+schemas: creation requires a title and update preserves omitted fields. Native
+permissions, live references and lifecycle rules remain server-authoritative.
+
+For a blocked task or an authorized manual lock, read
+[task locks and current availability](TASK_LOCKS.md). Locked is an effective
+availability state, not a fourth canonical progress value.
 
 | Operation         | Commands                                                       | Required access                                                                            |
 | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |

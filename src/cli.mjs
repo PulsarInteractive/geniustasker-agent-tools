@@ -226,17 +226,18 @@ export const commands = {
       'id',
       'path',
       'metric-id',
+      'task-state',
     ],
   },
   'changes list': {
     summary:
       'Read one bounded change page from a completed resource inventory or previous nextCursor.',
-    options: ['scope', 'collection', 'cursor'],
+    options: ['scope', 'collection', 'cursor', 'task-state'],
   },
   'changes watch': {
     summary:
       'Wait at most 60 seconds for one change page, rechecking rights on every poll. No infinite stream.',
-    options: ['scope', 'collection', 'cursor', 'wait-seconds'],
+    options: ['scope', 'collection', 'cursor', 'wait-seconds', 'task-state'],
   },
   'questions answers': {
     summary:
@@ -547,6 +548,7 @@ export async function main(
         scope: options.scope,
         collection: options.collection,
         cursor: options.cursor,
+        taskState: options['task-state'],
       };
       data =
         command === 'changes list'
@@ -675,7 +677,10 @@ export async function main(
       const input = Object.fromEntries(
         commands[command].options
           .filter((key) => options[key] !== undefined)
-          .map((key) => [key === 'metric-id' ? 'metricId' : key, options[key]]),
+          .map((key) => [
+            key === 'metric-id' ? 'metricId' : key === 'task-state' ? 'taskState' : key,
+            options[key],
+          ]),
       );
       data =
         command === 'resources list'

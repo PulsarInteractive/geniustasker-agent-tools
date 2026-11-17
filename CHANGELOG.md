@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Preserve optional protocol effort in command help and preview, including `0.1` working day and null for unknown. Teach truthful New/InProgress/Done progress, effort distinct from deadlines or AI runtime, and preservation of human estimates. Older deployments remain authoritative; no task-lock command is added in this change.
+- Add generated task create/update help and task/run lock commands without expanding task permissions. Guides distinguish canonical progress from current availability, preserve dependency locks after manual unlock and require the live run path for a claimed task. Availability and deployment remain server-authoritative.
+- Read task availability only through explicit `taskState: "v1"` / `--task-state v1` after capability discovery. Legacy reads retain their old response shape. Validate optional task snapshots without treating an absent or incomplete source as available.
+
+- Preserve optional protocol effort in command help and preview, including `0.1` working day and null for unknown. Teach truthful New/InProgress/Done progress, effort distinct from deadlines or AI runtime, and preservation of human estimates. Older deployments remain authoritative.
 
 - Add private feedback to CLI, local MCP and the hosted tool catalogue: immutable bug/suggestion submission, receipts and final decision tracking without chat. Current grants, account plan and deployment activation remain authoritative.
 - Add authorized local screenshot preparation, reservation, bounded binary transfer and exact retry. Hosted ChatGPT screenshot import is not implemented. A focused feedback skill requires the user's reporting instruction or agreement before submission.

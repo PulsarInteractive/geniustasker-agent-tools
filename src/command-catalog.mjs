@@ -582,6 +582,16 @@ export default {
       "module": "Project/ProjectAgentRun",
       "permission": "tasks:write"
     },
+    "run.lock": {
+      "action": "lockRunTask",
+      "fields": [
+        "taskRevision",
+        "reason"
+      ],
+      "inputSchema": "GeniusTasker.Runs.Lock",
+      "module": "Project/ProjectAgentRun",
+      "permission": "tasks:write"
+    },
     "run.patch": {
       "action": "patchRunTask",
       "fields": [
@@ -589,6 +599,15 @@ export default {
         "patch"
       ],
       "inputSchema": "GeniusTasker.Runs.Patch",
+      "module": "Project/ProjectAgentRun",
+      "permission": "tasks:write"
+    },
+    "run.unlock": {
+      "action": "unlockRunTask",
+      "fields": [
+        "taskRevision"
+      ],
+      "inputSchema": "GeniusTasker.Runs.Unlock",
       "module": "Project/ProjectAgentRun",
       "permission": "tasks:write"
     },
@@ -749,6 +768,16 @@ export default {
         "dependencies",
         "tags"
       ],
+      "inputSchema": "GeniusTasker.AgentTasks.Create",
+      "module": "Project/ProjectTask",
+      "permission": "tasks:write"
+    },
+    "task.lock": {
+      "action": "lockTask",
+      "fields": [
+        "reason"
+      ],
+      "inputSchema": "GeniusTasker.TaskPlanning.LockTask",
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },
@@ -765,6 +794,13 @@ export default {
     },
     "task.restore": {
       "fields": [],
+      "module": "Project/ProjectTask",
+      "permission": "tasks:write"
+    },
+    "task.unlock": {
+      "action": "unlockTask",
+      "fields": [],
+      "inputSchema": "GeniusTasker.TaskPlanning.UnlockTask",
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },
@@ -788,6 +824,7 @@ export default {
         "dependencies",
         "tags"
       ],
+      "inputSchema": "GeniusTasker.AgentTasks.Update",
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },
