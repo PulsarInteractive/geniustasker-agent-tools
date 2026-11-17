@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+import { commandHelp } from '../src/commands.mjs';
 
 test('workflow discovery is exhaustive, bounded, and rejects unknown topics', async () => {
   const tool = tools.find((t) => t.name.endsWith('_workflow'));
@@ -67,14 +68,26 @@ test('project guidance is served intact by real local MCP without credentials or
     diagnostics += value.toString();
   });
   await client.connect(transport);
-  const result = await client.callTool({
-    name: 'tasker_workflow',
-    arguments: { topic: 'projects' },
+  for (const topic of ['projects', 'planning', 'protocols']) {
+    const result = await client.callTool({
+      name: 'tasker_workflow',
+      arguments: { topic },
+    });
+    assert.notEqual(result.isError, true);
+    const texts = result.content.filter((item) => item.type === 'text');
+    assert.equal(texts.length, 1);
+    assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
+  }
+  const help = await client.callTool({
+    name: 'tasker_command_help',
+    arguments: { kind: 'protocol.publish' },
   });
-  assert.notEqual(result.isError, true);
-  const texts = result.content.filter((item) => item.type === 'text');
-  assert.equal(texts.length, 1);
-  assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic: 'projects' }));
+  assert.notEqual(help.isError, true);
+  assert.deepEqual(help.structuredContent.data, commandHelp({ kind: 'protocol.publish' }));
+  const step = help.structuredContent.data.properties.definition.properties.steps.items;
+  assert.equal(step.required.includes('estimateDays'), false);
+  assert.equal(step.properties.estimateDays.anyOf[0].minimum, 0.1);
+  assert.equal(step.properties.estimateDays.anyOf[0].maximum, 60);
   assert.equal(diagnostics, '');
   assert.deepEqual(await readdir(root), ['runtime']);
 });

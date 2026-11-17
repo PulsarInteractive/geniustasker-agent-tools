@@ -105,6 +105,10 @@ next steps when needed and actual evidence. Finishing the run does **not** mark
 the task Done. If the requested work is verified and task completion is intended,
 apply that task transition through the live run first, then finish the run.
 Do not award yourself progress, XP or successful delivery from an exit code alone.
+Task New/to do and InProgress describe actual work, independently of the run's
+claim or checkpoints. Follow [task progress and effort](../../../docs/PLANNING.md#progress-and-effort)
+when updating the task. Never convert the run's elapsed time into `estimateDays`
+or force Done because the process stopped or another task depends on it.
 
 If the lease expired while you were disconnected, a final result may still close
 the unchanged claim under its original user/profile. This does not renew the

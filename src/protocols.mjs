@@ -58,6 +58,7 @@ const step = z.object({
   dependencies: z.array(uuid).max(20),
   owner: z.string().regex(/^[A-Za-z0-9_-]{1,128}$/),
   dueDate: z.string().max(35).nullable(),
+  estimateDays: z.number().min(0.1).max(60).nullable().optional(),
   importance: z.enum(['Minor', 'Normal', 'Important', 'Critical']),
   importanceReason: z.string().max(400),
   delivery,

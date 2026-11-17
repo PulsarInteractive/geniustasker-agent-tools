@@ -57,7 +57,8 @@ needs the selected project, current epoch, a new version UUID and null revision)
         "delivery": { "push": "silent", "recap": true, "animation": "silent" },
         "acceptance": ["The requested behavior has been verified."],
         "ownerVariable": null,
-        "dueAfterDays": null
+        "dueAfterDays": null,
+        "estimateDays": null
       }
     ]
   },
@@ -69,6 +70,16 @@ Adapt the work to the request; this is a schema example, not a prescribed workfl
 An `ownerVariable` references a declared user variable; null assigns the creator.
 Parent/dependency values reference other step keys, never newly guessed task IDs.
 A child kind and its parent must form a supported Epic → Ticket → Subtask chain.
+
+The optional step `estimateDays` is in the unreleased source contract; installed
+npm beta.13 and older deployments may not expose it. Send it only when current
+command help supports it. Use a finite working-day effort from `0.1` through `60`,
+or null for unknown. See [effort guidance](../../../docs/PLANNING.md#progress-and-effort)
+before choosing a value. The example does not prescribe an estimate.
+For a legacy version whose steps omit this field, preserve omission in the
+saved definition and preview: adding null changes the immutable content and can
+change its digest. Publish an explicitly requested new version for changed
+estimates; never patch an existing version or substitute a new payload on retry.
 
 ## Bind and preview
 
@@ -106,8 +117,8 @@ continue with `after: nextAfter` and the original returned `digest`, keeping the
 version and every binding unchanged. Stop at `nextAfter: null`. Never claim
 unread pages were inspected; changed context or lost access needs reconciliation.
 
-Review the outcome, owners, dates, acceptance criteria, dependency structure and
-importance. [Importance](importance.md) measures impact, independently of urgency
+Review the outcome, owners, dates, effort when present, acceptance criteria,
+dependency structure and importance. [Importance](importance.md) measures impact, independently of urgency
 and hierarchy. Important/Critical need a concrete reason. Delivery preferences
 request or suppress attention; a request cannot bypass recipient settings.
 

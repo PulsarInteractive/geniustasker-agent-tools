@@ -847,6 +847,18 @@ export default {
                     }
                   ]
                 },
+                "estimateDays": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 60
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "importance": {
                   "type": "string",
                   "enum": [

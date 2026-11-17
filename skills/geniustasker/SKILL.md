@@ -86,6 +86,11 @@ dependencies and relevant comments. Report meaningful progress in comments
 when authorized: the intended change, verified result, blocker or next action.
 Do not create noisy comments for every tool call or label unverified work done.
 The user owns the workflow; Tasker does not require one fixed planning method.
+Use New/to do, InProgress and Done for actual work state, not promised progress
+or an agent process exit. Before estimating or changing task progress, read
+[Task progress and estimated effort](../../docs/PLANNING.md#progress-and-effort).
+An estimate is working effort; unknown is null. Preserve human estimates and
+reassess them when the requested scope changes, without inventing precision.
 
 Discover command kinds/fields through capabilities and `commands describe`.
 Creation uses a new record ID and null revision. Other commands use the revision

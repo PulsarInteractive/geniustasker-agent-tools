@@ -49,6 +49,19 @@ test('structured command help preserves protocol schemas, nullable fields and in
   repeated.definition.steps[0].dependencies = ['previous', 'previous'];
   assert.equal(validate['protocol.publish'](repeated), false);
   assert.equal(validate['protocol.publish']({ definition: published.definition }), false);
+  const effort = structuredClone(published);
+  delete effort.definition.steps[0].estimateDays;
+  assert.equal(validate['protocol.publish'](effort), true);
+  assert.equal(Object.hasOwn(effort.definition.steps[0], 'estimateDays'), false);
+  for (const estimateDays of [null, 0.1, 1, 12.375, 60]) {
+    effort.definition.steps[0].estimateDays = estimateDays;
+    assert.equal(validate['protocol.publish'](effort), true, String(estimateDays));
+    assert.equal(effort.definition.steps[0].estimateDays, estimateDays);
+  }
+  for (const estimateDays of [0, 0.09, 60.1, '0.1', Infinity, NaN]) {
+    effort.definition.steps[0].estimateDays = estimateDays;
+    assert.equal(validate['protocol.publish'](effort), false, String(estimateDays));
+  }
   assert.equal(validate['protocol.cancel']({}), true);
   assert.equal(validate['protocol.cancel']({ state: 'Applied' }), false);
   for (const [kind, schema] of Object.entries(schemas)) {
@@ -82,4 +95,25 @@ test('CLI can inspect one protocol command schema without authentication or netw
   assert.equal(result.data.kind, 'protocol.apply');
   assert.equal(result.data.properties.count.maximum, 20);
   assert.deepEqual(result.data.requiredFields, ['count', 'digest', 'from']);
+});
+
+test('CLI command help exposes optional fractional effort without changing the legacy protocol shape', async () => {
+  let stdout = '';
+  const code = await main(['commands', 'describe', '--kind', 'protocol.publish', '--json'], {
+    stdout: {
+      write: (chunk) => {
+        stdout += chunk;
+      },
+    },
+    stderr: { write: () => assert.fail('Unexpected CLI error') },
+    fetchImpl: () => assert.fail('Offline help must not contact the API'),
+  });
+  assert.equal(code, 0);
+  const step = JSON.parse(stdout).data.properties.definition.properties.steps.items;
+  assert.equal(step.required.includes('estimateDays'), false);
+  const validate = new Ajv({ strict: true }).compile(step.properties.estimateDays);
+  assert.equal(validate(0.1), true);
+  assert.equal(validate(null), true);
+  assert.equal(validate(0.09), false);
+  assert.equal(validate(60.1), false);
 });

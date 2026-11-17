@@ -4,6 +4,38 @@ Use `geniustasker workflow show --topic planning --json` or `tasker_workflow`
 with `topic: planning` for the same guide in CLI, local MCP and ChatGPT.
 Inspect `capabilities` and the current record before preparing a command.
 
+## Progress and effort
+
+Use the task's actual progress: `New` means to do, `InProgress` means work has
+started, and `Done` means the intended work and acceptance criteria are verified.
+Creating a plan, assigning an owner or claiming an agent run does not itself
+start or finish the task. Update progress when the work changes. A finished
+process, published protocol or completed run is not proof that a task is done.
+Never force completion to clear a dependency or make a plan appear finished.
+
+`estimateDays` measures approximate effort in working days: `0.1` is one tenth
+of a working day and `1` is one working day. It is not a deadline, elapsed
+calendar time, time spent waiting, or an AI execution timer. Do not convert it
+to hours without the user's working-day convention. Deadlines and protocol
+`dueAfterDays` are separate scheduling choices, never automatic conversions of
+estimated effort.
+
+Use `null` when the effort is unknown. Base estimates on the actual scope and
+known assumptions; do not manufacture values to fill every task. Preserve an
+existing human estimate unless its revision is within the user's request.
+When the scope or understanding changes, reassess the effort and explain a
+proposed or authorized revision. Do not silently replace another person's
+estimate with elapsed agent time or a faster model's runtime.
+
+The unreleased source accepts finite estimates from `0.1` through `60`, including
+optional protocol-step estimates. This is not a claim that installed npm
+beta.13 or the connected deployment supports those additions. Inspect current
+command help and capabilities before sending them. An older deployment can
+reject the new field or values below `0.25`; explain the limitation and retain
+the intended estimate rather than rounding it or changing transports to bypass
+validation. Task create/update help may provide only field names until its
+detailed input schema is available.
+
 | Operation         | Commands                                                       | Required access                                                                            |
 | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | New project       | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |

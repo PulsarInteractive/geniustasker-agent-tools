@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve optional protocol effort in command help and preview, including `0.1` working day and null for unknown. Teach truthful New/InProgress/Done progress, effort distinct from deadlines or AI runtime, and preservation of human estimates. Older deployments remain authoritative; no task-lock command is added in this change.
+
 - Add private feedback to CLI, local MCP and the hosted tool catalogue: immutable bug/suggestion submission, receipts and final decision tracking without chat. Current grants, account plan and deployment activation remain authoritative.
 - Add authorized local screenshot preparation, reservation, bounded binary transfer and exact retry. Hosted ChatGPT screenshot import is not implemented. A focused feedback skill requires the user's reporting instruction or agreement before submission.
 

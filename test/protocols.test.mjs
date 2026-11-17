@@ -97,6 +97,28 @@ test('malformed or mismatched preview inputs fail before authentication or netwo
   }
 });
 
+test('preview preserves optional working effort exactly and rejects out-of-contract estimates', async (t) => {
+  let response;
+  const f = await fixture(t, async () => Response.json(response));
+  response = page();
+  const legacy = await previewProtocol(f.client, input);
+  assert.deepEqual(legacy, response);
+  assert.equal(Object.hasOwn(legacy.steps[0], 'estimateDays'), false);
+  for (const estimateDays of [null, 0.1, 1, 12.375, 60]) {
+    response = page();
+    response.steps[0].estimateDays = estimateDays;
+    const result = await previewProtocol(f.client, input);
+    assert.deepEqual(result, response);
+    assert.equal(result.steps[0].dueDate, null, 'Effort does not schedule a deadline');
+    assert.equal(result.digest, digest);
+  }
+  for (const estimateDays of [0, 0.09, 60.1, '0.1']) {
+    response = page();
+    response.steps[0].estimateDays = estimateDays;
+    await assert.rejects(previewProtocol(f.client, input), { code: 'invalid_response' });
+  }
+});
+
 test('preview checks bound identity, digest, page size, progress and unique steps before returning data', async (t) => {
   let response;
   const f = await fixture(t, async () => Response.json(response));

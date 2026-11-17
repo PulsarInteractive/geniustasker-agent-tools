@@ -9,6 +9,13 @@ Inspect identity and capabilities, then read `tasker_workflow` with
 `topic: planning` for the current transport and product instructions.
 
 Read the project configuration, relevant tasks and existing sprint/workflow IDs.
+For task progress and `estimateDays`, read
+[Task progress and estimated effort](../../docs/PLANNING.md#progress-and-effort).
+Use New/to do before work starts, InProgress for actual work, and Done only for
+verified intended completion. Estimate working effort, not elapsed time or AI
+runtime; keep unknown effort null and preserve human estimates. Reassess when
+scope changes. Discover the connected deployment's support before sending new
+fields or fractional estimates; never force Done to clear prerequisites.
 For reusable multi-task procedures, read [Task protocols](../geniustasker/references/protocols.md)
 and `tasker_workflow` with `topic: protocols`. Preview creates no work; applying
 the requested procedure uses explicit journaled batches with current revisions.
