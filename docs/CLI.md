@@ -100,6 +100,14 @@ and approve it, or uncheck “All” to choose individual projects and memories 
 remove any permissions you do not need. Opening the page grants nothing, and
 existing connections keep their approved permissions.
 
+Without `--scope`, browser and device login leave the permission proposal to the
+selected server. A newer CLI can therefore connect before that environment has
+deployed every permission in its bundled command catalogue. The human still
+reviews and approves the visible selection; login never updates an existing
+connection or profile. Features absent from the deployment remain unavailable.
+An explicit `--scope` is sent unchanged: unsupported permissions are rejected,
+not silently removed or retried with different access.
+
 To narrow the permissions offered by the browser, pass `--scope`, for example:
 
 ```sh

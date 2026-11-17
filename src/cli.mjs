@@ -6,7 +6,6 @@ import {
   unlockDocumentation,
 } from './documentation-sync.mjs';
 import open, { apps } from 'open';
-import catalog from './command-catalog.mjs';
 import { CredentialStore } from './store.mjs';
 import { ORIGINS, originOf, Transport } from './transport.mjs';
 import { AgentClient } from './client.mjs';
@@ -266,7 +265,7 @@ export function help(command = 'help') {
       flow: 'browser (default, PKCE loopback) | device (SSH/headless)',
       browser: 'default (automatic) | chrome; --no-browser prints the link without opening it',
       scope:
-        'space-separated permission ceiling; official login proposes all requested permissions for review before approval',
+        'space-separated permission ceiling; omitted by default so the server proposes its available permissions for human approval',
       interactive:
         'required when starting login without a terminal; never use to bypass human consent',
     },
@@ -377,7 +376,9 @@ export async function main(
         }
       };
       data = await (options.flow === 'device' ? deviceLogin : browserLogin)(client, {
-        scope: options.scope ?? catalog.grants.permissions.join(' '),
+        // The selected deployment owns the default consent proposal. A newer
+        // CLI catalogue can contain permissions that production does not yet serve.
+        scope: options.scope,
         openBrowser: options['no-browser']
           ? undefined
           : async (url) => {

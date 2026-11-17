@@ -25,7 +25,7 @@ test('CLI beta defaults to browser PKCE and keeps stdout credential-free', async
       const url = new URL(value),
         callback = new URL(url.searchParams.get('redirect_uri'));
       assert.equal(url.searchParams.get('code_challenge_method'), 'S256');
-      assert.ok(url.searchParams.get('scope').includes('memory:write'));
+      assert.equal(url.searchParams.has('scope'), false);
       callback.search = new URLSearchParams({
         state: url.searchParams.get('state'),
         code: '00.consent',
@@ -40,6 +40,70 @@ test('CLI beta defaults to browser PKCE and keeps stdout credential-free', async
   assert.ok(!progress.includes('"event":'));
   assert.ok(!`${output}${progress}`.includes('gta1.'));
 });
+
+test('production browser login preserves an explicit scope without adding or removing permissions', async (t) => {
+  const f = await fixture(t, () => {}, { authenticated: false });
+  const scope = 'tasks:read metrics:read unsupported:permission';
+  let opened = 0;
+  const status = await main(['auth', 'login', '--environment', 'production', '--scope', scope], {
+    directory: f.directory,
+    isTTY: true,
+    stdout: { write() {} },
+    stderr: { write() {} },
+    fetchImpl: async () => assert.fail('denied consent must not exchange or save tokens'),
+    openBrowserImpl: async (value) => {
+      opened++;
+      const url = new URL(value);
+      assert.equal(url.origin, 'https://api-geniustasker.pulsarinteractive.cloud');
+      assert.equal(url.searchParams.get('scope'), scope);
+      const callback = new URL(url.searchParams.get('redirect_uri'));
+      callback.search = new URLSearchParams({
+        state: url.searchParams.get('state'),
+        error: 'access_denied',
+      });
+      assert.equal((await fetch(callback)).status, 200);
+    },
+  });
+  assert.notEqual(status, 0);
+  assert.equal(opened, 1);
+  assert.equal(await f.store.read(), null);
+});
+
+for (const scope of [undefined, 'tasks:read metrics:read unsupported:permission']) {
+  test(`CLI device login ${scope === undefined ? 'omits default scopes' : 'preserves explicit scopes'} without a permission fallback`, async (t) => {
+    const f = await fixture(t, () => {}, { authenticated: false });
+    let requests = 0;
+    const status = await main(
+      [
+        'auth',
+        'login',
+        '--environment',
+        'production',
+        '--flow',
+        'device',
+        ...(scope === undefined ? [] : ['--scope', scope]),
+      ],
+      {
+        directory: f.directory,
+        isTTY: true,
+        stdout: { write() {} },
+        stderr: { write() {} },
+        fetchImpl: async (url, options) => {
+          requests++;
+          assert.equal(url.origin, 'https://api-geniustasker.pulsarinteractive.cloud');
+          assert.equal(url.pathname, '/api/agents/oauth/device');
+          assert.equal(options.body.get('scope'), scope ?? null);
+          // A refusal is final: do not retry with a wider or narrower grant.
+          return Response.json({ error: 'invalid_scope' }, { status: 400 });
+        },
+        openBrowserImpl: async () => assert.fail('a refused request cannot open consent'),
+      },
+    );
+    assert.notEqual(status, 0);
+    assert.equal(requests, 1);
+    assert.equal(await f.store.read(), null);
+  });
+}
 
 for (const noBrowser of [false, true]) {
   test(`CLI manual consent still works when ${noBrowser ? 'browser opening is disabled' : 'browser launch fails'}`, async (t) => {

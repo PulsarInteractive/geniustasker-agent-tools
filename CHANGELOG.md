@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Leave default browser/device login scopes to the selected server's consent proposal so a newer CLI can connect to an earlier deployment. Explicit `--scope` remains unchanged; existing connections and profiles are never expanded automatically.
 - Add bounded personal focus/defer reads and replacement previews to CLI, local MCP and the hosted tool catalogue. Explicit `intent.change` commands reuse current revisions and the immutable command journal; they do not change shared task dates, status or rewards.
 - Document whole-selection replacement, cancellation, target invalidation and the connected owner boundary. Use only when `intent.change` is advertised by the deployment capabilities.
 
