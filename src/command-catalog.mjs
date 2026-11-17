@@ -55,6 +55,7 @@ export default {
     },
     "checklist.remove": {
       "action": "removeChecklistItem",
+      "delete": true,
       "fields": [
         "task"
       ],

@@ -92,8 +92,8 @@ Several InProgress tasks require real concurrent work with clear attribution.
 For a known interruption of work you control, preserve the description and
 record the reason and concrete resumption point through the discovered
 [task.pause/task.resume contract](../../docs/TASK_PAUSES.md), or run.pause/resume
-under your live claim. These pause additions are local source, not yet published
-or deployed: discover current support, and keep an authorized note if absent.
+under your live claim. Client beta.15 supports these commands; discover current
+service support, and keep an authorized note if absent.
 Never patch status to pause/resume or relabel started work New or Done. Resume
 explicitly only when execution resumes. A manual lock needs a real obstacle;
 it is independent of Paused. Silence or an expired lease does not prove work stopped.
@@ -111,7 +111,7 @@ For task availability or manual blocking, read
 manual unlock cannot clear unfinished prerequisites. A live claim requires
 run.lock/run.unlock rather than an unfenced direct task change.
 
-For small steps within one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Use separate tickets for independent owners, dependencies, deadlines or estimates. Checkbox progress never completes or resumes a task; the claim owner uses run.checklist. Discover these local, not yet published/deployed additions before use.
+For small steps within one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Use separate tickets for independent owners, dependencies, deadlines or estimates. Checkbox progress never completes or resumes a task; the claim owner uses run.checklist. Discover connected-service support before use; client installation alone is insufficient.
 
 Discover command kinds/fields through capabilities and `commands describe`.
 Creation uses a new record ID and null revision. Other commands use the revision

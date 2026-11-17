@@ -27,9 +27,9 @@ tasks because their reports or lease are stale.
 For a known pause or interruption of work you control, preserve descriptions,
 comments and verified results, and record a useful reason plus the concrete
 point at which work should resume. Read [explicit pause/resume](TASK_PAUSES.md)
-and discover `task.pause/resume` or the live run equivalents before use. These
-are local source additions, not yet published or deployed. Until the service
-supports them, retain an authorized note and explain the missing transition.
+and discover `task.pause/resume` or the live run equivalents before use. Client
+beta.15 supports these commands; the service must advertise them. If it does
+not, retain an authorized note and explain the missing transition.
 Use dedicated commands to pause/resume; never patch status or relabel started
 work as New or Done. Resume explicitly only for actual execution. A manual lock
 requires an actual obstacle, not merely switching to another work item.
@@ -59,13 +59,13 @@ When the scope or understanding changes, reassess the effort and explain a
 proposed or authorized revision. Do not silently replace another person's
 estimate with elapsed agent time or a faster model's runtime.
 
-The unreleased source accepts finite estimates from `0.1` through `60`, including
-optional protocol-step estimates. This is not a claim that installed npm
-beta.13 or the connected deployment supports those additions. Inspect current
+Current client schemas accept finite estimates from `0.1` through `60`, including
+optional protocol-step estimates. Installed beta.13 and older services may not
+support those additions. Inspect current
 command help and capabilities before sending them. An older deployment can
 reject the new field or values below `0.25`; explain the limitation and retain
 the intended estimate rather than rounding it or changing transports to bypass
-validation. Unreleased task create/update help now includes generated field
+validation. Task create/update help includes generated field
 schemas: creation requires a title and update preserves omitted fields. Native
 permissions, live references and lifecycle rules remain server-authoritative.
 

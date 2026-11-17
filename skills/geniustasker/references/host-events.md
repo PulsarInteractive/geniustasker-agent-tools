@@ -34,8 +34,8 @@ implementation. Multiple task InProgress states require actual concurrent work.
 If the host knows work was interrupted, retain its reason and resumption point;
 these events do not themselves pause or resume the task. Discover the separate
 [run.pause/run.resume commands](../../../docs/TASK_PAUSES.md) before use, retaining
-current run/task revisions and an exact operation. These additions are local
-source, not yet published/deployed. Never patch status or reset started work to
+current run/task revisions and an exact operation. Client beta.15 supports them;
+check connected-service capabilities before use. Never patch status or reset started work to
 New. An expired lease or silence alone is not an observed interruption.
 
 ## Save the event before sending

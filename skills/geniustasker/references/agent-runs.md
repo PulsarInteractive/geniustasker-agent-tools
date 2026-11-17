@@ -68,7 +68,7 @@ Concurrent InProgress tasks need actual parallel workers and clear attribution.
 For a known interruption or switch away from work you control, record the real
 reason and concrete resumption point while preserving descriptions and history.
 Discover [explicit pause/resume](../../../docs/TASK_PAUSES.md) before use: these
-additions are local source, not yet published/deployed. Under your live claim,
+commands require both client and connected-service support. Under your live claim,
 run.pause targets the run revision with {taskRevision,reason,nextSteps};
 run.resume uses {taskRevision}. Reason is 1–500 characters and nextSteps 1–2000,
 both useful and nonempty after trimming. Pause sets the task Paused and the run
@@ -102,7 +102,7 @@ A human edit changes the revision; reread and reconcile instead of overwriting.
 For an authorized manual blocker under your claim, use `run.lock` with
 `data: {taskRevision, reason}` or `run.unlock` with `data: {taskRevision}`.
 The envelope targets the run and its revision; taskRevision comes from a fresh
-task read. Read both records after success. Discover these unreleased commands
+task read. Read both records after success. Discover these commands
 before use and follow [task locks](../../../docs/TASK_LOCKS.md). Never fall back
 to task.lock/unlock, patch a manual lock field or set status Locked to evade the
 claim. Removing a manual reason does not remove unfinished prerequisites or

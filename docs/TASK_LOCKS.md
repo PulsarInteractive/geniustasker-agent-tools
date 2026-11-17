@@ -1,8 +1,8 @@
 # Task locks and current availability
 
-Pause commands and v2 reads are local source additions, not evidence of a
-published client, enabled production deployment or app release. Discover the
-connected service's capabilities and command help before using them. Keep the
+Client beta.15 adds pause commands and v2 reads. Client installation does not
+establish an enabled server deployment or app release. Discover the connected
+service's capabilities and command help before using them. Keep the
 same account, scope and current permission grants.
 
 ## Progress is separate from availability

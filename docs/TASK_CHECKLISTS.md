@@ -1,7 +1,8 @@
 # Small steps within a task
 
-Checklist commands and reads are local source additions, not yet published or
-deployed. Discover the `checklist` collection and supported commands first.
+Client beta.15 supports checklist commands and bounded reads. Discover the
+connected service's `checklist` collection and supported commands first; client
+installation alone does not establish server rollout.
 Use the normal task read/write grants and current project rights; a checklist
 does not grant access to another task or bypass its agent claim.
 

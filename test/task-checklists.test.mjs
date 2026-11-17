@@ -267,3 +267,55 @@ test('an uncertain desired checkbox value replays one immutable direct or claime
     assert.deepEqual(requests[0].data, data);
   }
 });
+
+test('checklist removal exposes delete semantics and retains tombstone receipts for exact direct and run retries', async (t) => {
+  assert.equal(commandHelp({ kind: 'checklist.remove' }).delete, true);
+  assert.notEqual(commandHelp({ kind: 'run.checklist' }).delete, true);
+  const requests = new Map();
+  const f = await fixture(t, async (_url, options) => {
+    const input = JSON.parse(options.body);
+    const calls = requests.get(input.operationId) ?? [];
+    calls.push(input);
+    requests.set(input.operationId, calls);
+    if (calls.length === 1) {
+      throw Error('Synthetic deletion acknowledgement lost');
+    }
+    return Response.json({
+      operationId: input.operationId,
+      scope,
+      kind: input.kind,
+      epoch: 'epoch',
+      cursor: '20',
+      affectedCollections: ['tasks', 'checklist'],
+      items: [{ collection: 'checklist', id: item, revision: '20', deleted: true }],
+    });
+  });
+  const journal = new CommandJournal(f.client);
+  for (const kind of ['checklist.remove', 'run.checklist']) {
+    const data =
+      kind === 'checklist.remove'
+        ? { task }
+        : {
+            taskRevision: '10',
+            itemId: item,
+            itemRevision: '7',
+            change: { action: 'removeChecklistItem', task },
+          };
+    const prepared = await journal.prepare({
+      scope,
+      epoch: 'epoch',
+      kind,
+      id: kind === 'run.checklist' ? 'run-id' : item,
+      expectedRevision: '7',
+      data,
+    });
+    await assert.rejects(journal.retry(prepared.operationId), { code: 'network_unavailable' });
+    const result = await journal.retry(prepared.operationId);
+    assert.equal(result.receipt.items[0].deleted, true);
+    assert.equal((await journal.retry(prepared.operationId)).source, 'local_receipt');
+    const calls = requests.get(prepared.operationId);
+    assert.equal(calls.length, 2);
+    assert.deepEqual(calls[0], calls[1]);
+    assert.deepEqual(calls[0].data, data);
+  }
+});

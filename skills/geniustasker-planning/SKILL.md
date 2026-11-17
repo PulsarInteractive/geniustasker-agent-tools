@@ -23,8 +23,8 @@ parallel work with identified actors. For a known interruption, preserve the
 work and record its reason and resumption point through
 [explicit Paused commands](../../docs/TASK_PAUSES.md) when advertised. Use
 task.pause/resume, or run.pause/resume under your live claim; never patch status
-or reset started work to New. Resume only for actual renewed execution. These
-additions are local source, not yet published/deployed; if unsupported, retain
+or reset started work to New. Resume only for actual renewed execution. Client
+beta.15 supports these commands; if the service does not advertise them, retain
 an authorized note and explain the missing transition. Do not infer interruption
 from a silent or expired lease, and use
 a manual lock only for a real obstacle. Estimate working effort, not elapsed time or AI
@@ -40,7 +40,7 @@ Prefer explicit taskState v2 only when the tasks collection advertises v2 in
 capabilities.taskStateVersions. Otherwise select v1 only if taskState is v1;
 omit the option on older deployments. V1 omits snapshots for Paused tasks.
 No snapshot means unknown, never available.
-For small steps of one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Prefer separate tickets when owner, dependency, deadline or estimate is independent. Read only the relevant taskId, use explicit checked booleans and current item revisions, and do not infer Done from 100%. Under a live claim use run.checklist. These additions require current discovery and are not yet published/deployed.
+For small steps of one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Prefer separate tickets when owner, dependency, deadline or estimate is independent. Read only the relevant taskId, use explicit checked booleans and current item revisions, and do not infer Done from 100%. Under a live claim use run.checklist. These commands require current connected-service discovery.
 For reusable multi-task procedures, read [Task protocols](../geniustasker/references/protocols.md)
 and `tasker_workflow` with `topic: protocols`. Preview creates no work; applying
 the requested procedure uses explicit journaled batches with current revisions.

@@ -33,10 +33,10 @@ labeled HTTPS evidence links; never include credentials, signed private URLs or
 claim that an author-provided link is independent verification.
 
 The phase and attributed, immutable discussion receipt commit together. A report
-on older deployments moves an open ticket to InProgress, not Done. In the local
-pause extension only Working requests InProgress; NeedsInformation/NeedsReview
-preserve current progress, and Working cannot resume Paused. This source behavior
-is not yet deployed. Read `workPhase` and `lastWorkReport`
+on older deployments moves an open ticket to InProgress, not Done. On services
+with the pause extension only Working requests InProgress;
+NeedsInformation/NeedsReview preserve current progress, and Working cannot
+resume Paused. Confirm current service support before relying on that behavior. Read `workPhase` and `lastWorkReport`
 on the task, and `workReport` on its comment. Reuse the exact saved operation after
 an uncertain response. Correct a published report with a new report, not by
 rewriting history. Human users can moderate/delete comments, so a missing receipt
@@ -49,7 +49,7 @@ as a generic note for inactive work or to summarize every partially implemented
 lot. InProgress requires current identifiable execution. For a known
 interruption, discover [task.pause/run.pause](../../../docs/TASK_PAUSES.md) and
 retain a reason and next steps; use explicit resume only when execution resumes.
-These additions are local source, not yet published/deployed. If absent, retain
+Check connected-service support. If absent, retain
 an authorized ordinary comment and explain the missing transition. Never patch
 status or reset started work to New. Waiting for information is not evidence
 that a worker is currently executing, and a stale lease is not proof they stopped.

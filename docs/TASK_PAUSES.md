@@ -1,9 +1,9 @@
 # Pause and resume known work
 
-Pause commands and task-state v2 are implemented in local source. They are not
-yet evidence of a published client or deployed service; installed beta.14 does
-not expose these additions. Discover the connected service's commands and
-collection versions before use. An unavailable transition is a limitation to
+Client beta.15 supports explicit pause commands and task-state v2. Installed
+beta.14 does not expose these additions. Client support does not establish
+server rollout: discover the connected service's commands and collection
+versions before use. An unavailable transition is a limitation to
 report, not permission to guess a command or reset started work to New.
 
 ## Record the actual work state

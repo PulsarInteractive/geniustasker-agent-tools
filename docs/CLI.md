@@ -128,7 +128,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.14", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.15", "mcp", "--context", "work"]
     }
   }
 }
@@ -587,7 +587,7 @@ Task create/update, manual lock and explicit pause input schemas are available
 through `commands describe --kind task.create` (or `task.update`, `task.lock`,
 `task.unlock`, `run.lock`, `run.unlock`, `task.pause`, `task.resume`, `run.pause`,
 `run.resume`). Read [task locks](TASK_LOCKS.md) and [pause/resume](TASK_PAUSES.md)
-before use. Pause/v2 are local source additions, not yet published or deployed.
+before use. Client beta.15 supports pause/v2; check connected-service capabilities.
 Use `--task-state v2` on task resource/change/watch reads only after the tasks
 collection advertises v2 in `taskStateVersions`. Otherwise select v1 only when
 `taskState: "v1"` is advertised. V1 omits the snapshot for Paused tasks; an absent
@@ -626,8 +626,8 @@ Use [the feedback guide](FEEDBACK.md) for authorized bug reports, feature sugges
 ## Task checklists
 
 Read [checklist commands and recovery](TASK_CHECKLISTS.md) before using these
-local, not yet published/deployed additions. Discover checklist and commands
-first. Read one task with `resources list --scope project:ID --collection
+client beta.15 additions. Discover checklist and commands on the connected
+service first. Read one task with `resources list --scope project:ID --collection
 checklist --task-id TASK_ID`, or one item with `--id ITEM_ID`. Preserve taskId,
 epoch and checkpoint during pagination; filtered lists have no changeCursor.
 The same taskId field is available through local MCP tasker_resources and hosted

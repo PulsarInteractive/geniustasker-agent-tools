@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-beta.15 — 2026-11-17
+
+- Add explicit task/run pause and resume commands with a useful reason and resumption point. InProgress now means current identifiable execution; silence, stale leases and unfinished code do not establish activity or a pause. Current service capabilities remain authoritative.
+- Add explicit task-state v2 reads with pause metadata while preserving v1 and legacy response compatibility. Missing, Unknown or incomplete availability never establishes permission to start or finish work.
+- Add bounded per-task checklist reads and typed create, check/uncheck, rename, move and remove commands, including the live-run path. Checkbox progress never completes, resumes or reopens a task, awards XP or requests push. Use separate tickets for independently owned, estimated or scheduled work.
+- Validate generated command data schemas before journaling or sending, including description length and effort limits. Preserve exact saved operations after uncertain replies; no silent rewriting or expanded grants.
+
 ## 0.1.0-beta.14 — 2026-11-17
 
 - Add generated task create/update help and task/run lock commands without expanding task permissions. Guides distinguish canonical progress from current availability, preserve dependency locks after manual unlock and require the live run path for a claimed task. Availability and deployment remain server-authoritative.

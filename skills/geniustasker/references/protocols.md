@@ -71,8 +71,8 @@ An `ownerVariable` references a declared user variable; null assigns the creator
 Parent/dependency values reference other step keys, never newly guessed task IDs.
 A child kind and its parent must form a supported Epic → Ticket → Subtask chain.
 
-The optional step `estimateDays` is in the unreleased source contract; installed
-npm beta.13 and older deployments may not expose it. Send it only when current
+The optional step `estimateDays` is described by current client schemas;
+installed npm beta.13 and older deployments may not expose it. Send it only when current
 command help supports it. Use a finite working-day effort from `0.1` through `60`,
 or null for unknown. When authoring a new or explicitly revised protocol,
 actively check each step's effort and supply an estimate if its scope is known,
@@ -164,8 +164,8 @@ parallel work and clear actors. Partial code or remaining delivery work alone
 does not qualify. If a started step is knowingly interrupted, preserve its work
 and record the reason and resumption point. Follow
 [explicit pause/resume](../../../docs/TASK_PAUSES.md): discover task.pause/resume
-or the live run equivalents before use. These additions are local source, not
-yet published/deployed. Never patch status or reset started work to New; resume
+or the live run equivalents before use. Client beta.15 supports them; the
+connected service must advertise the commands. Never patch status or reset started work to New; resume
 only for real renewed execution. If unsupported, retain an authorized note.
 An old lease is not evidence that another worker stopped.
 
