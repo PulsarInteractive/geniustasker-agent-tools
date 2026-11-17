@@ -29,6 +29,13 @@ No hook edits the task or awards XP. A `finished` run still does not mark its ta
 Done. A cancelled/replaced/expired lease may refuse a checkpoint; keep the real
 event and report that refusal rather than starting an unauthorized replacement.
 
+Working checkpoints describe current identifiable execution, not merely partial
+implementation. Multiple task InProgress states require actual concurrent work.
+If the host knows work was interrupted, retain its reason and resumption point;
+these events do not themselves pause or resume the task. The dedicated Paused
+contract is forthcoming, so never invent a status/command or reset started work
+to New. An expired lease or silence alone is not an observed interruption.
+
 ## Save the event before sending
 
 For each actual event, the host persists one UUID `eventId` and its original

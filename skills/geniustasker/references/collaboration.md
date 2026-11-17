@@ -41,6 +41,14 @@ is not an invitation to recreate its text. Completing/reopening the task clears
 its current work phase and retains the report as history. A report does not grant
 permission or count as approval. Use a question when a human answer is needed.
 
+That status side effect matters on existing deployments: do not use task.report
+as a generic note for inactive work or to summarize every partially implemented
+lot. InProgress requires current identifiable execution. For a known
+interruption, use an authorized ordinary comment to preserve the reason and
+resumption point until the exact Paused lifecycle is available; do not invent
+its wire or reset started work to New. Waiting for information is not evidence
+that a worker is currently executing, and a stale lease is not proof they stopped.
+
 ## Request and consume a precise human decision
 
 Use `approval.request` with `approvals:write` when a concrete action needs a

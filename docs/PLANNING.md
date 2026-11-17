@@ -6,12 +6,32 @@ Inspect `capabilities` and the current record before preparing a command.
 
 ## Progress and effort
 
-Use the task's actual progress: `New` means to do, `InProgress` means work has
-started, and `Done` means the intended work and acceptance criteria are verified.
+Use the task's actual progress: `New` means not yet started, `InProgress` means
+current, identifiable execution, and `Done` means the intended work and
+acceptance criteria are verified. Partly implemented code, an undelivered lot
+or unfinished acceptance criteria do not by themselves establish active work.
 Creating a plan, assigning an owner or claiming an agent run does not itself
 start or finish the task. Update progress when the work changes. A finished
 process, published protocol or completed run is not proof that a task is done.
 Never force completion to clear a dependency or make a plan appear finished.
+
+Keep several tasks InProgress only when people or agents are actually working
+on them concurrently, with identifiable responsibility and current activity.
+For example, one agent implementing a change and another actively running its
+independent verification can justify two active tasks. Twenty partially coded
+lots waiting while one agent works on a different lot cannot. Reconcile only
+the authorized work whose activity is known; do not reset another person's
+tasks because their reports or lease are stale.
+
+For a known pause or interruption of work you control, preserve descriptions,
+comments and verified results, and record a useful reason plus the concrete
+point at which work should resume. A dedicated `Paused` lifecycle is being
+implemented; it is not yet delivered by this guidance. Until the connected
+service exposes the exact pause/resume contract, record the interruption in
+an authorized note and explain the missing transition. Do not invent a command,
+send an unsupported enum or relabel started work as New or Done. A manual lock
+requires an actual obstacle, not merely switching to another work item.
+Silence, an absent heartbeat or lease expiry is not proof of interruption.
 
 `estimateDays` measures approximate effort in working days: `0.1` is one tenth
 of a working day and `1` is one working day. It is not a deadline, elapsed

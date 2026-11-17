@@ -86,8 +86,15 @@ dependencies and relevant comments. Report meaningful progress in comments
 when authorized: the intended change, verified result, blocker or next action.
 Do not create noisy comments for every tool call or label unverified work done.
 The user owns the workflow; Tasker does not require one fixed planning method.
-Use New/to do, InProgress and Done for actual work state, not promised progress
-or an agent process exit. On every authorized task creation or taking charge of
+Use InProgress only for current, identifiable execution by a person or agent.
+Partial implementation, an undelivered lot or an old claim is not active work.
+Several InProgress tasks require real concurrent work with clear attribution.
+For a known interruption of work you control, preserve the description and
+record the reason and concrete resumption point. A dedicated Paused state is
+being added; until the service exposes its exact contract, do not invent a
+pause command/status or relabel started work New or Done. A manual lock needs
+a real obstacle. Silence or an expired lease does not prove work stopped.
+On every authorized task creation or taking charge of
 existing work, check `estimateDays`: supply a working-effort estimate when the
 scope supports one, preserving human choices. If unknown, keep null, explain
 what is missing and reassess after clarification. Do the same for each step of

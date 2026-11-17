@@ -74,6 +74,9 @@ test('project guidance is served intact by real local MCP without credentials or
     diagnostics += value.toString();
   });
   await client.connect(transport);
+  const instructions = client.getInstructions();
+  assert.match(instructions, /InProgress means current identifiable execution/);
+  assert.match(instructions, /silence or lease expiry does not prove interruption/);
   const listed = (await client.listTools()).tools;
   for (const name of ['tasker_resources', 'tasker_changes', 'tasker_watch']) {
     const tool = listed.find((item) => item.name === name);
@@ -88,7 +91,7 @@ test('project guidance is served intact by real local MCP without credentials or
     ),
     false,
   );
-  for (const topic of ['projects', 'planning', 'protocols']) {
+  for (const topic of ['projects', 'planning', 'protocols', 'runs']) {
     const result = await client.callTool({
       name: 'tasker_workflow',
       arguments: { topic },

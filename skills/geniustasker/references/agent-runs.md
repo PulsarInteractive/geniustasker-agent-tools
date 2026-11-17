@@ -62,6 +62,17 @@ may renew a live lease. Schedule bounded updates around real work and respect
 retry times, not a polling loop that invents movement. The saved lease is the
 server authority; a local timer alone never authorizes another write.
 
+Use Working and task InProgress only for current, attributable execution.
+Partially written code or an undelivered lot does not establish activity.
+Concurrent InProgress tasks need actual parallel workers and clear attribution.
+For a known interruption or switch away from work you control, record the real
+reason and concrete resumption point while preserving descriptions and history.
+The dedicated Paused task contract is forthcoming: discover its exact wire
+before use, never invent a status/command or reset started work to New. A run's
+Waiting report is a separate fact, not an automatic task pause. A manual lock
+requires a real obstacle. Use current run/task fences for any supported task
+transition; an expired claim cannot be bypassed through direct task commands.
+
 Only the creating user/profile may report on the run. A new profile is a new
 identity, not a way to resume an uncertain write. Original immutable operations
 retain their original connection/session identity for retries.
@@ -94,8 +105,8 @@ establish that unknown availability is free.
 
 - `Waiting` is an explicit agent report requiring information or another action.
 - `NeedsReview` is an explicit request to inspect a real result.
-- An expired `leaseUntil` means the signal is stale. It does not prove failure,
-  blockage, cancellation or task completion. Do not generate a failure report
+- An expired `leaseUntil` means the signal is stale. It does not prove an
+  interruption, failure, blockage, cancellation or task completion. Do not generate a failure report
   just because a heartbeat was absent.
 - `cancelRequestedAt` asks the agent to stop. Stop new task changes and safely
   finish as `Cancelled` when still authorized. Human cancellation/takeover is an
@@ -114,8 +125,8 @@ next steps when needed and actual evidence. Finishing the run does **not** mark
 the task Done. If the requested work is verified and task completion is intended,
 apply that task transition through the live run first, then finish the run.
 Do not award yourself progress, XP or successful delivery from an exit code alone.
-Task New/to do and InProgress describe actual work, independently of the run's
-claim or checkpoints. Follow [task progress and effort](../../../docs/PLANNING.md#progress-and-effort)
+Task InProgress requires current execution, independently of an earlier claim
+or checkpoint. Follow [task progress and effort](../../../docs/PLANNING.md#progress-and-effort)
 when updating the task. Never convert the run's elapsed time into `estimateDays`
 or force Done because the process stopped or another task depends on it.
 

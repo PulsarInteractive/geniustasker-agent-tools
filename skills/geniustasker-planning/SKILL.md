@@ -16,8 +16,14 @@ clarification. Apply this check to each new or explicitly revised protocol step,
 without inventing values or changing immutable versions and saved retries.
 For task progress and `estimateDays`, read
 [Task progress and estimated effort](../../docs/PLANNING.md#progress-and-effort).
-Use New/to do before work starts, InProgress for actual work, and Done only for
-verified intended completion. Estimate working effort, not elapsed time or AI
+Use New/to do before work starts, InProgress only for current attributable
+execution, and Done only for verified intended completion. Partial code or an
+undelivered lot does not justify InProgress. Multiple active tasks require real
+parallel work with identified actors. For a known interruption, preserve the
+work and record its reason and resumption point; the dedicated Paused contract
+is not yet delivered, so do not invent a pause command/status or reset started
+work to New. Do not infer interruption from a silent or expired lease, and use
+a manual lock only for a real obstacle. Estimate working effort, not elapsed time or AI
 runtime; keep unknown effort null and preserve human estimates. Reassess when
 scope changes. Discover the connected deployment's support before sending new
 fields or fractional estimates; never force Done to clear prerequisites.

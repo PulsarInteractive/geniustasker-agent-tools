@@ -17,6 +17,9 @@ manual reason. It does not delete dependencies, finish a prerequisite or grant
 permission to start blocked work. When the last cause disappears, the retained
 New/InProgress progress becomes visible. A lock is not progress, a completion,
 an agent run's Waiting state or a private focus/defer instruction.
+Revealing retained InProgress after unlock does not prove execution resumed;
+check the actual worker's current activity. A known interruption needs its
+reason and resumption point, not an invented blocker or automatic restart.
 
 Already Done work remains Done when a prerequisite is reopened. Locking a Done
 task requires an explicitly intended reopen first. Archived unfinished
