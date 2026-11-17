@@ -863,7 +863,9 @@ export default {
       "memory:read",
       "memory:write",
       "media:read",
-      "media:write"
+      "media:write",
+      "feedback:read",
+      "feedback:write"
     ],
     "maxResources": 200,
     "maxProfilesPerConnection": 20

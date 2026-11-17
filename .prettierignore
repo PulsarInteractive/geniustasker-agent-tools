@@ -6,3 +6,4 @@ src/command-input-schemas.mjs
 tools/schemas/
 LICENSE
 LICENSES/
+src/feedback-contract.mjs

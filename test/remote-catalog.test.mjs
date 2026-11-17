@@ -5,7 +5,13 @@ import Ajv from 'ajv';
 const tools = JSON.parse(await readFile(new URL('../remote/tool-catalog.json', import.meta.url)));
 test('remote catalogue has bounded explicit schemas and honest write annotations', () => {
   assert.equal(new Set(tools.map((t) => t.name)).size, tools.length);
-  const ajv = new Ajv({ strict: false });
+  const ajv = new Ajv({
+    strict: false,
+    formats: {
+      uuid: /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i,
+      int64: { type: 'number', validate: Number.isSafeInteger },
+    },
+  });
   for (const tool of tools) {
     assert.match(tool.name, /^(tasker|fitness)_[a-z_]+$/);
     assert.ok(tool.title && tool.description);
@@ -13,9 +19,12 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
     assert.equal(tool.inputSchema.additionalProperties, false);
     ajv.compile(tool.inputSchema);
     if (tool.write) {
-      assert.equal(tool.destructive, true);
+      assert.equal(
+        tool.destructive,
+        tool.name.startsWith('tasker_feedback_') ? tool.name.endsWith('_media_remove') : true,
+      );
     }
-    assert.ok(!tool.route || /^[a-z]+(?:\/[a-z]+)?$/.test(tool.route));
+    assert.ok(!tool.route || /^[a-z]+(?:[-/][a-z]+)*$/.test(tool.route));
   }
   const execute = tools.find((t) => t.name.endsWith('_execute_command'));
   assert.equal(execute.write, true);

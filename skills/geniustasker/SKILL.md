@@ -6,6 +6,11 @@ description: Read and update GeniusTasker projects, tickets, goals, comments and
 GeniusTasker is the shared record of progress. The agent runs in the user's own
 tools and chooses its workflow; Tasker does not execute or supervise it.
 
+For a bug or suggestion about GeniusTasker itself, use the
+[feedback skill](../geniustasker-feedback/SKILL.md). Dedicated feedback tools
+require an explicit reporting request or agreement before sending; project work
+and ordinary tool failures are not automatically feedback reports.
+
 ## Connect and discover
 
 Use `geniustasker whoami --json` and `geniustasker capabilities --json`, or MCP

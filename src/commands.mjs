@@ -1,5 +1,14 @@
+import {
+  feedbackDraftSchema,
+  prepareFeedbackCommand,
+  readFeedbackCapabilities,
+  validateFeedbackCreate,
+  validateFeedbackUpload,
+  validFeedbackReceipt,
+  validFeedbackMediaSession,
+} from './feedback.mjs';
 import { retryAt, requireRetryReady } from './recovery.mjs';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { constants } from 'node:fs';
 import { open } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -180,7 +189,7 @@ const binding = (session) => ({
   profileId: session.profile_id,
   sessionId: session.session_id,
 });
-function checkSavedCommand(row, input, identity) {
+function checkSavedCommand(row, input, identity, protocol) {
   if (row && (row.formatVersion !== 1 || canonical(row.binding) !== canonical(identity))) {
     fail(
       'operation_identity_mismatch',
@@ -191,7 +200,7 @@ function checkSavedCommand(row, input, identity) {
       },
     );
   }
-  if (row && canonical(row.input) !== canonical(input)) {
+  if (row && (row.protocol !== protocol || canonical(row.input) !== canonical(input))) {
     fail(
       'idempotency_mismatch',
       'The operation ID already belongs to a different immutable request.',
@@ -222,6 +231,21 @@ const receiptSchema = z
     affectedCollections: z.array(z.string()),
   })
   .strict();
+
+const confirmationProtocols = {
+  feedback_submit: {
+    validate: validateFeedbackCreate,
+    validReceipt: validFeedbackReceipt,
+    operationId: (input) => input.commandId,
+    path: '/api/agents/v1/feedback',
+  },
+  feedback_media_open: {
+    validate: validateFeedbackUpload,
+    validReceipt: validFeedbackMediaSession,
+    operationId: (input) => input.id,
+    path: '/api/agents/v1/feedback/media/uploads',
+  },
+};
 
 /** A journal is bound to one authenticated terminal identity. Persist the full
  * request before the network call, never regenerate a UUID after a timeout.
@@ -262,14 +286,184 @@ export class CommandJournal {
       return { operationId: input.operationId, state: row?.state ?? 'prepared', request: input };
     }, this.client.transport.signal);
   }
+  async prepareFeedback(draft) {
+    const value = checked(feedbackDraftSchema, draft);
+    const identity = binding(await this.client.session());
+    if (!value.expectedEpoch) {
+      value.expectedEpoch = (await readFeedbackCapabilities(this.client)).epoch;
+    }
+    if (canonical(binding(await this.client.session())) !== canonical(identity)) {
+      fail('operation_identity_mismatch', 'The connection changed while preparing feedback.');
+    }
+    const prepared = prepareFeedbackCommand(value),
+      store = this.store(prepared.command.commandId);
+    await store.locked(
+      () =>
+        store.write({
+          formatVersion: 1,
+          protocol: 'feedback_submit',
+          binding: identity,
+          input: prepared.command,
+          state: 'prepared',
+        }),
+      this.client.transport.signal,
+    );
+    return prepared;
+  }
+  async submitFeedback(value) {
+    return this.#execute(value, 'feedback_submit');
+  }
+  async openFeedbackMedia(value) {
+    return this.#execute(value, 'feedback_media_open');
+  }
+  async #mediaUploadRow(store, protocol = 'feedback_media_open') {
+    const identity = binding(await this.client.session());
+    const row = await store.read();
+    if (
+      !row ||
+      row.formatVersion !== 1 ||
+      row.input?.id !== store.context ||
+      row.protocol !== protocol ||
+      row.state !== 'confirmed' ||
+      !confirmationProtocols[protocol].validReceipt(row.receipt, row.input)
+    ) {
+      fail(
+        'operation_not_found',
+        'Confirm the saved upload reservation first. Recover an uncertain reservation with commands retry.',
+      );
+    }
+    if (canonical(row.binding) !== canonical(identity)) {
+      fail(
+        'operation_identity_mismatch',
+        'The upload belongs to another connection, profile, session or environment.',
+      );
+    }
+    return { identity, row };
+  }
+  #confirmedMediaReceipt(row) {
+    if (row.uploadState !== 'confirmed') {
+      return null;
+    }
+    if (
+      !confirmationProtocols[row.protocol].validReceipt(row.uploadReceipt, row.input) ||
+      row.uploadReceipt.state !== 'ready'
+    ) {
+      fail(
+        'invalid_response',
+        'The saved feedback image receipt is invalid. Inspect the operation before acting.',
+      );
+    }
+    return row.uploadReceipt;
+  }
+  #requireCurrentMediaSize(row) {
+    if (row.input.size > 4_000_000) {
+      fail('feedback_media_too_large', 'Use a screenshot no larger than 4,000,000 bytes.', {
+        status: 413,
+      });
+    }
+  }
+  /** A confirmed upload can be replayed without reopening the source file.
+   * The same identity and receipt checks still apply; no HTTP request is made. */
+  async confirmedFeedbackMediaUpload(id) {
+    return this.#confirmedMediaUpload(id, 'feedback_media_open');
+  }
+  async #confirmedMediaUpload(id, protocol) {
+    const store = this.store(id);
+    return store.locked(async () => {
+      const { row } = await this.#mediaUploadRow(store, protocol);
+      const receipt = this.#confirmedMediaReceipt(row);
+      if (!receipt) {
+        this.#requireCurrentMediaSize(row);
+      }
+      return receipt;
+    }, this.client.transport.signal);
+  }
+  /** Binary transfer uses the already-confirmed immutable reservation. It
+   * never renews an uncertain reservation or retries another request silently. */
+  async uploadFeedbackMediaBytes(id, bytes, sha256) {
+    return this.#uploadMediaBytes(id, bytes, sha256, 'feedback_media_open');
+  }
+  async #uploadMediaBytes(id, bytes, sha256, protocol) {
+    const store = this.store(id);
+    return store.locked(async () => {
+      const { identity, row } = await this.#mediaUploadRow(store, protocol);
+      const confirmed = this.#confirmedMediaReceipt(row);
+      if (confirmed) {
+        return confirmed;
+      }
+      this.#requireCurrentMediaSize(row);
+      const source = row.input;
+      if (
+        !Buffer.isBuffer(bytes) ||
+        bytes.length !== source.size ||
+        sha256 !== source.sha256 ||
+        createHash('sha256').update(bytes).digest('hex') !== source.sha256
+      ) {
+        fail(
+          'idempotency_mismatch',
+          'The image bytes changed after preparation. Do not reuse this reservation.',
+        );
+      }
+      requireRetryReady(row.uploadRetryAt);
+      const session = await this.client.authorizedSession();
+      if (canonical(binding(session)) !== canonical(identity)) {
+        fail('operation_identity_mismatch', 'The connection changed before upload.');
+      }
+      await store.write({ ...row, uploadState: 'uncertain' });
+      this.client.invalidateReads?.();
+      try {
+        const result = await this.client.transport.request(row.receipt.uploadPath, {
+          method: 'PUT',
+          token: session.access_token,
+          bytes,
+        });
+        if (
+          !confirmationProtocols[protocol].validReceipt(result, row.input) ||
+          result.state !== 'ready'
+        ) {
+          fail(
+            'invalid_response',
+            'The feedback image upload receipt is invalid. Retry the same bytes and reservation.',
+            { execution: 'unknown' },
+          );
+        }
+        await store.write({ ...row, uploadState: 'confirmed', uploadReceipt: result });
+        return result;
+      } catch (error) {
+        const safe = safeError(error);
+        await store
+          .write({
+            ...row,
+            uploadState: 'uncertain',
+            uploadRetryAt: retryAt(error),
+            uploadError: safe.toJSON(),
+          })
+          .catch(() => {});
+        throw new AgentError(safe.code, safe.message, {
+          status: safe.status,
+          retryable: safe.retryable,
+          ...safe.details,
+          execution: 'unknown',
+          operationId: id,
+        });
+      }
+    }, this.client.transport.signal);
+  }
   async inspect(id) {
     const row = await this.store(id).read();
-    if (!row || row.formatVersion !== 1 || row.input?.operationId !== id) {
+    if (
+      !row ||
+      row.formatVersion !== 1 ||
+      (row.protocol
+        ? confirmationProtocols[row.protocol]?.operationId(row.input)
+        : row.input?.operationId) !== id
+    ) {
       fail('operation_not_found', 'This context has no valid local operation with that ID.');
     }
     return {
       operationId: id,
       source: 'local_journal',
+      ...(row.protocol ? { protocol: row.protocol } : {}),
       state: row.state,
       request: row.input,
       ...(row.receipt ? { receipt: row.receipt } : {}),
@@ -278,16 +472,27 @@ export class CommandJournal {
     };
   }
   async execute(value) {
-    const input = validateCommand(value),
-      store = this.store(input.operationId);
+    return this.#execute(value);
+  }
+  async #execute(value, protocol) {
+    const typed = protocol ? confirmationProtocols[protocol] : null;
+    if (protocol && !typed) {
+      fail('invalid_arguments', 'Unknown saved operation protocol.');
+    }
+    const input = typed ? typed.validate(value) : validateCommand(value),
+      operationId = typed ? typed.operationId(input) : input.operationId,
+      store = this.store(operationId);
     return store.locked(async () => {
       // Capture token and identity together under the refresh lock. A later
       // logout/login cannot turn this pending operation into another profile.
       const localSession = await this.client.session(),
         identity = binding(localSession);
       let row = await store.read();
-      checkSavedCommand(row, input, identity);
+      checkSavedCommand(row, input, identity, protocol);
       if (row?.state === 'confirmed') {
+        if (typed && !typed.validReceipt(row.receipt, input)) {
+          fail('invalid_response', 'Invalid saved feedback receipt.');
+        }
         return { source: 'local_receipt', receipt: row.receipt };
       }
       requireRetryReady(row?.retryAt);
@@ -295,17 +500,28 @@ export class CommandJournal {
       if (canonical(binding(session)) !== canonical(identity)) {
         fail('operation_identity_mismatch', 'The connection changed before transmission.');
       }
-      row = { formatVersion: 1, binding: identity, input, state: 'uncertain' };
+      row = {
+        formatVersion: 1,
+        ...(protocol ? { protocol } : {}),
+        binding: identity,
+        input,
+        state: 'uncertain',
+      };
       await store.write(row);
       try {
-        const receipt = await this.client.transport.request('/api/agents/v1/commands', {
-          method: 'POST',
-          json: input,
-          token: session.access_token,
-        });
+        const receipt = await this.client.transport.request(
+          typed?.path ?? '/api/agents/v1/commands',
+          {
+            method: 'POST',
+            json: input,
+            token: session.access_token,
+          },
+        );
         if (
-          !receiptSchema.safeParse(receipt).success ||
-          ['operationId', 'scope', 'kind', 'epoch'].some((key) => receipt[key] !== input[key])
+          typed
+            ? !typed.validReceipt(receipt, input)
+            : !receiptSchema.safeParse(receipt).success ||
+              ['operationId', 'scope', 'kind', 'epoch'].some((key) => receipt[key] !== input[key])
         ) {
           fail(
             'invalid_response',
@@ -323,7 +539,7 @@ export class CommandJournal {
           remediation: safe.remediation,
           execution: 'unknown',
           ...safe.details,
-          operationId: input.operationId,
+          operationId,
         });
         // The uncertainty marker is already durable. Preserve the useful original
         // error/operation ID even if disk pressure prevents saving diagnostics.
@@ -335,6 +551,7 @@ export class CommandJournal {
     }, this.client.transport.signal);
   }
   async retry(id) {
-    return this.execute((await this.inspect(id)).request);
+    const saved = await this.inspect(id);
+    return this.#execute(saved.request, saved.protocol);
   }
 }

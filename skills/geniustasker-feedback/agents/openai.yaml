@@ -1,0 +1,4 @@
+interface:
+  display_name: 'GeniusTasker feedback'
+  short_description: 'Report bugs and read final feedback decisions'
+  default_prompt: 'Use $geniustasker-feedback to prepare a report about this GeniusTasker problem.'

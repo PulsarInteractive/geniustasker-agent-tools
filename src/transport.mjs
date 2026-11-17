@@ -80,10 +80,17 @@ export class Transport {
         }
       }
     }
+    const feedbackMedia =
+      /^\/api\/agents\/v1\/feedback\/media\/[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\/content$/.test(
+        url.pathname,
+      );
     if (
       (bytes !== undefined || binary) &&
-      (url.pathname !== '/api/agents/v1/media/content' ||
-        (bytes !== undefined && (!Buffer.isBuffer(bytes) || bytes.length > 15000000)) ||
+      ((!feedbackMedia && url.pathname !== '/api/agents/v1/media/content') ||
+        (feedbackMedia &&
+          (url.search || (bytes !== undefined ? method !== 'PUT' : method !== 'GET'))) ||
+        (bytes !== undefined &&
+          (!Buffer.isBuffer(bytes) || bytes.length > (feedbackMedia ? 4_000_000 : 15_000_000))) ||
         (bytes !== undefined && (json !== undefined || form)))
     ) {
       fail('invalid_arguments', 'Binary transfer requires the bounded delegated media endpoint.');
@@ -144,7 +151,7 @@ export class Transport {
       if (response.body) {
         for await (const chunk of response.body) {
           size += chunk.length;
-          if (size > (binary && response.ok ? 15000000 : 262144)) {
+          if (size > (binary && response.ok ? (feedbackMedia ? 1_000_000 : 15_000_000) : 262144)) {
             fail('invalid_response', 'The API response exceeded the size limit.');
           }
           chunks.push(chunk);

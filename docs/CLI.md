@@ -607,3 +607,7 @@ window and overlapping instructions without writing. Follow
 [the planning guide](PLANNING.md#temporary-personal-focus-and-deferral) and
 `workflow show --topic intents`, then use the ordinary immutable
 `intent.change` command flow. Availability is determined by service capabilities.
+
+## Feedback
+
+Use [the feedback guide](FEEDBACK.md) for authorized bug reports, feature suggestions, screenshots and final decisions. Availability follows current server capabilities, grants and plan. Preparing a report does not send it; submit after the user’s reporting instruction or agreement.

@@ -88,3 +88,7 @@ cover included components. The GeniusTasker application and backend are separate
 ## ChatGPT
 
 Connect the hosted service with OAuth: [setup and examples](docs/CHATGPT.md). Your computer does not need to run the CLI. Account permissions and quotas still apply. [Official directory publication](docs/OPENAI_PUBLICATION.md) is a separate review.
+
+## Feedback
+
+Use [the feedback guide](docs/FEEDBACK.md) for authorized bug reports, feature suggestions, screenshots and final decisions. Availability follows current server capabilities, grants and plan. Preparing a report does not send it; submit after the user’s reporting instruction or agreement.
