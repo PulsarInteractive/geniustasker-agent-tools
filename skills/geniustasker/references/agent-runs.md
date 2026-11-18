@@ -39,6 +39,26 @@ attribution. Another actor may win the claim between your read and write. On a
 claim conflict, inspect the current run and choose independent authorized work;
 never change profiles, overwrite the claim or infer human approval.
 
+## Start the task under the claim
+
+A successful `run.claim` can return a Working run while the task stays New. A
+`started` host event has the same behavior. When you begin the authorized work:
+
+1. Read your live run and its task by ID. Check the task status and availability.
+2. If the task is New, send `run.patch` to the run ID using its current revision
+   as `expectedRevision`. The data below uses the revision from the task read.
+3. Read the task by ID again. Report that work is in progress once its saved
+   status is InProgress.
+
+```json
+{ "taskRevision": "8", "patch": { "status": "InProgress" } }
+```
+
+If the task is already InProgress, continue under your valid claim. A previously
+Paused task uses `run.resume` when execution resumes. A lock or a conflicting
+human edit requires a fresh read and reconciliation. Preserve the exact saved
+operation after an uncertain reply.
+
 ## Report actual work and keep the fence
 
 `run.checkpoint` targets the run UUID and its current revision. Use `Working`,

@@ -95,6 +95,10 @@ If unavailable, retain the proposed text and explain the missing capability.
 Use InProgress only for current, identifiable execution by a person or agent.
 Partial implementation, an undelivered lot or an old claim is not active work.
 Several InProgress tasks require real concurrent work with clear attribution.
+A `run.claim` can leave a New task unchanged. When you actually start it, read
+the live run and task, use `run.patch` with both revisions and
+`patch.status: "InProgress"`, then read the task back. Use `run.resume` for a
+Paused task. See [starting a claimed task](references/agent-runs.md).
 For a known interruption of work you control, preserve the description and
 record the reason and concrete resumption point through the discovered
 [task.pause/task.resume contract](../../docs/TASK_PAUSES.md), or run.pause/resume

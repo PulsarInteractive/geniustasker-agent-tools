@@ -104,6 +104,7 @@ test('project guidance is served intact by real local MCP without credentials or
   const instructions = client.getInstructions();
   assert.match(instructions, /InProgress means current identifiable execution/);
   assert.match(instructions, /silence or lease expiry does not prove interruption/);
+  assert.match(instructions, /run\.claim can leave a task New.*run\.patch.*read the task back/);
   const listed = (await client.listTools()).tools;
   for (const name of ['tasker_resources', 'tasker_changes', 'tasker_watch']) {
     const tool = listed.find((item) => item.name === name);
@@ -127,6 +128,22 @@ test('project guidance is served intact by real local MCP without credentials or
     const texts = result.content.filter((item) => item.type === 'text');
     assert.equal(texts.length, 1);
     assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
+    if (topic === 'runs') {
+      const start = result.structuredContent.data.steps.find((step) =>
+        step.includes('Working run while the task stays New'),
+      );
+      assert.ok(start);
+      for (const term of [
+        'expectedRevision',
+        'taskRevision',
+        'status: "InProgress"',
+        'Read the task again',
+        'run.resume',
+        'locks',
+      ]) {
+        assert.ok(start.includes(term), 'Missing claimed-task start guidance: ' + term);
+      }
+    }
     if (topic === 'checklist') {
       const guidance = result.structuredContent.data.steps.join(' ');
       for (const term of [

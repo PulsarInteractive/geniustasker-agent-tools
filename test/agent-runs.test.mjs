@@ -13,11 +13,13 @@ test('run examples use the generated public schemas and distinguish reports from
     new URL('../skills/geniustasker/references/agent-runs.md', import.meta.url),
     'utf8',
   );
-  const [claim, checkpoint, patch] = [...guide.matchAll(/```json\n([\s\S]+?)\n```/g)].map((match) =>
-    JSON.parse(match[1]),
+  const [claim, start, checkpoint, patch] = [...guide.matchAll(/```json\n([\s\S]+?)\n```/g)].map(
+    (match) => JSON.parse(match[1]),
   );
   const validate = (kind) => new Ajv({ strict: true }).compile(commandHelp({ kind }).dataSchema);
   assert.equal(validate('run.claim')(claim), true);
+  assert.equal(validate('run.patch')(start), true);
+  assert.equal(start.patch.status, 'InProgress');
   assert.equal(validate('run.checkpoint')(checkpoint), true);
   assert.equal(validate('run.patch')(patch), true);
   assert.equal(validate('run.claim')({ ...claim, leaseSeconds: 901 }), false);

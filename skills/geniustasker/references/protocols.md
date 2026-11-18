@@ -165,7 +165,7 @@ does not qualify. If a started step is knowingly interrupted, preserve its work
 and record the reason and resumption point. Follow
 [explicit pause/resume](../../../docs/TASK_PAUSES.md): discover task.pause/resume
 or the live run equivalents before use. Client beta.15 supports them; the
-connected service must advertise the commands. Never patch status or reset started work to New; resume
+connected service must advertise the commands. Never patch status to enter or leave Paused, or reset started work to New; resume
 only for real renewed execution. If unsupported, retain an authorized note.
 An old lease is not evidence that another worker stopped.
 

@@ -29,13 +29,16 @@ No hook edits the task or awards XP. A `finished` run still does not mark its ta
 Done. A cancelled/replaced/expired lease may refuse a checkpoint; keep the real
 event and report that refusal rather than starting an unauthorized replacement.
 
+After `started`, read the claimed run and task. When execution begins on a New
+ticket, use the separate [task start command](agent-runs.md#start-the-task-under-the-claim)
+and verify the saved InProgress status.
 Working checkpoints describe current identifiable execution, not merely partial
 implementation. Multiple task InProgress states require actual concurrent work.
 If the host knows work was interrupted, retain its reason and resumption point;
 these events do not themselves pause or resume the task. Discover the separate
 [run.pause/run.resume commands](../../../docs/TASK_PAUSES.md) before use, retaining
 current run/task revisions and an exact operation. Client beta.15 supports them;
-check connected-service capabilities before use. Never patch status or reset started work to
+check connected-service capabilities before use. Never patch status to enter or leave Paused, or reset started work to
 New. An expired lease or silence alone is not an observed interruption.
 
 ## Save the event before sending

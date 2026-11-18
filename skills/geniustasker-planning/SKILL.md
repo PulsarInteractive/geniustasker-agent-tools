@@ -14,6 +14,10 @@ supply a scope-based estimate when possible. Preserve human choices; if effort
 is unknown, keep null, explain the missing assumption and reassess after
 clarification. Apply this check to each new or explicitly revised protocol step,
 without inventing values or changing immutable versions and saved retries.
+When starting a newly claimed task, follow
+[starting a claimed task](../geniustasker/references/agent-runs.md#start-the-task-under-the-claim).
+A Working run can coexist with a New ticket until its claim owner sends
+`run.patch` with status InProgress and confirms the task by ID.
 For task progress and `estimateDays`, read
 [Task progress and estimated effort](../../docs/PLANNING.md#progress-and-effort).
 Use New/to do before work starts, InProgress only for current attributable
