@@ -218,6 +218,25 @@ test('unbounded checklist and wrong taskId collections fail before authenticatio
     item,
   );
 });
+function checklistReceipt(input, removed = false) {
+  const claimed = input.kind === 'run.checklist';
+  return {
+    operationId: input.operationId,
+    scope,
+    kind: input.kind,
+    epoch: 'epoch',
+    cursor: '20',
+    affectedCollections: claimed ? ['agentRuns', 'tasks', 'checklist'] : ['tasks', 'checklist'],
+    items: [
+      {
+        collection: claimed ? 'agentRuns' : 'checklist',
+        id: input.id,
+        revision: '20',
+        deleted: !claimed && removed,
+      },
+    ],
+  };
+}
 test('an uncertain desired checkbox value replays one immutable direct or claimed operation', async (t) => {
   const calls = new Map();
   const f = await fixture(t, async (url, options) => {
@@ -229,15 +248,7 @@ test('an uncertain desired checkbox value replays one immutable direct or claime
     if (prior.length === 1) {
       throw Error('Synthetic response lost');
     }
-    return Response.json({
-      operationId: input.operationId,
-      scope,
-      kind: input.kind,
-      epoch: 'epoch',
-      cursor: '20',
-      items: [],
-      affectedCollections: ['tasks', 'checklist'],
-    });
+    return Response.json(checklistReceipt(input));
   });
   const journal = new CommandJournal(f.client);
   for (const kind of ['checklist.update', 'run.checklist']) {
@@ -268,7 +279,7 @@ test('an uncertain desired checkbox value replays one immutable direct or claime
   }
 });
 
-test('checklist removal exposes delete semantics and retains tombstone receipts for exact direct and run retries', async (t) => {
+test('direct removal returns the item tombstone and claimed removal returns the primary run on exact retry', async (t) => {
   assert.equal(commandHelp({ kind: 'checklist.remove' }).delete, true);
   assert.notEqual(commandHelp({ kind: 'run.checklist' }).delete, true);
   const requests = new Map();
@@ -280,15 +291,7 @@ test('checklist removal exposes delete semantics and retains tombstone receipts 
     if (calls.length === 1) {
       throw Error('Synthetic deletion acknowledgement lost');
     }
-    return Response.json({
-      operationId: input.operationId,
-      scope,
-      kind: input.kind,
-      epoch: 'epoch',
-      cursor: '20',
-      affectedCollections: ['tasks', 'checklist'],
-      items: [{ collection: 'checklist', id: item, revision: '20', deleted: true }],
-    });
+    return Response.json(checklistReceipt(input, true));
   });
   const journal = new CommandJournal(f.client);
   for (const kind of ['checklist.remove', 'run.checklist']) {
@@ -311,11 +314,94 @@ test('checklist removal exposes delete semantics and retains tombstone receipts 
     });
     await assert.rejects(journal.retry(prepared.operationId), { code: 'network_unavailable' });
     const result = await journal.retry(prepared.operationId);
-    assert.equal(result.receipt.items[0].deleted, true);
-    assert.equal((await journal.retry(prepared.operationId)).source, 'local_receipt');
+    const entry = result.receipt.items[0];
+    assert.equal(entry.id, prepared.request.id);
+    assert.equal(entry.deleted, kind === 'checklist.remove');
+    assert.equal(entry.collection, kind === 'checklist.remove' ? 'checklist' : 'agentRuns');
+    const recovered = await journal.retry(prepared.operationId);
+    assert.equal(recovered.source, 'local_receipt');
+    assert.deepEqual(recovered.receipt, result.receipt);
     const calls = requests.get(prepared.operationId);
     assert.equal(calls.length, 2);
     assert.deepEqual(calls[0], calls[1]);
     assert.deepEqual(calls[0].data, data);
   }
+});
+
+test('a claimed create recovers its saved item ID after a lost acknowledgement and reads current progress', async (t) => {
+  let committed;
+  let attempts = 0;
+  const f = await fixture(t, async (url, options) => {
+    if (url.pathname === '/api/agents/v1/commands') {
+      const request = JSON.parse(options.body);
+      attempts++;
+      if (!committed) {
+        committed = request;
+        throw Error('Synthetic acknowledgement lost after create');
+      }
+      assert.deepEqual(request, committed);
+      return Response.json(checklistReceipt(committed));
+    }
+    assert.equal(url.pathname, '/api/agents/v1/resources');
+    assert.equal(url.searchParams.get('scope'), scope);
+    const collection = url.searchParams.get('collection');
+    const id = url.searchParams.get('id');
+    const { itemId, change } = committed.data;
+    if (collection === 'checklist' && id === itemId) {
+      return Response.json({
+        scope,
+        collection,
+        epoch: 'epoch',
+        items: [
+          { id, revision: '20', data: { task: change.task, title: change.title, checked: false } },
+        ],
+      });
+    }
+    assert.equal(collection, 'tasks');
+    assert.equal(id, change.task);
+    return Response.json({
+      scope,
+      collection,
+      epoch: 'epoch',
+      items: [{ id, revision: '21', data: { checklistCount: 4, checklistDoneCount: 2 } }],
+    });
+  });
+  const journal = new CommandJournal(f.client);
+  const { operationId } = await journal.prepare({
+    scope,
+    epoch: 'epoch',
+    kind: 'run.checklist',
+    id: 'run-id',
+    expectedRevision: '6',
+    data: {
+      taskRevision: '10',
+      itemId: item,
+      itemRevision: null,
+      change: {
+        action: 'createChecklistItem',
+        task,
+        title: 'Check the preview',
+      },
+    },
+  });
+  await assert.rejects(journal.retry(operationId), { code: 'network_unavailable' });
+  const resumed = new CommandJournal(f.client);
+  const { request } = await resumed.inspect(operationId);
+  const result = await resumed.retry(operationId);
+  assert.equal(result.source, 'server');
+  assert.deepEqual(result.receipt.items, [
+    { id: 'run-id', revision: '20', collection: 'agentRuns', deleted: false },
+  ]);
+  assert.ok(result.receipt.affectedCollections.includes('checklist'));
+  const entry = (
+    await readResources(f.client, { scope, collection: 'checklist', id: request.data.itemId })
+  ).items[0];
+  assert.deepEqual(entry.data, { task, title: 'Check the preview', checked: false });
+  const parent = (
+    await readResources(f.client, { scope, collection: 'tasks', id: request.data.change.task })
+  ).items[0];
+  assert.equal(parent.revision, '21');
+  assert.deepEqual(parent.data, { checklistCount: 4, checklistDoneCount: 2 });
+  assert.equal((await resumed.retry(operationId)).source, 'local_receipt');
+  assert.equal(attempts, 2);
 });

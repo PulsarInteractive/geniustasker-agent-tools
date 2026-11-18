@@ -117,7 +117,7 @@ For task availability or manual blocking, read
 manual unlock cannot clear unfinished prerequisites. A live claim requires
 run.lock/run.unlock rather than an unfenced direct task change.
 
-For small steps within one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Use separate tickets for independent owners, dependencies, deadlines or estimates. Checkbox progress never completes or resumes a task; the claim owner uses run.checklist. Discover connected-service support before use; client installation alone is insufficient.
+For small steps within one deliverable, read [Task checklists](../../docs/TASK_CHECKLISTS.md). Use separate tickets for independent owners, dependencies, deadlines or estimates. Checkbox progress never completes or resumes a task; the claim owner uses run.checklist. Its receipt may list only the run. Read the saved item and parent task to verify the change and current totals. Discover connected-service support before use; client installation alone is insufficient.
 
 Discover command kinds/fields through capabilities and `commands describe`.
 Creation uses a new record ID and null revision. Other commands use the revision

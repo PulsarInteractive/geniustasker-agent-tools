@@ -100,6 +100,18 @@ test('project guidance is served intact by real local MCP without credentials or
     const texts = result.content.filter((item) => item.type === 'text');
     assert.equal(texts.length, 1);
     assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
+    if (topic === 'checklist') {
+      const guidance = result.structuredContent.data.steps.join(' ');
+      for (const term of [
+        'agentRuns',
+        'affectedCollections',
+        'itemId',
+        'tasker_retry_command',
+        'tasker_edit_tasks',
+      ]) {
+        assert.ok(guidance.includes(term), 'Missing public checklist guidance: ' + term);
+      }
+    }
   }
   for (const kind of [
     'protocol.publish',

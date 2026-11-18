@@ -63,11 +63,34 @@ values are required; do not send an internal action at the top level of a
 normal checklist command. Retain current run, parent task, item and neighbor
 revisions as applicable; never bypass a claim with a direct item command.
 
-Save one immutable command before sending and replay that same operation after
-an uncertain reply. A new operation after a definitive conflict needs fresh
-reads. A successful checklist edit changes parent totals/revision, so reread
-before the next run operation or parent edit. Respect current authorization,
-storage admission and the 50-item limit.
+## Confirm the edit and recover a lost response
+
+Save the item UUID and prepared command before sending. For a lost reply,
+CLI `commands retry` and local MCP `tasker_retry_command` take the same
+`operationId`. In hosted ChatGPT, retain the `command` object returned by
+`tasker_prepare_command` and send that full object unchanged to `tasker_edit_tasks` again.
+This preserves the original operation ID, item ID, timestamp and revisions,
+including when creating an item. Reconcile a definitive conflict against current
+records before preparing a different edit.
+
+For `run.checklist`, the server can acknowledge only the primary `agentRuns` row
+in `receipt.items`. The entry’s revision belongs to that run.
+`affectedCollections` tells you which collections changed. For example, a
+successful create can name `agentRuns`, `tasks` and `checklist` while the item
+UUID appears only in the original command. Treat that receipt as successful.
+Use the following reads in the same project scope to confirm the result.
+
+| What you need             | Bounded read                                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Created or updated item   | `collection: "checklist", id: itemId`. Match the parent task and the intended fields.                                                   |
+| Reordered or removed item | `collection: "checklist", taskId`. Follow any continuation before concluding that an item is absent; check adjacent order after a move. |
+| Progress                  | `collection: "tasks", id: taskId`. Use its current `checklistDoneCount` and `checklistCount`.                                           |
+| Next claimed edit         | Read the current run by ID in `agentRuns`, the task and the relevant item or neighbor revisions.                                        |
+
+A cached operation receipt confirms the original edit. Current checklist state
+may have changed since then. If permission for the read is unavailable,
+report the acknowledged edit and leave the current progress unverified.
+Respect current authorization, storage admission and the 50-item limit.
 
 Archived tasks allow authorized reading, but checklist writes are refused. Do
 not restore a task merely to bypass that refusal; restoration must itself belong
