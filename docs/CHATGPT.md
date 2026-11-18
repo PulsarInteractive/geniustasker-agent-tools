@@ -107,3 +107,14 @@ loads the canonical change. When reconnecting after a network interruption, the
 application catches up through its existing sync system. A server receipt and a
 screen update are different observations: the assistant should verify the changed
 record, and should not claim to have seen your screen unless it actually did.
+
+## If ChatGPT cannot find bug reports or feature requests
+
+Select **@GeniusTasker** and ask whether this connection can report a bug or suggest a
+feature. The live check is `tasker_feedback_capabilities`. Product feedback
+uses dedicated tools outside the list of project or training commands.
+
+1. If that tool is missing, open **Plugins → GeniusTasker → Settings → Manage app → Refresh tools**, then select the plugin in a new chat.
+2. If the tool returns `canReportBug: false`, review the selected account and its personal `feedback:write` grant. Reconnect in ChatGPT if you want to authorize that access.
+3. If `canReportBug` is true and `canRequestFeature` is false, this account can report bugs. Feature requests require a paid plan.
+4. Ask to prepare a report. Review its contents and selected attachments, then approve sending. The returned receipt identifies the submission.

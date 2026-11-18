@@ -302,7 +302,17 @@ export class CommandJournal {
     const value = checked(feedbackDraftSchema, draft);
     const identity = binding(await this.client.session());
     if (!value.expectedEpoch) {
-      value.expectedEpoch = (await readFeedbackCapabilities(this.client)).epoch;
+      const capabilities = await readFeedbackCapabilities(this.client);
+      if (!capabilities.canReportBug) {
+        fail('agent_permission_denied', 'Feedback needs a personal feedback:write grant.');
+      }
+      if (value.type === 'FeatureRequest' && !capabilities.canRequestFeature) {
+        fail(
+          'feedback_premium_required',
+          'This account can report bugs. Feature requests require a paid plan.',
+        );
+      }
+      value.expectedEpoch = capabilities.epoch;
     }
     if (canonical(binding(await this.client.session())) !== canonical(identity)) {
       fail('operation_identity_mismatch', 'The connection changed while preparing feedback.');
