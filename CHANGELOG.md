@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.17
+
+- Discover support reporting through feedback capabilities, including when ordinary project commands omit it.
+- Configure completion alerts independently from task impact. Respect human-owned choices and nominate exceptional subtasks explicitly.
+- Read one task’s description and its checklist by task ID. Add steps to a chosen section, including while holding an agent run.
+
 ## 0.1.0-beta.16
 
 - Document how an agent starts a New task after claiming its run, verifies InProgress on the task, and explicitly resumes previously paused work.
