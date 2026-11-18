@@ -5,6 +5,9 @@ comment, ask questions and keep a useful handoff. Your account and project
 permissions remain the limit. GeniusTasker does not run your agent or bill its
 external model tokens.
 
+Run `geniustasker workflow show --help` to list the guide topics included in your installation.
+For example, `geniustasker workflow show --topic checklist --json` explains how to track steps within a ticket.
+
 ## Custom metric definitions
 
 For custom measurement definitions, use `metrics list --scope project:ID --json`

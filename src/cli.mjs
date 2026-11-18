@@ -11,7 +11,7 @@ import {
   uploadFeedbackImage,
   downloadFeedbackImage,
 } from './feedback-media-transfer.mjs';
-import { workflow } from './workflows.mjs';
+import { workflow, workflowTopics } from './workflows.mjs';
 import { readFile } from 'node:fs/promises';
 import {
   syncDocumentation,
@@ -97,7 +97,11 @@ export const commands = {
     summary: 'Explicitly update a global npm installation when no CLI or MCP process is active.',
     options: ['channel'],
   },
-  'workflow show': { summary: 'Read a reviewed workflow guide; no network.', options: ['topic'] },
+  'workflow show': {
+    summary: 'Read a reviewed workflow guide offline.',
+    options: ['topic'],
+    topics: workflowTopics,
+  },
   'auth login': {
     summary: 'Open browser sign-in and choose access. No tutorial or token to copy.',
     options: ['flow', 'browser', 'no-browser', 'scope', 'interactive'],

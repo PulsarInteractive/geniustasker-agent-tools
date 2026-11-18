@@ -41,6 +41,33 @@ test('workflow discovery is exhaustive, bounded, and rejects unknown topics', as
   }
 });
 
+test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {
+  for (const args of [['--help'], [], ['--topic', 'checklists']]) {
+    let output = '';
+    let error = '';
+    const status = await main(['workflow', 'show', ...args, '--json'], {
+      stdout: { write: (value) => (output += value) },
+      stderr: { write: (value) => (error += value) },
+      fetchImpl: () => assert.fail('Workflow discovery must stay offline'),
+    });
+    if (args.includes('--help')) {
+      assert.equal(status, 0);
+      assert.equal(error, '');
+      assert.deepEqual(
+        JSON.parse(output).data.commands['workflow show'].topics,
+        Object.keys(guides.topics),
+      );
+    } else {
+      assert.equal(status, 2);
+      assert.equal(output, '');
+      const result = JSON.parse(error);
+      assert.equal(result.error.code, 'invalid_arguments');
+      assert.equal(result.error.retryable, false);
+      assert.match(result.error.remediation, /workflow show --help/);
+    }
+  }
+});
+
 test('hosted archive filters use the API values, not boolean strings', () => {
   for (const tool of tools.filter((t) => t.route === 'resources')) {
     assert.deepEqual(tool.inputSchema.properties.archive.enum, ['active', 'archived', 'all']);
