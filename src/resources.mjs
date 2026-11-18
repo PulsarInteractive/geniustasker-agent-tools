@@ -60,8 +60,8 @@ export const metricReadSchema = resourceReadSchema
 /** Personal access is an explicit metric surface, never a generic account read.
  * Current owner, grant and project rights are always checked by the server. */
 export function validateResourceScope({ scope, collection, metricId, taskState, taskId }) {
-  if (taskId !== undefined && collection !== 'checklist') {
-    fail('invalid_arguments', 'taskId filters the checklist collection only.');
+  if (taskId !== undefined && !['checklist', 'documents'].includes(collection)) {
+    fail('invalid_arguments', 'Use taskId with checklist items or task documents.');
   }
   if (taskState !== undefined && collection !== 'tasks') {
     fail('invalid_arguments', 'taskState is available only for the tasks collection.');

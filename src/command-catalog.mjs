@@ -36,7 +36,8 @@ export default {
       "create": true,
       "fields": [
         "task",
-        "title"
+        "title",
+        "sectionId"
       ],
       "inputSchema": "GeniusTasker.Checklists.Create",
       "module": "Project/ProjectTaskChecklistItem",

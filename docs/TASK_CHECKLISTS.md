@@ -106,3 +106,23 @@ does not mark the task Done. Editing, checking, moving or clearing a checklist
 does not start, resume, unlock, reopen or move Paused work to New. Leave actual
 progress and blockers intact; complete the task separately only after verifying
 its intended outcome and acceptance criteria.
+
+### Sections in the task description
+
+When the service advertises `sectionId` on `checklist.create`, read the
+task document with `tasker_resources` or CLI resources using collection
+`documents` and the same `taskId`. An ordered Quill insert such as
+`{"insert":{"task-checklist":"<section UUID>"}}` marks a section. Read the
+canonical checklist for that task, then match items by `sectionId` and sort
+each section by `order`. Items with a missing or null section belong to the
+default list. Preserve any items whose section is absent from an older
+document, and surface them as a separate list.
+
+Add to the chosen section with `checklist.create` and its exact section UUID.
+The same field is accepted inside a claimed run’s `run.checklist.change`.
+Omit it to use the default list. Rename, check and remove still target the
+item ID and revision. A move swaps adjacent items in the same section and
+requires both revisions. Reordering a whole section changes its position in
+the document, with the current document version. A populated section cannot
+be removed by deleting its embed. Keep the saved steps unless the user asks
+for their removal explicitly. Task counts cover every section.

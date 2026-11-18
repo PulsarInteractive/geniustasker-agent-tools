@@ -16,6 +16,17 @@ export default {
         "type": "string",
         "minLength": 1,
         "maxLength": 240
+      },
+      "sectionId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "additionalProperties": false
@@ -1187,6 +1198,17 @@ export default {
                 "type": "string",
                 "enum": [
                   "createChecklistItem"
+                ]
+              },
+              "sectionId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "task": {

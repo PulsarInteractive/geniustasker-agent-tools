@@ -37,6 +37,11 @@ test('checklist help exposes exact parent/item/run fences and public commands va
       return [kind, new Ajv({ strict: true }).compile(help.dataSchema)];
     }),
   );
+  assert.equal(check['checklist.create']({ task, title: 'Milestone', sectionId: item }), true);
+  assert.equal(
+    check['checklist.create']({ task, title: 'Milestone', sectionId: 'unknown section' }),
+    false,
+  );
   for (const title of ['Step', 'x'.repeat(240)]) {
     assert.equal(check['checklist.create']({ task, title }), true);
   }

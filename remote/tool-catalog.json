@@ -158,7 +158,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 128,
-          "description": "Checklist parent task ID; required for a bounded checklist list unless reading one exact item id. Preserve this filter with epoch/checkpoint during pagination. Filtered lists have no change cursor."
+          "description": "Parent task ID for checklist or task documents. Required for a checklist list unless reading an exact item ID. Use documents with taskId to discover ordered task-checklist section IDs in the Quill content. Preserve this filter with epoch/checkpoint during pagination. Filtered lists have no change cursor."
         }
       },
       "required": ["scope", "collection"],
@@ -1438,7 +1438,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 128,
-          "description": "Checklist parent task ID; required for a bounded checklist list unless reading one exact item id. Preserve this filter with epoch/checkpoint during pagination. Filtered lists have no change cursor."
+          "description": "Parent task ID for checklist or task documents. Required for a checklist list unless reading an exact item ID. Use documents with taskId to discover ordered task-checklist section IDs in the Quill content. Preserve this filter with epoch/checkpoint during pagination. Filtered lists have no change cursor."
         }
       },
       "required": ["scope", "collection"],
