@@ -3,6 +3,8 @@ name: geniustasker-feedback
 description: Prepare and send a GeniusTasker bug report or feature suggestion with the user's agreement, attach selected screenshots, recover a receipt or read a final decision. Use for feedback about GeniusTasker itself, not project tickets or a support conversation.
 ---
 
+Use `tasker_feedback_capabilities` for « signaler un bug », « proposer une fonctionnalité », bug reports and feature requests. If the feedback tools are missing from ChatGPT, refresh tools in the plugin settings and open a new chat. If the tools are present but personal feedback access is missing, reconnect with the owner’s feedback:write grant. The general command list covers a different protocol. Read `canReportBug` and `canRequestFeature` independently before advising the user.
+
 Use `tasker_workflow` with `topic: feedback`, then read current feedback
 capabilities. Feedback belongs only to the connected owner. Free can submit bugs
 and recover receipts; Starter/Pro can also suggest features and read decisions.

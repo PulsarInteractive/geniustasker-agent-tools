@@ -18,7 +18,7 @@ import {
   downloadFeedbackImage,
 } from './feedback-media-transfer.mjs';
 import remoteTools from '../remote/tool-catalog.json' with { type: 'json' };
-import { agentPresentation } from './presentation.mjs';
+import { agentPresentation, withFeedbackDiscovery } from './presentation.mjs';
 import { workflow, workflowSchema } from './workflows.mjs';
 import {
   documentationSyncSchema,
@@ -330,9 +330,9 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_capabilities',
-    'Discover available collections, fields, permission ceiling and write availability before choosing a workflow.',
+    'Discover available collections, fields, permission ceiling and write availability before choosing a workflow. For a bug report or feature request about GeniusTasker, call tasker_feedback_capabilities even when no feedback command appears in commands.',
     z.object({}).strict(),
-    async () => agentPresentation(await client.get('capabilities')),
+    async () => withFeedbackDiscovery(agentPresentation(await client.get('capabilities'))),
   );
   register(
     'tasker_projects',

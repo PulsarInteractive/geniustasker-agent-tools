@@ -15,7 +15,7 @@
   {
     "name": "tasker_capabilities",
     "title": "Available actions",
-    "description": "Discover the current permitted collections and commands. Do not assume paid or coach access.",
+    "description": "Discover the current permitted collections and commands. Do not assume paid or coach access. For a bug report or feature request about GeniusTasker, call tasker_feedback_capabilities even when no feedback command appears in commands.",
     "inputSchema": {
       "type": "object",
       "properties": {},
@@ -1866,7 +1866,7 @@
   {
     "name": "tasker_feedback_capabilities",
     "title": "Feedback access",
-    "description": "Read current feedback eligibility and epoch. Server results include current grants: Free permits bugs and receipts; Starter/Pro also permit suggestions and decision history. canReply is always false.",
+    "description": "Check whether this account can report a bug or submit a feature request to GeniusTasker support. Read current feedback eligibility and epoch. Server results include current grants: Free permits bugs and receipts; Starter/Pro also permit suggestions and decision history. canReply is always false.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,

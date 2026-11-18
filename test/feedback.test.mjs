@@ -137,6 +137,17 @@ test('Free bug preparation reads epoch once, sends only on explicit submit and r
   assert.ok(calls.every((entry) => !entry.path.includes('/detail/')));
 });
 
+test('preparation distinguishes a missing personal write grant from paid feature eligibility', async (t) => {
+  let canReportBug = false;
+  const f = await fixture(t, async () => Response.json({ ...capabilities(), canReportBug }));
+  const journal = new CommandJournal(f.client);
+  await assert.rejects(journal.prepareFeedback(draft()), { code: 'agent_permission_denied' });
+  canReportBug = true;
+  await assert.rejects(journal.prepareFeedback({ ...draft(), type: 'FeatureRequest' }), {
+    code: 'feedback_premium_required',
+  });
+});
+
 test('explicit epoch prepares offline, and preparing across a changed connection is fenced', async (t) => {
   const f = await fixture(t, async () => {
     throw Error('No network expected');
