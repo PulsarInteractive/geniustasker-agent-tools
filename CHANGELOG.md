@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.16
+
+- Document how an agent starts a New task after claiming its run, verifies InProgress on the task, and explicitly resumes previously paused work.
+- Explain which revision a claimed checklist change returns. The checklist guides show how to verify the item and parent totals, and how to recover the original command after an interrupted reply.
+- List all bundled topics in `geniustasker workflow show --help`. An omitted or unknown topic now returns a usage error and points to that list.
+
 ## 0.1.0-beta.15 — 2026-11-17
 
 - Add explicit task/run pause and resume commands with a useful reason and resumption point. InProgress now means current identifiable execution; silence, stale leases and unfinished code do not establish activity or a pause. Current service capabilities remain authoritative.
