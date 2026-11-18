@@ -88,3 +88,32 @@ The change can appear in the task audit. It does not by itself establish that a
 push was sent, XP was awarded or an overlay was displayed. Notification thresholds
 and Flutter presentation are separate capabilities; discover them rather than
 promising a future interface from these fields alone.
+
+## Decide whether the completion merits an interruption
+
+A release may have a dozen important prerequisites and a single outcome worth
+announcing. Leave the release milestone eligible. Keep internal setup, reviews,
+tests and intermediate handoffs quiet unless the user identifies a separate
+milestone. Decide impact and delivery separately, including when building a
+protocol. A checkbox never sends a completion alert.
+
+1. Read the project instructions, the task and its parent, and discover
+   `completionDelivery` on the current command. If the service lacks this field,
+   preserve delivery and explain the limitation when relevant. An older public
+   skill or npm version cannot grant a missing command.
+2. For ordinary work, omit the field to retain the existing choice. To keep an
+   intermediate step quiet, set `push: "silent"`. Inherited subtasks are silent.
+   Use `push: "request"` for a user-visible milestone, including an exceptional
+   subtask, with a concrete reason of up to 240 characters. Optional integer
+   `score` (0–100) ranks eligible milestones in a burst. It never makes an
+   ineligible task important. Omit a score when there is no basis for one.
+3. Submit the whole delivery object. Preserve any saved `animation` and `recap`;
+   if absent, their defaults are `"inherit"` and `true`. A typical milestone is
+   `{"push":"request","animation":"inherit","recap":true,"reason":"The onboarding flow is ready for the invited testers."}`.
+   Use the current task revision, or a live claim's `run.patch` with both
+   revisions. For protocols, configure each step's `delivery` independently.
+4. Never write `completionDeliveryOrigin` or change human-owned delivery.
+   On `task_delivery_human_review_required`, preserve the choice and let the
+   user adjust it. Thresholds, quiet hours, access and account-wide budgets still
+   apply to explicit requests. Read back the decision. Promise a notification
+   only when a delivery receipt actually establishes it.

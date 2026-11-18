@@ -54,6 +54,8 @@ Use ticket.plan for placement changes and preserve its root and per-task revisio
 checks. Project tags and saved filters are shared configuration; do not turn an
 example label into a global requirement for every project.
 
+Choose completion delivery independently on each protocol step. Keep routine prerequisites quiet and reserve explicit alerts for outcomes the user cares about. See the [notification decision workflow](../geniustasker/references/importance.md#decide-whether-the-completion-merits-an-interruption).
+
 Existing project contributions must be enabled by a human administrator.
 project.create requires projects:write and all-resources consent; newly created
 projects opt into agent contributions. Existing grants do not grow automatically.

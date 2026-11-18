@@ -72,6 +72,27 @@ test('generated task help describes creation, partial edits and exact lock data 
     assert.equal(check[kind]({ ...base, description: 'x'.repeat(600) }), true);
     assert.equal(check[kind]({ ...base, description: 'x'.repeat(601) }), false);
     assert.equal(check[kind]({ ...base, description: 'x'.repeat(618) }), false);
+    const delivery = {
+      push: 'request',
+      recap: true,
+      animation: 'inherit',
+      reason: 'Ready for customers',
+      score: 90,
+    };
+    assert.equal(check[kind]({ ...base, completionDelivery: delivery }), true);
+    for (const invalid of [
+      { push: 'always' },
+      { recap: 'false' },
+      { score: -1 },
+      { score: 101 },
+      { reason: 'x'.repeat(241) },
+    ]) {
+      assert.equal(
+        check[kind]({ ...base, completionDelivery: { ...delivery, ...invalid } }),
+        false,
+      );
+    }
+    assert.equal(check[kind]({ ...base, completionDeliveryOrigin: 'human' }), false);
   }
   assert.match(
     JSON.stringify(commandHelp({ kind: 'task.update' }).properties.status),

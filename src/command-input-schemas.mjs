@@ -913,8 +913,31 @@ export default {
                         "request"
                       ]
                     },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 240
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "recap": {
                       "type": "boolean"
+                    },
+                    "score": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "additionalProperties": false
@@ -1551,6 +1574,59 @@ export default {
           }
         ]
       },
+      "completionDelivery": {
+        "type": "object",
+        "required": [
+          "animation",
+          "push",
+          "recap"
+        ],
+        "properties": {
+          "animation": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "silent",
+              "request"
+            ]
+          },
+          "push": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "silent",
+              "request"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recap": {
+            "type": "boolean"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "type": {
         "anyOf": [
           {
@@ -1794,6 +1870,59 @@ export default {
             "type": "null"
           }
         ]
+      },
+      "completionDelivery": {
+        "type": "object",
+        "required": [
+          "animation",
+          "push",
+          "recap"
+        ],
+        "properties": {
+          "animation": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "silent",
+              "request"
+            ]
+          },
+          "push": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "silent",
+              "request"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recap": {
+            "type": "boolean"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
       },
       "type": {
         "anyOf": [
