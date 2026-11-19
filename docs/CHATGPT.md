@@ -118,3 +118,10 @@ uses dedicated tools outside the list of project or training commands.
 2. If the tool returns `canReportBug: false`, review the selected account and its personal `feedback:write` grant. Reconnect in ChatGPT if you want to authorize that access.
 3. If `canReportBug` is true and `canRequestFeature` is false, this account can report bugs. Feature requests require a paid plan.
 4. Ask to prepare a report. Review its contents and selected attachments, then approve sending. The returned receipt identifies the submission.
+
+When a verified feature changes, ask the connector to check the linked project's
+editorial policy and its existing Memory. The `memory-editorial` workflow
+describes when it may edit, offer a draft or leave the result in its ticket.
+For comparing notes, use `tasker_memory_read_pages` with specific authorized
+page and block IDs. The `memory-reading`, `memory-history` and
+`memory-templates` workflows apply directly in hosted ChatGPT.

@@ -85,3 +85,8 @@ For a requested focus or temporary deferral, read `tasker_workflow` topic
 These instructions belong to the connected owner and do not change a task's
 status, schedule, reward or execution claim. Resolve timezone before an end time;
 never silently replace a larger group or apply an instruction to a collaborator.
+
+At project start and after verifying a durable feature or decision, check the
+linked Memory and documentation preference. Read the [Memory skill](../geniustasker-memory/SKILL.md)
+and workflow `memory-editorial` to decide whether to update an existing note,
+propose a first note, or leave the information in the task.

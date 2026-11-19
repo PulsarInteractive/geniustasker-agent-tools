@@ -3,7 +3,10 @@ name: geniustasker-memory
 description: Read and maintain GeniusTasker Memory documents and Graph relations through the connected CLI or MCP. Use for knowledge search, structured documents, linked nodes and authorized imports. Memory access remains independent of project and Graph access.
 ---
 
-Memory belongs to the account and is independent of projects. Use the user's
+Delegated document, history, media and Graph operations require an active
+Starter or Pro plan and explicit access to the target. Stop on
+`memory_premium_required` and discard protected content after revocation.
+Memory belongs to the account and can be linked to several projects. Use the user's
 selected context and environment; discover identity and capabilities first.
 If no session exists, ask the user to run `geniustasker auth login --context work`
 in their terminal with the intended environment. The beta defaults to development;
@@ -12,12 +15,24 @@ CLI/MCP invocations. Use a distinct context; its name alone does not select an
 environment. The browser lets them select resources and permissions.
 Do not collect passwords or tokens, approve your own consent, or edit credentials.
 
+## Decide when a note should change
+
+Read `tasker_workflow` topic `memory-editorial` when starting project work,
+closing a verified milestone, or maintaining a feature guide. Check the project's
+linked Memory, policy and explicit resource grants. Look for one existing note
+to update before offering a specific first page. Respect deferred and declined
+suggestions. Write each section in its existing language and editorial style.
+Use topic `memory-templates` only when choosing an optional starting page.
+
 ## Navigate without loading the entire corpus
 
 1. Call `tasker_identity` and `tasker_capabilities` (CLI `whoami`, `capabilities`).
 2. Use `tasker_memories` / `memories list`. Follow `nextAfter`, including empty pages.
 3. When `documentationSync` is advertised, use `tasker_memory_tree` to navigate folders and compare branch versions. Otherwise read `tasker_resources` with `collection: pageIndex`.
-4. Fetch the needed `pages` by `id` or `path`. Targeted reads do not return a change cursor.
+4. On a service supporting note sections, use `tasker_memory_read_pages` (CLI
+   `memory read-pages --file selection.json`) for a maximum of five particular
+   pages. See workflow `memory-reading` for continuations and coverage at scale.
+   Fetch the needed `pages` by `id` or `path`. Targeted reads do not return a change cursor.
 5. Use `tasker_search` (`memory search`) to find page or node excerpts. Read the
    full record before editing; an excerpt does not establish the full context.
 
@@ -30,6 +45,10 @@ For a large library, cross-memory questions or resumable maintenance, read
 how to combine search, Graph neighborhoods and targeted pages without downloading
 every space. The client revalidates its bounded resource cache on every access;
 it never treats an offline or refused request as a successful cached read.
+
+For inspecting a revision or deliberately restoring its text, follow workflow
+`memory-history`. Restoring requires an explicit instruction, a preview of the
+diff, fresh access and an exact expected revision.
 
 ## Maintain editable, trustworthy knowledge
 
@@ -72,9 +91,8 @@ deployments may not expose them. Nodes and edges live in a memory scope. Read
 (`graph explore`) around a selected node rather than reading the entire graph.
 `truncated` means the result is incomplete. Never infer absent relations from it.
 
-Graph creation, edits and delegated Graph reads/search/exploration require
-Starter or Pro for the acting user, plus the resource grant. Documents and their
-attachments remain independent. On `memory_graph_premium_required`, stop Graph
+Graph also enforces its per-resource rights. Documents and their attachments
+have their own per-page and media permissions. On `memory_graph_premium_required`, stop Graph
 calls; do not switch tools, profiles or copy it into documents to bypass the tier.
 
 Each node owns its editable text; references contain only scope, pageId and an

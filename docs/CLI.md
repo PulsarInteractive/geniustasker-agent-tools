@@ -131,7 +131,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.17", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.18", "mcp", "--context", "work"]
     }
   }
 }
@@ -638,3 +638,30 @@ MCP tasker_resources/tasker_read_tasks.
 Inspect exact schemas with `commands describe --kind checklist.create` (also
 update/move/remove or run.checklist under a live claim). Checking is an explicit
 boolean, never a toggle or automatic task completion.
+
+## Search archived tasks
+
+Use `archive query --file query.json` or `tasker_archive_query` to retrieve
+one page for a project. Both `tasks:read` and `history:read` must be granted
+on that project. Existing connections keep their prior grants until the owner
+consents to the additional permission.
+
+```json
+{
+  "scope": "project:example",
+  "query": "release",
+  "importance": ["Important", "Critical"],
+  "archivedFrom": "2026-10-01T00:00:00Z",
+  "limit": 20
+}
+```
+
+Also supported are `archivedUntil`, `statuses`, `assignees`, `sort`,
+`sharedFilterId` and `column`. Read the next page by supplying the returned
+`next` as `continuation` together with the unchanged query. A page can be
+empty while a continuation remains. Fetch an item with
+`archive detail --scope project:ID --id TASK` and load comments separately
+with `archive comments --scope project:ID --id TASK`. The connector offers
+`tasker_archive_detail` and `tasker_archive_comments`. A restored, expired or
+inaccessible task may be absent from the archive. Reconnect with explicit
+historical access when needed.

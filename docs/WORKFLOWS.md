@@ -49,3 +49,11 @@ Read [Task protocols](../skills/geniustasker/references/protocols.md) for exact 
 For real agent claims, checkpoints, scoped task patches and completion, read
 [Agent runs](../skills/geniustasker/references/agent-runs.md). A recorded run does
 not start or monitor an external agent automatically.
+
+## Memory maintenance and reading
+
+- `memory-editorial` evaluates verified project changes, document ownership, section language, writing style, proposals and conflicts.
+- `memory-reading` covers selected sections, resumable multi-page comparisons and explicitly exhaustive inventories.
+- `archives` covers bounded, permission-specific task and comment lookups for historical work.
+- `memory-history` covers revision metadata, scoped diffs and explicit restores.
+- `memory-templates` previews an individually selected product, game, music or free-form page.

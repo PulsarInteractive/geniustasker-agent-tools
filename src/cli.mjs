@@ -12,6 +12,14 @@ import {
   uploadFeedbackImage,
   downloadFeedbackImage,
 } from './feedback-media-transfer.mjs';
+import { readArchive } from './archive.mjs';
+import {
+  readProjectDocumentation,
+  reviewProjectMemory,
+  previewMemoryTemplate,
+} from './memory-editorial.mjs';
+import { memoryHistoryRequest } from './memory-history.mjs';
+import { readMemoryPages } from './memory-read-pages.mjs';
 import { workflow, workflowTopics } from './workflows.mjs';
 import { readFile } from 'node:fs/promises';
 import {
@@ -181,6 +189,43 @@ export const commands = {
     summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
     options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match'],
   },
+  'archive query': {
+    summary: 'Search one project archive with bounded filters from a JSON file.',
+    options: ['file'],
+  },
+  'archive detail': {
+    summary: 'Read one archived task with historical access.',
+    options: ['scope', 'id'],
+  },
+  'archive comments': {
+    summary: 'Read one page of comments for the selected archived task.',
+    options: ['scope', 'id', 'after'],
+  },
+  'memory review': {
+    summary: 'Evaluate verified evidence against the live documentation policy. Reads only.',
+    options: ['file'],
+  },
+  'memory template': {
+    summary: 'List optional pages in a family or preview one selected page.',
+    options: ['family', 'page', 'language'],
+  },
+  'memory history': {
+    summary: 'Read a page of retained revision metadata for an authorized note.',
+    options: ['scope', 'page', 'before-revision'],
+  },
+  'memory diff': {
+    summary: 'Compare changed fields and block excerpts between retained revisions.',
+    options: ['scope', 'page', 'from', 'to'],
+  },
+  'memory restore': {
+    summary: 'Restore a confirmed note revision using an immutable JSON request.',
+    options: ['file'],
+  },
+  'memory read-pages': {
+    summary:
+      'Read one bounded batch of selected page outlines or blocks. The JSON file contains scope, pages and optional snapshot.',
+    options: ['file'],
+  },
   'memory markdown': {
     summary: 'Fetch one portable Markdown document with stable media IDs and source metadata.',
     options: ['scope', 'page', 'revision', 'epoch', 'checkpoint'],
@@ -197,6 +242,10 @@ export const commands = {
     summary:
       'Resolve a Memory page or block with current permissions; unavailable links preserve nodes.',
     options: ['scope', 'page', 'block'],
+  },
+  'projects documentation': {
+    summary: 'Read the current editorial policy and its authorized target.',
+    options: ['scope'],
   },
   'projects list': {
     summary: 'Read a bounded project page; follow nextAfter even for an empty page.',
@@ -597,6 +646,44 @@ export async function main(
         checkpoint: options.checkpoint,
         ifNoneMatch: options['if-none-match'],
       });
+    } else if (command.startsWith('archive ')) {
+      const operation = command.split(' ')[1];
+      const input =
+        operation === 'query'
+          ? await readCommandFile(options.file)
+          : {
+              scope: options.scope,
+              id: options.id,
+              ...(options.after ? { after: options.after } : {}),
+            };
+      data = await readArchive(client, operation, input);
+    } else if (command === 'projects documentation') {
+      data = await readProjectDocumentation(client, { scope: options.scope });
+    } else if (command === 'memory review') {
+      data = await reviewProjectMemory(client, await readCommandFile(options.file));
+    } else if (command === 'memory template') {
+      data = previewMemoryTemplate({
+        family: options.family,
+        language: options.language,
+        ...(options.page ? { page: options.page } : {}),
+      });
+    } else if (command === 'memory history') {
+      data = await memoryHistoryRequest(client, 'history', {
+        scope: options.scope,
+        pageId: options.page,
+        ...(options['before-revision'] ? { beforeRevision: options['before-revision'] } : {}),
+      });
+    } else if (command === 'memory diff') {
+      data = await memoryHistoryRequest(client, 'diff', {
+        scope: options.scope,
+        pageId: options.page,
+        fromRevision: options.from,
+        ...(options.to ? { toRevision: options.to } : {}),
+      });
+    } else if (command === 'memory restore') {
+      data = await memoryHistoryRequest(client, 'restore', await readCommandFile(options.file));
+    } else if (command === 'memory read-pages') {
+      data = await readMemoryPages(client, await readCommandFile(options.file));
     } else if (command === 'memory markdown') {
       data = await readMemoryMarkdown(client, {
         scope: options.scope,

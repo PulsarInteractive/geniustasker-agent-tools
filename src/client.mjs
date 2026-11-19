@@ -180,6 +180,9 @@ export class AgentClient {
         'me',
         'capabilities',
         'projects',
+        'project/documentation',
+        'tasks/archive/detail',
+        'tasks/archive/comments',
         'memories',
         'resources',
         'profiles',
@@ -189,6 +192,9 @@ export class AgentClient {
         'reference',
         'memory/tree',
         'memory/markdown',
+        'memory/sections',
+        'memory/history',
+        'memory/diff',
       ].includes(resource)
     ) {
       fail('invalid_arguments', 'Unknown delegated resource.');

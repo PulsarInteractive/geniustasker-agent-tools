@@ -325,6 +325,7 @@ export default {
     "memory.page.create": {
       "create": true,
       "fields": [
+        "changeReason",
         "visibility",
         "readRoles",
         "title",
@@ -352,8 +353,17 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.restore": {
+      "action": "restoreMemoryVersion",
+      "fields": [
+        "revision"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.update": {
       "fields": [
+        "changeReason",
         "visibility",
         "readRoles",
         "title",
@@ -481,6 +491,15 @@ export default {
       "module": "Project/ProjectMetricObservation",
       "permission": "metrics:write",
       "personalModule": "LocalUser/LocalUserMetricObservation"
+    },
+    "project.configureDocumentation": {
+      "action": "configureDocumentation",
+      "fields": [
+        "documentation"
+      ],
+      "inputSchema": "GeniusTasker.Contracts.AgentDocumentationSettings",
+      "module": "Project/$",
+      "permission": "projects:write"
     },
     "project.configureInstructions": {
       "action": "configureAgentInstructions",
@@ -990,6 +1009,7 @@ export default {
   },
   "grants": {
     "permissions": [
+      "history:read",
       "projects:read",
       "projects:write",
       "tasks:read",

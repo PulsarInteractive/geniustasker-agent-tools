@@ -66,7 +66,7 @@
   {
     "name": "tasker_resources",
     "title": "Read records",
-    "description": "Read a bounded page or exact record before modifying it. Preserve epoch/revision. Never crawl all collections. Use personal scope only for the connected owner; revoked access is unavailable. Prefer the permission-specific read tools for new calls.",
+    "description": "Read a bounded page or exact record before modifying it. Preserve epoch/revision. Never crawl all collections. Use personal scope only for the connected owner; revoked access is unavailable. Prefer the permission-specific read tools for new calls. Archived task data also requires history:read. Prefer tasker_archive_query for archive search and filters.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -303,6 +303,482 @@
     "route": "memory/markdown"
   },
   {
+    "name": "tasker_archive_query",
+    "title": "Search archived tasks",
+    "description": "Read one bounded page of archived tasks in a single project, optionally filtering by text, archive date, status, impact or assignee. All reads require the specific history:read permission. Follow next even after an empty page and reuse all original filters.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^project:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 136
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "query": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "statuses": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": ["New", "InProgress", "Paused", "Done"]
+          }
+        },
+        "importance": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": ["Minor", "Normal", "Important", "Critical"]
+          }
+        },
+        "assignees": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "archivedFrom": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 40
+        },
+        "archivedUntil": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 40
+        },
+        "sort": {
+          "type": "string",
+          "enum": ["Rank", "DueDate", "Priority", "Newest"]
+        },
+        "sharedFilterId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "column": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "continuation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "history:read"],
+    "route": "tasks/archive/query",
+    "method": "POST"
+  },
+  {
+    "name": "tasker_archive_detail",
+    "title": "Read an archived task",
+    "description": "Read one archived task by ID under current task and historical access. No other project or active queue is scanned.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^project:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 136
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": ["scope", "id"],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "history:read"],
+    "route": "tasks/archive/detail"
+  },
+  {
+    "name": "tasker_archive_comments",
+    "title": "Read comments of an archived task",
+    "description": "Read one bounded page of an archived task’s authorized comments. Follow the opaque nextAfter cursor only for the same task and project.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^project:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 136
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": ["scope", "id"],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "history:read"],
+    "route": "tasks/archive/comments"
+  },
+  {
+    "name": "tasker_project_documentation",
+    "title": "Read project documentation settings",
+    "description": "Read the project’s current documentation policy, revision and authorized Memory destination. A hidden destination stays undisclosed. Read before reviewing or configuring the policy. Linking a project grants no new Memory access.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^project:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 136
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["projects:read"],
+    "route": "project/documentation"
+  },
+  {
+    "name": "tasker_memory_review",
+    "title": "Evaluate a documentation change",
+    "description": "Check the project’s current documentation policy and recommend one next action after real work. Supply durable evidence and candidate IDs from an authorized search. The review only reads scoped records, never writes a note or changes the project. Its result cannot authorize a mutation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^project:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 136
+        },
+        "domain": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,64}$",
+          "maxLength": 64
+        },
+        "change": {
+          "type": "string",
+          "enum": [
+            "feature",
+            "decision",
+            "procedure",
+            "limitation",
+            "proposal",
+            "routine",
+            "uncertain"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "tested-release",
+                  "verified-behavior",
+                  "approved-decision",
+                  "verified-procedure",
+                  "task-status",
+                  "proposal"
+                ]
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              }
+            },
+            "required": ["kind", "reference"],
+            "additionalProperties": false
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageId": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+                "maxLength": 128
+              },
+              "revision": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)$",
+                "maxLength": 32
+              }
+            },
+            "required": ["pageId", "revision"],
+            "additionalProperties": false
+          }
+        },
+        "existingFactMatches": {
+          "type": "boolean",
+          "description": "True only after reading the current section and verifying it already covers this change."
+        }
+      },
+      "required": ["scope", "domain", "change", "sources", "candidates"],
+      "additionalProperties": false
+    },
+    "scopes": ["projects:read"],
+    "route": "memory/review"
+  },
+  {
+    "name": "tasker_memory_template",
+    "title": "Preview a starting note",
+    "description": "Choose an optional page from a software/product, game, music or free-form template. Omit page for the available choices; select its key for a localized draft outline. This consists of static suggestions and never creates a note.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "type": "string",
+          "enum": ["product", "game", "music", "freeform"]
+        },
+        "page": {
+          "type": "string",
+          "pattern": "^[a-z-]{1,32}$",
+          "maxLength": 32
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "fr"]
+        }
+      },
+      "required": ["family", "language"],
+      "additionalProperties": false
+    },
+    "scopes": [],
+    "route": "memory/template"
+  },
+  {
+    "name": "tasker_memory_read_pages",
+    "title": "Read selected Memory sections",
+    "description": "Compare up to five different pages in one authorized Memory. Each page costs one ordinary read. Select outlines or specific block IDs. Use the page cursor and revision with the same selector, epoch and checkpoint to continue. A partial batch covers only the returned material. Read tasker_workflow topic memory-reading for ten-page comparisons and large libraries. Use atRevision for an explicitly selected retained historical version.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "checkpoint": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 32
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageId": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+                "maxLength": 128
+              },
+              "mode": {
+                "type": "string",
+                "enum": ["outline", "blocks"]
+              },
+              "blockIds": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$",
+                  "maxLength": 80
+                }
+              },
+              "knownRevision": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)$",
+                "maxLength": 16
+              },
+              "revision": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)$",
+                "maxLength": 16
+              },
+              "cursor": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+              },
+              "atRevision": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)$",
+                "maxLength": 16,
+                "description": "Read this retained historical revision with current access. Omit for live content."
+              }
+            },
+            "required": ["pageId", "mode"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["scope", "pages"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "memory/read-pages"
+  },
+  {
+    "name": "tasker_memory_history",
+    "title": "Read Memory note history",
+    "description": "Read one bounded page of retained revisions for a currently accessible note. Continue using nextBeforeRevision in the same Memory and note. See workflow memory-history.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "pageId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        },
+        "beforeRevision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 16
+        }
+      },
+      "required": ["scope", "pageId"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "memory/history"
+  },
+  {
+    "name": "tasker_memory_diff",
+    "title": "Compare Memory revisions",
+    "description": "Compare two retained note revisions. Omitting toRevision compares with the current revision. The result contains bounded excerpts of changed fields and blocks.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "pageId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        },
+        "fromRevision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 16
+        },
+        "toRevision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 16
+        }
+      },
+      "required": ["scope", "pageId", "fromRevision"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "memory/diff"
+  },
+  {
+    "name": "tasker_memory_restore",
+    "title": "Restore note content",
+    "description": "Restore one selected note revision only after the user requests it and reviews its effect. Preserve the complete immutable payload for retries. Current access and placement are retained. A stale expectedRevision requires a new comparison.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "pageId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 16
+        },
+        "expectedRevision": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 16
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "scope",
+        "pageId",
+        "revision",
+        "expectedRevision",
+        "operationId",
+        "epoch",
+        "issuedAt"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:write"],
+    "route": "memory/restore",
+    "write": true,
+    "destructive": true
+  },
+  {
     "name": "tasker_command_help",
     "title": "Explain an edit",
     "description": "Read the allowed fields and value schemas before preparing an unfamiliar command. Missing access cannot be bypassed.",
@@ -345,6 +821,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.restore",
             "memory.page.update",
             "memory.update",
             "metric.correct",
@@ -356,6 +833,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
             "project.delete",
@@ -452,6 +930,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.restore",
             "memory.page.update",
             "memory.update",
             "metric.correct",
@@ -463,6 +942,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
             "project.delete",
@@ -599,6 +1079,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.restore",
             "memory.page.update",
             "memory.update",
             "metric.correct",
@@ -610,6 +1091,7 @@
             "metric.record",
             "metric.update",
             "metric.void",
+            "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
             "project.delete",
@@ -938,6 +1420,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.restore",
             "memory.page.update",
             "memory.update"
           ]
@@ -1371,7 +1854,7 @@
   {
     "name": "tasker_read_tasks",
     "title": "Read tasks records",
-    "description": "Read one authorized page or exact record from the listed tasks collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply.",
+    "description": "Read one authorized page or exact record from the listed tasks collections. Preserve epoch/revision and follow nextAfter only when needed. This tool cannot change data. Existing resource access and quotas apply. Archived task data also requires history:read. Prefer tasker_archive_query for archive search and filters.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1465,6 +1948,7 @@
         "kind": {
           "type": "string",
           "enum": [
+            "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
             "project.delete",
@@ -1542,7 +2026,12 @@
             "metrics",
             "intents",
             "feedback",
-            "checklist"
+            "checklist",
+            "memory-editorial",
+            "memory-reading",
+            "memory-templates",
+            "memory-history",
+            "archives"
           ]
         }
       },

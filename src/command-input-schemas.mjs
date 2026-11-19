@@ -794,6 +794,108 @@ export default {
     },
     "additionalProperties": false
   },
+  "project.configureDocumentation": {
+    "type": "object",
+    "required": [
+      "documentation"
+    ],
+    "properties": {
+      "documentation": {
+        "type": "object",
+        "required": [
+          "autoDomains",
+          "folderId",
+          "guidance",
+          "language",
+          "memoryId",
+          "stylePageId",
+          "suggestionState"
+        ],
+        "properties": {
+          "autoDomains": {
+            "type": "array",
+            "maxItems": 24,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "folderId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guidance": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "memoryId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stylePageId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suggestionState": {
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ask"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "later"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "dismissed"
+                ]
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
   "project.configureInstructions": {
     "type": "object",
     "required": [

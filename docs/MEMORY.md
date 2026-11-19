@@ -1,13 +1,12 @@
 # Memory and Graph
 
-Graph creation, node/edge changes and Graph reads through CLI/MCP/connectors
-require Starter or Pro for the acting user, plus the normal resource permissions.
-The space owner's plan does not grant a collaborator this capability. Document
-pages, attachments and document references retain their independent access.
-`memory_graph_premium_required` is a subscription refusal, not a reason to switch
-tools or profiles. After downgrade, ordinary application sync and account export
-remain available for existing data. Discover the current server capabilities;
-package installation alone does not activate a server release.
+Delegated access to Memory documents, history, assets and Graph through the CLI,
+local MCP and ChatGPT requires a current Starter or Pro account and explicit
+rights to the selected resource. A linked project and a paid space owner confer
+no access on another account. Read live capabilities before selecting sections,
+history or restore. On `memory_premium_required` or
+`memory_graph_premium_required`, end that delegated read. The ordinary app and
+account export use their own existing permissions after a downgrade.
 
 Memory stores structured documents independently of projects. Graph connects
 nodes and links them to a page or a stable document block. These commands require
@@ -45,3 +44,86 @@ so people can see and repair the unavailable attachment. No credentials, URLs
 with public access tokens or file bytes are embedded in documents.
 
 See the [CLI reference](CLI.md) for document blocks, page roles, node types, images and detailed command examples.
+
+## Maintain a project note after a feature changes
+
+At the start of an actual work session, inspect the project's linked library,
+destination and editorial policy. After verifying a lasting change, search for
+the existing feature guide and read its relevant section. An implemented fix, a
+release and a proposal describe different states. Use the verified state in the
+note and keep routine task progress in its ticket. When no suitable note exists,
+offer a specific first page for an identified reader and purpose. Respect a
+previous decision to defer or decline.
+
+The command `geniustasker workflow show --topic memory-editorial` and MCP tool
+`tasker_workflow` publish the same allowed editing procedure. The
+`memory-templates` topic provides optional product, game, music and free-form
+pages with English and French starting headings. Preview the selected page,
+adapt the wording to the destination and populate it from authorized evidence.
+
+## Read several notes
+
+Save one JSON selection, then run `geniustasker memory read-pages --file selection.json`.
+The local MCP and ChatGPT use the same JSON in `tasker_memory_read_pages`.
+
+```json
+{
+  "scope": "memory:example",
+  "pages": [
+    { "pageId": "release-guide", "mode": "outline" },
+    { "pageId": "offline-workouts", "mode": "blocks", "blockIds": ["starting-offline"] }
+  ]
+}
+```
+
+Use IDs returned by the authorized index and outline. Each selected page
+uses one ordinary account read. A batch accepts five pages and runs at most two
+reads at once. The logical response is limited to 64 KiB of UTF-8 JSON.
+`complete` counts fully consumed selectors, including unchanged selectors.
+A complete outline covers headings and previews only. Each partial page returns
+its revision and a `nextCursor`. Reuse the original selector, supply that cursor
+as `cursor`, and include the returned revision, scope epoch and checkpoint on
+the next call. Use the stable block ID and UTF-16 offset to reassemble split text.
+After a quota interruption save the unread IDs, wait for the reported reset,
+and resume from the last verified page. No background reads are scheduled.
+
+Compare ten chosen notes in two groups of five when each fits. Search and read
+matching sections for a focused question about a 500-page library. For an
+explicit full review, enumerate authorized IDs and revisions into a resumable
+manifest, count complete and outstanding pages, then process selected blocks in
+bounded batches. An expired checkpoint requires a new inventory and fresh
+permission checks. A missing or forbidden page stays unavailable.
+
+## Read and restore revisions
+
+`memory history --scope memory:ID --page PAGE` lists retained revisions.
+Repeat with `--before-revision` from `nextBeforeRevision` for older entries.
+`memory diff --scope memory:ID --page PAGE --from REV --to REV` compares
+retained revisions. To read retained content, include its revision as `atRevision` on the original outline or block selector. Reuse the same historical selector when continuing. Current membership and page rights always apply. The corresponding tools are `tasker_memory_history` and
+`tasker_memory_diff`. When explicitly authorized, prepare the chosen
+`scope`, `pageId`, `revision`, current `expectedRevision`, `epoch`,
+new UUID `operationId` and millisecond `issuedAt` once. Submit the exact object
+to `tasker_memory_restore` or `memory restore --file restore.json`. Preserve it
+for retries and inspect the resulting note and revision after success.
+
+Use `geniustasker memory template --family game --language fr` to list
+independent game pages. Add `--page mechanic` to preview that page in French.
+The preview contains possible headings and performs no write. The connector
+offers the same selections through `tasker_memory_template`.
+
+For a verified milestone, `memory review --file review.json` or
+`tasker_memory_review` reads the project's current policy and checks the selected
+candidate revision. Supply an editorial domain, the type of change, references
+to reviewed evidence and candidates from a scoped search. The result explains
+whether to leave the information in the task, clarify it, suggest a note or prepare
+a small update. A read-only review cannot execute or authorize that update.
+
+```json
+{
+  "scope": "project:example",
+  "domain": "usage",
+  "change": "feature",
+  "sources": [{ "kind": "tested-release", "reference": "reviewed-release-42" }],
+  "candidates": [{ "pageId": "offline-workouts", "revision": "21" }]
+}
+```

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.18 — 2026-11-19
+
+- Review verified project changes against the owner's documentation policy and the selected note revision. Offer first notes individually, preserve each section's language and style, and preview optional product, game, music or free-form pages.
+- Read selected page outlines, blocks and retained revisions in metered batches of up to five. Inspect revision history, compare changes and restore an explicitly chosen version.
+- Query one project's archive by text, dates, status, impact or assignee, then read an archived task and its comments with explicit historical access. Existing grants remain unchanged.
+
 ## 0.1.0-beta.17
 
 - Discover support reporting through feedback capabilities, including when ordinary project commands omit it.

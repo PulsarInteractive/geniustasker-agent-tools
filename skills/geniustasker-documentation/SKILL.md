@@ -37,3 +37,8 @@ the node’s own notes. A removed managed snapshot cannot erase previous Git cop
 Read [the recommended structure](references/structure.md) when organizing new
 knowledge. For configuration and recovery commands, consult the packaged
 `docs/DOCUMENTATION_SYNC.md` or its canonical public repository page.
+
+When reconciling new evidence into a source note, follow workflow
+`memory-editorial`. Preserve the language and style of each section, stable
+anchors, links and human edits. Use `memory-reading` for bounded source review
+and track which selected pages were actually covered before reporting completion.

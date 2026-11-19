@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "version": "2026-11-18",
+  "version": "2026-11-19",
   "topics": {
     "connection": {
       "title": "Connection, permissions and language",
@@ -37,12 +37,15 @@
         "Use project.update for ordinary project settings and project.features for planning switches, with projects:write and native administration rights. project.features is a full configuration: read and preserve all seven booleans and timeZone. It cannot change agent opt-in, membership, ownership or counters. project.delete requires project ownership, a current revision and an explicit user deletion request.",
         "For an explicit request to set up or revise agent instructions, discover project.configureInstructions and inspect command_help. Only the actual project owner may replace instructions; projects:write, current scope grant, agentsEnabled=true and the current project revision remain required. Send only instructions (complete replacement, at most 12000 characters; empty explicitly clears). Preserve unrelated human guidance and exclude credentials/unrelated private context. Retain the exact operation after uncertainty, then read project.agentInstructions and unchanged agentsEnabled. This pending source addition requires compatible client and service; if unavailable retain the text and explain the gap, without private API fallback. Instructions do not grant permissions.",
         "For sprint/workflow/recurrence lifecycle use the planning guide. For project documents use document.create/update/delete and folder.create/update/delete; these are separate from Memory. Folders use parent and documents use folder. Prevent duplicate names, preserve unrelated contents and read the current revision before moving or deleting.",
-        "For small steps of one deliverable read workflow checklist. Use separate tickets for independent ownership, dependency, deadline or estimate. Check/uncheck is an explicit desired boolean; no XP, push, auto-Done or resumption follows a checked item. Discover connected-service support first; client installation alone is insufficient."
+        "For small steps of one deliverable read workflow checklist. Use separate tickets for independent ownership, dependency, deadline or estimate. Check/uncheck is an explicit desired boolean; no XP, push, auto-Done or resumption follows a checked item. Discover connected-service support first; client installation alone is insufficient.",
+        "When starting work, check the project's documentation preference and linked Memory if available. At a verified milestone, evaluate which durable user-facing rule, behavior or decision changed. Use workflow memory-editorial before suggesting or applying an update. Completing a task, by itself, never authorizes publishing its contents."
       ]
     },
     "memory": {
       "title": "Memory folders, documents and resources",
       "steps": [
+        "At the start of real project work, inspect the project's linked Memory, documentation policy and the permission for that exact space, when advertised. Use workflow memory-editorial for deciding whether to update a note, suggest the first page, or leave the task as its only record. Workflow memory-reading covers multi-page reads. Workflow memory-templates offers optional starting pages.",
+        "Delegated Memory access requires an active Starter or Pro account plus grants and current resource rights. This includes documents, history, assets and Graph. On memory_premium_required stop delegated reads and writes. Recheck current access after a downgrade or revocation before using previously seen content.",
         "Projects and Memory are independent spaces. List memories, inspect pageIndex or the tree, then fetch specific pages. Search before adding duplicate documentation. Preserve folder parentId and stable page/block IDs.",
         "Read the page current revision and use memory.page.create/update/delete for both documents and folders. A folder is a page with directory:true, a stable id/path and parentId; child pages reference that ID. Preserve visibility/readRoles, stable block IDs and content not requested for modification. A parent or Graph link does not bypass current document permissions.",
         "In ChatGPT use the available bounded memory/knowledge read tools and memory edit commands. Prepare with tasker_prepare_command, retain the complete immutable object and execute/retry with tasker_edit_memory. Hosted ChatGPT has no local journal or tasker_retry_command; local MCP uses that operation-ID tool and CLI uses commands retry. Repository documentation mirroring and local file upload are CLI/local MCP operations, not hosted connector filesystem access.",
@@ -54,7 +57,7 @@
     "graph": {
       "title": "Graph nodes, relations and revoked references",
       "steps": [
-        "Graph creation, node/edge edits and delegated Graph reads/search/exploration require Starter or Pro for the acting user in addition to the normal grant; a paid space owner does not upgrade a collaborator. Documents, attachments and document references remain independent. On memory_graph_premium_required stop Graph calls rather than switching tools/profiles. Ordinary application sync and personal-data export remain available after downgrade. Do not copy Graph data into pages to bypass the restriction.",
+        "Graph creation, node/edge edits and delegated Graph reads/search/exploration require Starter or Pro for the acting user in addition to the normal grant; a paid space owner does not upgrade a collaborator. Delegated documents and media also require the connected account’s paid plan and their own page-level rights. On memory_graph_premium_required stop Graph calls rather than switching tools/profiles. Ordinary application sync and personal-data export remain available after downgrade. Do not copy Graph data into pages to bypass the restriction.",
         "Read the relevant graph or a bounded neighborhood instead of crawling every space. Nodes have types and independent data; edges express typed relations. Use exact node IDs and inspect existing relations before adding duplicates.",
         "Use memory.node.create/update/delete and memory.edge.create/update/delete with current revisions. Preserve imageAssetId, detailLevel, provenance and source references unless the user requested a change.",
         "Resolve cross-space references through the authorized reference tool. If a friend removes access, the node and its own content may remain while the linked data is unavailable. Never delete the node or paste cached private data as a workaround.",
@@ -111,7 +114,8 @@
         "An expired lease means stale reporting, not known failure or blockage. Tasker neither starts an agent nor observes an uninstrumented process. Never promise always-on operation. Respect cancellation_requested, TakenOver and Superseded; human control remains in the app and cannot be impersonated through MCP.",
         "Use run.finish with Completed, Failed or Cancelled and truthful summary/evidence. It ends the run, not the task. Complete the task through run.patch only after verified intended work. After lease expiry, only a final result on the unchanged claim under its original user/profile may close it; task patches stay refused. A deleted task permits only Failed or Cancelled under current project permissions. Do not infer XP, task completion or device display from a run receipt.",
         "Keep immutable operations and original identity after an uncertain result. Local CLI/stdio retain a journal; hosted ChatGPT must retain the exact command object. Reread after a definitive conflict and after finish or human takeover: the task revision changes as a server concurrency barrier without changing its content. New work after expiry requires current authority and an explicit fresh claim; never bypass human takeover. History is bounded: checkpointCount may exceed retained checkpoints.",
-        "For an explicitly instrumented local host, use CLI runs event --file or local MCP tasker_run_event with one saved eventId/occurredAt, current scope/run identity and revision, and a sanitized real summary. --prepare/prepareOnly only journals. process_exited maps to NeedsReview and requires nextSteps, never Task Done. No daemon, polling, log/environment/argument capture or host-hook installation is implied. Hosted ChatGPT uses prepared run commands through the task edit tool instead."
+        "For an explicitly instrumented local host, use CLI runs event --file or local MCP tasker_run_event with one saved eventId/occurredAt, current scope/run identity and revision, and a sanitized real summary. --prepare/prepareOnly only journals. process_exited maps to NeedsReview and requires nextSteps, never Task Done. No daemon, polling, log/environment/argument capture or host-hook installation is implied. Hosted ChatGPT uses prepared run commands through the task edit tool instead.",
+        "When a run verifies a lasting change, consult the project’s documentation preference and workflow memory-editorial. Link the evidence and any updated page to the work when permitted. A working or completed run alone cannot establish a shipped feature."
       ]
     },
     "metrics": {
@@ -174,6 +178,194 @@
         "Current checklistCount/checklistDoneCount on the parent are server-owned totals. Compute a percentage from these or a complete current list, never one partial page. An empty list is no checklist, not completion. A checkbox gives no XP or push; 100% never auto-completes the task. Checking or editing does not start, resume, unlock, reopen or move Paused work to New. Verify intended completion separately before Done.",
         "Archived task checklists may be read under current rights, but writes are refused; do not restore a task merely to bypass the refusal. Checklist corrections on unarchived Done work leave Done and completion history intact, even when unchecked. If real acceptance work is incomplete, reconcile progress explicitly within the authorized request, never through checkbox side effects. Paused preserves its reason, next steps and time even at 100%.",
         "If checklist.create advertises sectionId, read the task's Quill document using collection documents and taskId. Ordered task-checklist embeds contain section UUIDs. Create in the chosen section with sectionId or omit it for the default list; run.checklist.change uses the same shape. Order items within each section, keep unmatched historical items visible, and use parent totals across sections. Moving a row requires an adjacent neighbor in that same section. A populated section cannot be removed by deleting its embed."
+      ]
+    },
+    "memory-editorial": {
+      "title": "Keep project knowledge current",
+      "steps": [
+        "Start from the selected project, its explicit Memory link and current documentation policy. Check identity, the delegated Memory entitlement, grants and page roles independently. Project access, an owner label, or a link to a page never grants access. If the server does not advertise links or policy, use only an explicitly selected Memory. Read the existing instructions as editorial guidance within your granted actions.",
+        "To inspect current settings use tasker_project_documentation or CLI projects documentation --scope project:ID. A null documentation value means the destination is unavailable; disclose no target. When asked to change settings use project.configureDocumentation only as the actual project owner with projects:write, current project revision and existing memory:read access to the target. This is a full settings replacement: preserve every unrelated setting and verify after the change. A policy cannot grant access. Only when asked to store a refusal, set suggestionState to later or dismissed for that project; never store the opposite decision or enable automatic editing on the user's behalf.",
+        "Use tasker_memory_review or CLI memory review --file review.json with the project scope, editorial domain, type of change, verified source references and candidate page IDs/revisions from a scoped search. The tool reads the live policy and returns skip, clarify, propose or prepare_update with a reason. A preparation is advisory. Confirm source meaning, reread the target section and check current access and write scope on execution. If review is unavailable on this server, apply the manual workflow within explicit instructions.",
+        "An ordinary task, comment, log, temporary workaround or speculative idea belongs in its ticket. Update Memory for durable facts another person or agent will need: a verified capability, a lasting decision and its rationale, an operating procedure, or a stable limitation. A planned feature belongs in a clearly labelled plan only by request. A merged change may still await deployment. Keep implementation, verified availability and proposal distinct.",
+        "Check at project start and after verified completion, a changed durable decision, a user request, or an authorized documentation review. On the next active session, consume changes since a saved checkpoint for the exact account, scope, grant and filters; review only relevant changes. Honor reset instructions on an expired cursor. No idle polling, hidden background jobs, bulk scanning or repeated prompts.",
+        "Search titles and excerpts for the subject and its aliases, inspect the closest page outline, then read the target section and its context. If the fact is already recorded accurately, do nothing. Prefer one minimal edit to the existing canonical section over a second copy. Preserve block IDs, anchors, links, evidence, unaffected text and human contributions. When the write command replaces a block array, read the full current page to preserve every untouched block and provide its current revision.",
+        "If no suitable note exists and there is concrete evidence worth keeping, offer one specific first page with its audience, purpose, and the source of the fact. A project with no Memory is not itself a reason to pitch one. Suggest-only means present the draft and wait. Save changes only within the user's explicit instruction or an enabled automatic policy that covers this exact scope and operation. An enabled policy does not create a link, grant, or destination. Respect later and do-not-ask choices and do not ask again on unrelated tasks.",
+        "Write in the target section's existing language, tone, register, point of view and degree of technical detail. Match local headings, terminology, Markdown/list conventions, units and citation style. In a bilingual note, each section keeps its own language; translate prose for the conversation only when useful. Publish a translation only when explicitly requested. Preserve quoted text, commands, identifiers, URLs, product terminology and code. For a new page prefer the configured editorial language, then consistent neighboring pages; ask if neither resolves an important ambiguity.",
+        "Follow command_help and the live schema. Prepare the smallest authorized mutation, retain it for idempotent retry, then read back the affected revision and section. Reference a non-sensitive stable source such as a reviewed task, a release or an approved public guide. Preserve private scope boundaries and verify any broader destination has permission to receive the source information. Conflicts require rereading and merging compatible changes; present contradictory changes to the user. Never infer publication from a local draft or an uncertain response.",
+        "For example, after a Fitness implementation passes a verified release test that changes how scheduled workouts start offline, search the linked usage note for offline workouts. Update its existing paragraph and release evidence under the configured policy. A ticket saying “fix offline start” with no tested behavior supplies no publishable result. For Tasker a verified change to checklist completion might update one existing checklist rule; the per-ticket progress belongs in Tasker."
+      ]
+    },
+    "memory-reading": {
+      "title": "Select and compare Memory pages at project scale",
+      "steps": [
+        "Use the current user's capabilities and authorized Memory. Identify the exact project and linked library before listing pages. Search by topic or alias and use tree/pageIndex headings, paths and summaries. Follow authorized cursors and stop when the question has enough verified evidence. Search excerpts and folder indexes alone cannot support a claim about a page's whole content.",
+        "When memorySections is true in the current capabilities use tasker_memory_read_pages (CLI memory read-pages --file selection.json). Select one to five distinct page IDs in a single Memory with mode outline or blocks. For blocks optionally pass blockIds from the current outline. Each page costs an ordinary read; a batch runs at most two at once and returns at most 64 KiB of logical JSON. Standalone page/Markdown reads remain available. Connectors never read a repository mirror or personal on-disk files.",
+        "For a comparison across ten known pages, use two groups of five with the same scope, epoch and checkpoint. Read outlines first when relevant block IDs are unknown, then fetch only the sections needed. Reuse the same page selector, block IDs/order, revision, epoch and checkpoint with nextCursor to resume a partial page. Concatenate fragments by stable block ID and offset. Keep excerpts and a source map of page IDs, blocks and revisions. An unchanged result can validate content only from the same selection, access context and revision.",
+        "For a question in a 500-page library, run a few targeted searches and inspect the matching branches; narrow by topic and choose the relevant sections. If results are incomplete say so. A search hit count does not establish complete coverage, absence or authority. Do not enumerate all pages simply because the library is large.",
+        "Only for an explicitly exhaustive review or export, build a bounded manifest from authorized folders/pageIndex (stable page ID, revision and work status). Continue each inventory with its own cursor and checkpoint, then process selected sections in groups of at most five. Checkpoint progress as requested/available, complete, partial, unavailable, changed and deferred. Allow resumption at the next page/block; store source material only in a destination explicitly authorized by the user. For CLI repository mirrors use docs sync and its existing file protections.",
+        "An unavailable page is neither evidence of deletion nor proof it never existed. Retain only the missing selection and mark it unavailable. On a changed revision, reread context and reconcile; on a snapshot/access conflict discard that batch and restart discovery. On permission loss stop using previously obtained material. On a quota stop honor retryAfterSeconds/resetAt and preserve outstanding IDs; never bypass quotas with another token, connection, direct storage or unmetered export."
+      ]
+    },
+    "memory-templates": {
+      "title": "Choose an optional starting page",
+      "steps": [
+        "Offer a template only for an actual knowledge need. Select one family and a single useful page. Let the user choose other pages separately. Preview the title, proposed sections, audience and source; apply the same memory-editorial write policy as for any other note. A template grants no permissions and creates nothing automatically.",
+        "Use tasker_memory_template or CLI memory template --family product --language fr to list choices. Pass page (CLI --page feature) to preview one title and suggested headings. No write occurs. Localized starting suggestions support en/fr; adapt a new draft to the project's actual editorial language before requesting approval.",
+        "Product/software: a feature guide may cover its verified behavior, prerequisites and constraints; a decision record may contain context, choice and rationale; an operations note may document a repeatable recovery or release procedure. For an already documented feature update the existing page with evidence.",
+        "Video game: offer a mechanic note with player action, rule and edge cases; a balancing decision with objective, tested value range and build evidence; or a production constraint with owner and applicable platform. Keep design concepts separate from tested mechanics.",
+        "Music: offer a track or release brief with the intended arrangement and independently confirmed credits; a recording process page with routing and reproducible session setup; or a decision about a mix with version and reason. Include private artist or rights information only with permission for that destination.",
+        "Free-form: choose the user's title and one relevant section or a blank note. Use the requested language for a new page and follow existing neighboring style. Keep stable editable blocks and evidence references. Omit empty headings, placeholder facts and unused categories; keep secrets, access tokens and transient work logs out of notes."
+      ],
+      "templates": [
+        {
+          "family": "product",
+          "pages": [
+            {
+              "key": "feature",
+              "title": {
+                "en": "How the feature works",
+                "fr": "Fonctionnement de la fonctionnalité"
+              },
+              "sections": {
+                "en": ["Who uses it", "Verified behavior", "Limits"],
+                "fr": ["À qui elle sert", "Comportement vérifié", "Limites"]
+              }
+            },
+            {
+              "key": "decision",
+              "title": {
+                "en": "Product decision",
+                "fr": "Décision produit"
+              },
+              "sections": {
+                "en": ["Context", "Decision", "Rationale"],
+                "fr": ["Contexte", "Décision", "Motifs"]
+              }
+            },
+            {
+              "key": "operations",
+              "title": {
+                "en": "Operating procedure",
+                "fr": "Procédure"
+              },
+              "sections": {
+                "en": ["When to use it", "Steps", "Verification"],
+                "fr": ["Quand l’utiliser", "Étapes", "Vérification"]
+              }
+            }
+          ]
+        },
+        {
+          "family": "game",
+          "pages": [
+            {
+              "key": "mechanic",
+              "title": {
+                "en": "Gameplay mechanic",
+                "fr": "Mécanique de jeu"
+              },
+              "sections": {
+                "en": ["Player action", "Rule", "Edge cases"],
+                "fr": ["Action du joueur", "Règle", "Cas particuliers"]
+              }
+            },
+            {
+              "key": "balance",
+              "title": {
+                "en": "Balance decision",
+                "fr": "Décision d’équilibrage"
+              },
+              "sections": {
+                "en": ["Objective", "Tested build", "Decision"],
+                "fr": ["Objectif", "Version testée", "Décision"]
+              }
+            },
+            {
+              "key": "production",
+              "title": {
+                "en": "Production constraint",
+                "fr": "Contrainte de production"
+              },
+              "sections": {
+                "en": ["Affected platform", "Constraint", "Reason"],
+                "fr": ["Plateforme concernée", "Contrainte", "Motif"]
+              }
+            }
+          ]
+        },
+        {
+          "family": "music",
+          "pages": [
+            {
+              "key": "track",
+              "title": {
+                "en": "Track brief",
+                "fr": "Fiche du morceau"
+              },
+              "sections": {
+                "en": ["Arrangement", "Confirmed credits"],
+                "fr": ["Arrangement", "Crédits confirmés"]
+              }
+            },
+            {
+              "key": "recording",
+              "title": {
+                "en": "Recording setup",
+                "fr": "Configuration d’enregistrement"
+              },
+              "sections": {
+                "en": ["Signal path", "Session settings"],
+                "fr": ["Chaîne du signal", "Réglages de session"]
+              }
+            },
+            {
+              "key": "mix",
+              "title": {
+                "en": "Mix decision",
+                "fr": "Décision de mixage"
+              },
+              "sections": {
+                "en": ["Version", "Decision", "Reason"],
+                "fr": ["Version", "Décision", "Motif"]
+              }
+            }
+          ]
+        },
+        {
+          "family": "freeform",
+          "pages": [
+            {
+              "key": "note",
+              "title": {
+                "en": "Untitled note",
+                "fr": "Note sans titre"
+              },
+              "sections": {
+                "en": [],
+                "fr": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "memory-history": {
+      "title": "Inspect or restore a Memory note revision",
+      "steps": [
+        "Check memoryHistory in capabilities for history/diff and memoryRestore for restore. Missing capabilities on an older deployment require using the supported current-page tools. Start with the active page and verify its current grant, role and revision. Use tasker_memory_history (CLI memory history) to list one page of retained revisions with available author/source metadata. Continue with nextBeforeRevision for the same page. A missing older revision may have expired; do not claim a complete lifetime audit.",
+        "Compare two retained revisions using tasker_memory_diff (CLI memory diff). The returned fields and changed block excerpts are bounded. Preserve distinct human and agent attribution; absent metadata supplies no identity. A temporary content restriction or revoked grant applies to history as well.",
+        "Restore only after an explicit request for the exact version. Re-read its diff and current page before offering or preparing the restore; disclose which content the selected revision would restore. Preserve the current page's access, links and placement. Never treat reading history, inspecting an old version or having write permission as authorization to restore.",
+        "For a confirmed restore, use the same scope, pageId, epoch, selected revision, expectedRevision, operationId and issuedAt on every retry. A stale revision needs a fresh read and explicit resolution of any intervening contributions. Read the active page and history back after success."
+      ]
+    },
+    "archives": {
+      "title": "Look up previous work in a project archive",
+      "steps": [
+        "Use archived tasks for a past decision, ticket or evidence when the current project needs it. A normal working session uses active tasks. Historical data loads on demand. Discover effective tasks:read and history:read for this selected project and check server support for the archive routes.",
+        "Existing grants keep their original permissions. If a read is denied, explain which permission is missing and let the owner authorize a new or updated delegation. Never switch into an unscoped export, another transport, a privileged account or an all/active filter to retrieve restricted history.",
+        "Use tasker_archive_query or CLI archive query --file criteria.json with a project scope. Select text, archive dates, importance, status, assignees (or unassigned), shared filter and optional column. Dates refer to archive time; omit unknown constraints. A result is a bounded selection; an empty page can still have a next continuation. Keep the exact filters, project and returned cursor unchanged on each new call.",
+        "Fetch only the chosen task using tasker_archive_detail, then the relevant comments with tasker_archive_comments. CLI equivalents are archive detail and archive comments. Continue comments using nextAfter, scoped to this exact task and project. Stop when the available evidence answers the question, report actual coverage and keep the material within the allowed project audience.",
+        "If the project, access or query checkpoint changes, restart the bounded discovery. Honor account reads, retry delays and resetAt. Archived tasks contribute to the owning account’s storage. Paid accounts retain archives; Free has a maximum 90-day retention policy. An unavailable record may have expired, been restored or become inaccessible; never infer which from absence alone."
       ]
     }
   }

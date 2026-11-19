@@ -203,3 +203,12 @@ saved operation ID. After a conflict, reread before preparing a new operation.
 Successful edits use the application’s normal realtime path. Verify the server
 result, but do not claim another device has displayed it unless observed. Do not
 start a polling loop or prescribe a manual refresh as the normal workflow.
+
+At project start and after verifying a durable feature or decision, check the
+linked Memory and documentation preference. Read the [Memory skill](../geniustasker-memory/SKILL.md)
+and workflow `memory-editorial` to decide whether to update an existing note,
+propose a first note, or leave the information in the task.
+
+To investigate historical work, use workflow `archives`. Search one project's
+archive, follow its bounded continuation and fetch only the relevant task and
+comments. Both `tasks:read` and a current `history:read` grant are required.
