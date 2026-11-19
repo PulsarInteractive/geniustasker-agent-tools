@@ -26,6 +26,10 @@ separate context at login and on subsequent commands and MCP configuration.
 See [environment selection](docs/CLI.md#install-and-connect); a context name
 alone does not change the environment.
 
+## Run your first mission
+
+Ask your connected agent: “Show my GeniusTasker account, the project and what you can do there. Help me pick one ticket. Wait for my choice before starting.” In the CLI, `geniustasker workflow show --topic first-mission --json` opens the same guide. [Follow one ticket through verification](docs/FIRST_MISSION.md).
+
 ## What you can do
 
 | Area                | Features                                                       |
