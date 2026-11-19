@@ -349,6 +349,18 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.proposeRevision": {
+      "action": "proposeDecisionRevision",
+      "fields": [
+        "blockId",
+        "original",
+        "replacement",
+        "evidenceKind",
+        "evidenceRef"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.restore": {
       "action": "restoreMemoryVersion",
       "fields": [
