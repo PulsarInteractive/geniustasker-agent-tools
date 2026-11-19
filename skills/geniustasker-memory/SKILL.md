@@ -157,3 +157,10 @@ Read the full current record before editing and preserve its revision.
 For a repository documentation mirror, use the documentation skill and packaged
 `docs/DOCUMENTATION_SYNC.md`: check at least once per working day before relying
 on the local copy, and sync again after relevant completed changes.
+
+## Storage and deletion
+
+Read workflow `storage` for one ticket attachment or a project storage review.
+An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
+the app for deleting a project or an entire Memory. Never approximate that
+action with a sequence of child deletions.

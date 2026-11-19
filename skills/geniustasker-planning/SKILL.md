@@ -90,3 +90,10 @@ At project start and after verifying a durable feature or decision, check the
 linked Memory and documentation preference. Read the [Memory skill](../geniustasker-memory/SKILL.md)
 and workflow `memory-editorial` to decide whether to update an existing note,
 propose a first note, or leave the information in the task.
+
+## Storage and deletion
+
+Read workflow `storage` for one ticket attachment or a project storage review.
+An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
+the app for deleting a project or an entire Memory. Never approximate that
+action with a sequence of child deletions.

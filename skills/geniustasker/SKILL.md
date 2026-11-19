@@ -212,3 +212,10 @@ propose a first note, or leave the information in the task.
 To investigate historical work, use workflow `archives`. Search one project's
 archive, follow its bounded continuation and fetch only the relevant task and
 comments. Both `tasks:read` and a current `history:read` grant are required.
+
+## Storage and deletion
+
+Read workflow `storage` for one ticket attachment or a project storage review.
+An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
+the app for deleting a project or an entire Memory. Never approximate that
+action with a sequence of child deletions.

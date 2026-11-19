@@ -21,7 +21,9 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
     if (tool.write) {
       assert.equal(
         tool.destructive,
-        tool.name.startsWith('tasker_feedback_') ? tool.name.endsWith('_media_remove') : true,
+        tool.name.startsWith('tasker_feedback_')
+          ? tool.name.endsWith('_media_remove')
+          : tool.name !== 'tasker_attachment_add',
       );
     }
     assert.ok(!tool.route || /^[a-z]+(?:[-/][a-z]+)*$/.test(tool.route));

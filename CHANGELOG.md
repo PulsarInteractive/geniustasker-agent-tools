@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.19
+
+- Inspect one project’s storage, preview a single attachment change and publish an original with resumable uploads. Addition, replacement and removal have separate grants.
+- Retire individual notes with a recoverable editorial history. Project and Memory deletion are owner actions.
+
 ## 0.1.0-beta.18 — 2026-11-19
 
 - Review verified project changes against the owner's documentation policy and the selected note revision. Offer first notes individually, preserve each section's language and style, and preview optional product, game, music or free-form pages.

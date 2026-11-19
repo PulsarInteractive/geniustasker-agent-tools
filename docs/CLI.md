@@ -131,7 +131,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.18", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.19", "mcp", "--context", "work"]
     }
   }
 }
@@ -665,3 +665,7 @@ with `archive comments --scope project:ID --id TASK`. The connector offers
 `tasker_archive_detail` and `tasker_archive_comments`. A restored, expired or
 inaccessible task may be absent from the archive. Reconnect with explicit
 historical access when needed.
+
+## Ticket files and storage
+
+For project diagnostics, distinct permissions, resumable file uploads and per-item receipts, follow the [ticket attachment workflow](STORAGE.md).

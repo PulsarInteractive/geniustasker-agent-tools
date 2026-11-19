@@ -55,7 +55,7 @@ For a stdio MCP host, use this after signing in:
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.18", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.19", "mcp", "--context", "work"]
     }
   }
 }

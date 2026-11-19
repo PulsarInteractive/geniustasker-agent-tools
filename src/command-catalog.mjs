@@ -238,12 +238,6 @@ export default {
       "module": "Memory/$",
       "permission": "memory:write"
     },
-    "memory.delete": {
-      "delete": true,
-      "fields": [],
-      "module": "Memory/$",
-      "permission": "memory:write"
-    },
     "memory.edge.create": {
       "create": true,
       "fields": [
@@ -348,8 +342,10 @@ export default {
       "permission": "memory:write"
     },
     "memory.page.delete": {
-      "delete": true,
-      "fields": [],
+      "action": "retireMemoryPage",
+      "fields": [
+        "changeReason"
+      ],
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
@@ -518,12 +514,6 @@ export default {
         "type",
         "icon"
       ],
-      "module": "Project/$",
-      "permission": "projects:write"
-    },
-    "project.delete": {
-      "delete": true,
-      "fields": [],
       "module": "Project/$",
       "permission": "projects:write"
     },
@@ -877,6 +867,12 @@ export default {
       "module": "Project/ProjectTask",
       "permission": "tasks:write"
     },
+    "task.delete": {
+      "delete": true,
+      "fields": [],
+      "module": "Project/ProjectTask",
+      "permission": "tasks:delete"
+    },
     "task.lock": {
       "action": "lockTask",
       "fields": [
@@ -1009,6 +1005,11 @@ export default {
   },
   "grants": {
     "permissions": [
+      "tasks:delete",
+      "storage:read",
+      "attachments:add",
+      "attachments:replace",
+      "attachments:remove",
       "history:read",
       "projects:read",
       "projects:write",

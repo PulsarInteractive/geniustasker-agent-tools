@@ -16,8 +16,8 @@ environment or replace a connection just to get around an access refusal.
 For example, to connect a production context to a direct Codex MCP server:
 
 ```sh
-npx -y @pulsarinteractive/geniustasker@0.1.0-beta.18 auth login --environment production --context tasker-beta
-codex mcp add geniustasker-production -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.18 mcp --environment production --context tasker-beta
+npx -y @pulsarinteractive/geniustasker@0.1.0-beta.19 auth login --environment production --context tasker-beta
+codex mcp add geniustasker-production -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.19 mcp --environment production --context tasker-beta
 ```
 
 Use either this configuration or the development example below for the intended
@@ -27,8 +27,8 @@ before working. Adding the production example does not retarget a bundled plugin
 ## Codex: direct MCP
 
 ```sh
-npx -y @pulsarinteractive/geniustasker@0.1.0-beta.18 auth login --context work
-codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.18 mcp --context work
+npx -y @pulsarinteractive/geniustasker@0.1.0-beta.19 auth login --context work
+codex mcp add geniustasker -- npx -y @pulsarinteractive/geniustasker@0.1.0-beta.19 mcp --context work
 ```
 
 Restart the host as needed, then inspect its MCP list. Ask the agent to read its
@@ -83,3 +83,7 @@ geniustasker auth logout --context work
 This revokes the server session before removing its credentials. A failed revoke
 keeps local evidence so it can be retried. Uninstalling a package alone does not
 revoke a remote session.
+
+## Ticket files and storage
+
+For project diagnostics, distinct permissions, resumable file uploads and per-item receipts, follow the [ticket attachment workflow](STORAGE.md).
