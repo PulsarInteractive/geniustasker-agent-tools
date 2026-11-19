@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta.20
+
+- Follow a first mission from the connected account and project through a claimed ticket, interruption, resumption and verified evidence. Discover the available actions from the current grant and service capabilities.
+- Prepare a sourced change to a tracked Memory decision for its reviewer when the service advertises proposal support. Preserve the published text, its language and writing style. A pending or previously handled proposal ends the automatic follow-up.
+- Preview storage usage and retention choices before archiving a ticket. The storage guide explains how another link to the original affects retention.
+
 ## 0.1.0-beta.19
 
 - Inspect one project’s storage, preview a single attachment change and publish an original with resumable uploads. Addition, replacement and removal have separate grants.
