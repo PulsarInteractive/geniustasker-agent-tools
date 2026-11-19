@@ -11,10 +11,23 @@ export function agentPresentation(value) {
   return result;
 }
 
-/** Product feedback uses dedicated tools outside the generic command registry. */
+/** Discovery only describes the connected profile. Effective project membership,
+ * contribution mode and per-ticket authorization are checked by the service. */
 export function withFeedbackDiscovery(capabilities) {
   return {
     ...capabilities,
+    firstMission: {
+      workflowTopic: 'first-mission',
+      canListProjects: capabilities?.permissions?.includes('projects:read') === true,
+      canReadTickets: capabilities?.permissions?.includes('tasks:read') === true,
+      runCommands: (Array.isArray(capabilities?.commands) ? capabilities.commands : [])
+        .map((command) => command.kind)
+        .filter((kind) =>
+          ['run.claim', 'run.patch', 'run.pause', 'run.resume', 'run.finish'].includes(kind),
+        ),
+      projectCheck:
+        'Read the selected project to confirm agent contributions and current membership.',
+    },
     feedback: {
       types: ['BugReport', 'FeatureRequest'],
       capabilitiesTool: 'tasker_feedback_capabilities',

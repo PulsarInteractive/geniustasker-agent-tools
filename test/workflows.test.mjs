@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import guides from '../remote/workflows.json' with { type: 'json' };
 import tools from '../remote/tool-catalog.json' with { type: 'json' };
 import { workflow } from '../src/workflows.mjs';
+import { withFeedbackDiscovery } from '../src/presentation.mjs';
 import { main } from '../src/cli.mjs';
 import { mkdtemp, rm, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -182,4 +183,31 @@ test('project guidance is served intact by real local MCP without credentials or
   }
   assert.equal(diagnostics, '');
   assert.deepEqual(await readdir(root), ['runtime']);
+});
+
+test('first mission discovery uses the current grant and advertises only supported run commands', () => {
+  const readOnly = withFeedbackDiscovery({
+    permissions: ['tasks:read'],
+    commands: [],
+  }).firstMission;
+  assert.equal(readOnly.canListProjects, false);
+  assert.equal(readOnly.canReadTickets, true);
+  assert.deepEqual(readOnly.runCommands, []);
+  const partial = withFeedbackDiscovery({
+    permissions: ['projects:read', 'tasks:read', 'tasks:write'],
+    commands: [{ kind: 'run.claim' }, { kind: 'task.update' }, { kind: 'run.patch' }],
+  }).firstMission;
+  assert.deepEqual(partial.runCommands, ['run.claim', 'run.patch']);
+  const guide = workflow({ topic: partial.workflowTopic });
+  const instructions = guide.steps.join(' ');
+  for (const operation of [
+    'tasker_identity',
+    'agentsEnabled',
+    'run.pause',
+    'run.resume',
+    'run.finish',
+    'NeedsReview',
+  ]) {
+    assert.ok(instructions.includes(operation));
+  }
 });

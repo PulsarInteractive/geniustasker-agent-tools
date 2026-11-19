@@ -115,6 +115,44 @@ function permitsWrite(grant, scope) {
   );
 }
 
+async function hasDelegatedWrite(client, scope) {
+  const identity = await client.get('me');
+  return (
+    permitsWrite(identity?.connection?.grant, scope) &&
+    permitsWrite(identity?.profile?.grant, scope)
+  );
+}
+
+const proposalCommand = 'memory.page.proposeRevision';
+
+function reviewedReferences(review) {
+  if (
+    !review ||
+    typeof review.ownerId !== 'string' ||
+    !review.ownerId.trim() ||
+    !Array.isArray(review.handled) ||
+    review.handled.length > 32
+  ) {
+    fail('invalid_response', 'The tracked decision did not return its reviewer or review history.');
+  }
+  return review.handled.map((entry) => {
+    let signature;
+    try {
+      signature = JSON.parse(entry);
+    } catch {
+      // This page is tracked. An unreadable refusal history must stop the proposal.
+    }
+    if (
+      !Array.isArray(signature) ||
+      signature.length !== 3 ||
+      signature.some((part) => typeof part !== 'string' || !part.length)
+    ) {
+      fail('invalid_response', 'The tracked decision returned an unreadable review history.');
+    }
+    return signature[2];
+  });
+}
+
 export async function readProjectDocumentation(client, input) {
   const query = documentationSchema.safeParse(input);
   if (!query.success) {
@@ -161,7 +199,15 @@ export async function reviewProjectMemory(client, input) {
     suggestionState === 'ask'
       ? decision('propose', reason, extra)
       : decision('skip', 'suggestion_' + suggestionState);
-  if (change === 'uncertain' || !sources.some((s) => evidence.has(s.kind))) {
+  const verifiedSources = sources
+    .filter(
+      (source) =>
+        evidence.has(source.kind) &&
+        source.reference.trim() &&
+        !/[\p{Cc}\p{Bidi_Control}]/u.test(source.reference),
+    )
+    .map((source) => ({ kind: source.kind, reference: source.reference.trim() }));
+  if (change === 'uncertain' || !verifiedSources.length) {
     return decision('clarify', 'verify_durable_source');
   }
   if (!memoryId) {
@@ -177,7 +223,7 @@ export async function reviewProjectMemory(client, input) {
   const memoryScope = 'memory:' + memoryId;
   const read = await pageIndex(client, memoryScope, target.pageId);
   const page = read.items[0];
-  if (!page) {
+  if (!page || page.data?.state === 'retired') {
     return decision('skip', 'candidate_unavailable');
   }
   if (page.revision !== target.revision) {
@@ -202,14 +248,49 @@ export async function reviewProjectMemory(client, input) {
     stylePageId,
     guidance,
   };
+  const review = page.data?.decisionReview;
+  if (review !== undefined && review !== null) {
+    if (suggestionState !== 'ask') {
+      return decision('skip', 'suggestion_' + suggestionState);
+    }
+    const reviewed = reviewedReferences(review);
+    if (review.pending !== undefined && review.pending !== null) {
+      return decision('skip', 'memory_decision_review_pending');
+    }
+    // The selector identifies a page, not a block. Reusing only reviewed evidence
+    // must never trigger another automatic prompt. A distinct source can proceed.
+    const source = verifiedSources.find((candidate) => !reviewed.includes(candidate.reference));
+    if (!source) {
+      return decision('skip', 'memory_decision_already_reviewed');
+    }
+    if (!(await hasDelegatedWrite(client, memoryScope))) {
+      return proposal('no_delegated_write', { ...context, ownerId: review.ownerId });
+    }
+    const discovery = await client.get('capabilities');
+    if (
+      !Array.isArray(discovery?.commands) ||
+      !discovery.commands.some((command) => command?.kind === proposalCommand)
+    ) {
+      return proposal('decision_review_command_unavailable', {
+        ...context,
+        ownerId: review.ownerId,
+      });
+    }
+    return decision('prepare_proposal', 'tracked_decision_requires_review', {
+      ...context,
+      scope: memoryScope,
+      epoch: read.epoch,
+      ownerId: review.ownerId,
+      command: proposalCommand,
+      evidenceKind: source.kind,
+      evidenceRef: source.reference,
+      needsUserApprovalToSubmit: !autoDomains.includes(domain),
+    });
+  }
   if (!autoDomains.includes(domain)) {
     return proposal('domain_requires_review', context);
   }
-  const identity = await client.get('me');
-  if (
-    !permitsWrite(identity?.connection?.grant, memoryScope) ||
-    !permitsWrite(identity?.profile?.grant, memoryScope)
-  ) {
+  if (!(await hasDelegatedWrite(client, memoryScope))) {
     return proposal('no_delegated_write', context);
   }
   return decision('prepare_update', 'matching_domain_and_page', context);

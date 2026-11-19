@@ -127,3 +127,52 @@ a small update. A read-only review cannot execute or authorize that update.
   "candidates": [{ "pageId": "offline-workouts", "revision": "21" }]
 }
 ```
+
+## Tracked decisions
+
+A team can assign a reviewer to a decision in the app. The ordinary index
+lists notes compactly. Reading a single `pageIndex` record by ID includes its
+`data.decisionReview` and current revision. The reviewer can record a
+verification date even if the wording remains accurate.
+
+For example, a tested release changes the offline-workout rule documented in
+a tracked decision. Use the review input above. When it returns
+`prepare_proposal`, read the affected block at the returned revision and
+compare the source with the text. If the published section is French, keep
+the proposed change in French. A proposal's command data might be:
+
+```json
+{
+  "blockId": "starting-offline",
+  "original": "Une connexion est nécessaire pour démarrer la séance.",
+  "replacement": "Une séance déjà enregistrée sur cet appareil peut démarrer hors ligne.",
+  "evidenceKind": "tested-release",
+  "evidenceRef": "reviewed-release-42"
+}
+```
+
+Use the actual block ID, source reference and a verbatim excerpt occurring
+exactly once in the current block. Include only changed wording, up to 2,000
+characters per excerpt, and use a verifiable reference of up to 256 characters.
+Accepted evidence kinds are `tested-release`, `verified-behavior`,
+`approved-decision` and `verified-procedure`. A completed ticket alone
+does not establish a change to the decision.
+`tasker_command_help` describes `memory.page.proposeRevision`.
+Prepare that command for the review’s Memory scope, page ID, epoch and current
+revision. If `needsUserApprovalToSubmit` is true, wait for approval to submit.
+Otherwise follow the project’s granted workflow. Read back the pending proposal
+and report it as awaiting review. Only acceptance by its reviewer or an
+administrator changes the published wording.
+
+If a proposal is pending, let the reviewer resolve it. Respect a deferred or
+dismissed suggestion. Automatic review skips evidence already used on that page
+when its input identifies no new block. For an explicitly requested change in a
+different block based on the same source, check the exact block, evidence kind
+and reference against the page’s handled entries. An already-reviewed
+combination ends the request. The exact index carries the 32 most recent handled
+entries. The service also checks older handled proposals when a command is
+submitted. If it returns `memory_decision_already_reviewed`, stop and leave the
+reviewer’s inbox untouched. Preserve the original reference across retries.
+If the excerpt changed, reread the section and check whether the change is still
+needed. Missing delegation or an unavailable proposal command leaves the draft
+with the human reviewer.

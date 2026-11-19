@@ -8,6 +8,8 @@ intended account and review its resource permissions. The beta CLI's development
 default does not change this hosted connector's environment, and connecting a
 custom server does not imply approval in OpenAI's public directory.
 
+For a first mission ask: “Show which GeniusTasker account and project you can read, what you can change there, and help me choose one ticket. Wait for my choice before starting.” The [walkthrough](FIRST_MISSION.md) includes interruption, evidence and read-only connections.
+
 ## Connect your account
 
 1. In ChatGPT on the web, open **Plugins → Add → Add custom MCP server**.

@@ -820,6 +820,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.proposeRevision",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -928,6 +929,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.proposeRevision",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -1076,6 +1078,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.proposeRevision",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -1416,6 +1419,7 @@
             "memory.node.update",
             "memory.page.create",
             "memory.page.delete",
+            "memory.page.proposeRevision",
             "memory.page.restore",
             "memory.page.update",
             "memory.update"
@@ -2027,7 +2031,8 @@
             "memory-templates",
             "memory-history",
             "archives",
-            "storage"
+            "storage",
+            "first-mission"
           ]
         }
       },

@@ -11,6 +11,8 @@ For a bug or suggestion about GeniusTasker itself, use the
 require an explicit reporting request or agreement before sending; project work
 and ordinary tool failures are not automatically feedback reports.
 
+For a first connection, a first mission, or a user asking “how do I know it worked?”, load `tasker_workflow` with `topic: first-mission`. Show the actual account, environment, project and effective rights before choosing one ticket. Keep the task identifier through the request, claim, any interruption and the verification. [First mission walkthrough](../../docs/FIRST_MISSION.md).
+
 ## Connect and discover
 
 Use `geniustasker whoami --json` and `geniustasker capabilities --json`, or MCP

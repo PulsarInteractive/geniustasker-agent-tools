@@ -24,6 +24,17 @@ to update before offering a specific first page. Respect deferred and declined
 suggestions. Write each section in its existing language and editorial style.
 Use topic `memory-templates` only when choosing an optional starting page.
 
+For a decision with a named reviewer, read the exact `pageIndex` ID and its
+`data.decisionReview`. Run `tasker_memory_review` with the verified source.
+On `prepare_proposal`, read the affected block, quote its unique original text
+and prepare `memory.page.proposeRevision` with the replacement and evidence.
+Preserve the section’s language, style and block ID. Follow
+`needsUserApprovalToSubmit` before submitting through the normal command flow.
+The named reviewer or an administrator can resolve the proposal in the app.
+Leave a pending review alone. Honor deferred and dismissed suggestions, keep a
+stable evidence reference and stop when an earlier review covered it.
+See [tracked decision example](../../docs/MEMORY.md#tracked-decisions).
+
 ## Navigate without loading the entire corpus
 
 1. Call `tasker_identity` and `tasker_capabilities` (CLI `whoami`, `capabilities`).
