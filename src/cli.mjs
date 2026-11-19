@@ -12,6 +12,8 @@ import {
   uploadFeedbackImage,
   downloadFeedbackImage,
 } from './feedback-media-transfer.mjs';
+import { prepareTicketUpload, uploadTicketAttachment } from './attachment-upload.mjs';
+import { ticketStorageTools, ticketStorageRequest } from './ticket-storage.mjs';
 import { readArchive } from './archive.mjs';
 import {
   readProjectDocumentation,
@@ -188,6 +190,20 @@ export const commands = {
   'memory tree': {
     summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
     options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match'],
+  },
+  ...Object.fromEntries(
+    [...ticketStorageTools].map(([command, { tool }]) => [
+      command,
+      { summary: tool.description, options: ['file'] },
+    ]),
+  ),
+  'attachment prepare-upload': {
+    summary: 'Prepare a local original and bind it to one ticket and attachment.',
+    options: ['file'],
+  },
+  'attachment upload': {
+    summary: 'Resume the prepared private upload and return its published asset ID.',
+    options: ['operation'],
   },
   'archive query': {
     summary: 'Search one project archive with bounded filters from a JSON file.',
@@ -646,6 +662,12 @@ export async function main(
         checkpoint: options.checkpoint,
         ifNoneMatch: options['if-none-match'],
       });
+    } else if (command === 'attachment prepare-upload') {
+      data = await prepareTicketUpload(client, await readCommandFile(options.file));
+    } else if (command === 'attachment upload') {
+      data = await uploadTicketAttachment(client, options.operation);
+    } else if (ticketStorageTools.has(command)) {
+      data = await ticketStorageRequest(client, command, await readCommandFile(options.file));
     } else if (command.startsWith('archive ')) {
       const operation = command.split(' ')[1];
       const input =

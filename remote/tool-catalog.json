@@ -812,7 +812,6 @@
             "goal.update",
             "intent.change",
             "memory.create",
-            "memory.delete",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -836,7 +835,6 @@
             "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
-            "project.delete",
             "project.features",
             "project.update",
             "protocol.apply",
@@ -867,6 +865,7 @@
             "tag.update",
             "task.archive",
             "task.create",
+            "task.delete",
             "task.lock",
             "task.pause",
             "task.report",
@@ -921,7 +920,6 @@
             "goal.update",
             "intent.change",
             "memory.create",
-            "memory.delete",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -945,7 +943,6 @@
             "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
-            "project.delete",
             "project.features",
             "project.update",
             "protocol.apply",
@@ -976,6 +973,7 @@
             "tag.update",
             "task.archive",
             "task.create",
+            "task.delete",
             "task.lock",
             "task.pause",
             "task.report",
@@ -1070,7 +1068,6 @@
             "goal.update",
             "intent.change",
             "memory.create",
-            "memory.delete",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -1094,7 +1091,6 @@
             "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
-            "project.delete",
             "project.features",
             "project.update",
             "protocol.apply",
@@ -1125,6 +1121,7 @@
             "tag.update",
             "task.archive",
             "task.create",
+            "task.delete",
             "task.lock",
             "task.pause",
             "task.report",
@@ -1411,7 +1408,6 @@
           "type": "string",
           "enum": [
             "memory.create",
-            "memory.delete",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -1951,7 +1947,6 @@
             "project.configureDocumentation",
             "project.configureInstructions",
             "project.create",
-            "project.delete",
             "project.features",
             "project.update"
           ]
@@ -2031,7 +2026,8 @@
             "memory-reading",
             "memory-templates",
             "memory-history",
-            "archives"
+            "archives",
+            "storage"
           ]
         }
       },
@@ -2887,5 +2883,523 @@
     "route": "changes",
     "write": false,
     "destructive": false
+  },
+  {
+    "name": "tasker_storage_project",
+    "title": "Read project storage totals",
+    "description": "Read totals for one authorized project. Requires current task and historical access. Partial coverage is not an exact inventory.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 160
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["storage:read", "tasks:read"],
+    "route": "storage/project",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_storage_tickets",
+    "title": "Find tickets by storage",
+    "description": "Find one bounded page of tickets by storage and state. Use state=active without historical access. Preserve the filters on continuation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "minBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["storage:read", "tasks:read"],
+    "route": "storage/tickets",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_storage_files",
+    "title": "Find ticket attachments",
+    "description": "Read one bounded page of attachment metadata by ticket, type, dates or bytes. Protected or shared bytes may remain after unlinking.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "taskId": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "minBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "from": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "until": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["storage:read", "tasks:read"],
+    "route": "storage/files",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_storage_selection",
+    "title": "Estimate one selected item",
+    "description": "Read the estimated logical, exclusive and protected bytes of exactly one selected ticket or attachment. No changes are made.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["scope"],
+      "properties": {
+        "attachmentIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "taskIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["storage:read", "tasks:read"],
+    "route": "storage/selection",
+    "method": "POST",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_storage_analyze",
+    "title": "Continue a bounded storage analysis",
+    "description": "Process one bounded storage index page for an authorized project. Keep nextCursor for the next explicit request.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["scope"],
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["storage:read", "tasks:read"],
+    "route": "storage/analyze",
+    "method": "POST",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_attachment_preview",
+    "title": "Preview attachment change",
+    "description": "Inspect one requested add, replace or remove. Get epoch, revision and archival state. The matching attachment permission is checked. Read the storage workflow first.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["action", "attachmentId", "scope", "taskId"],
+      "properties": {
+        "action": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["add"]
+            },
+            {
+              "type": "string",
+              "enum": ["replace"]
+            },
+            {
+              "type": "string",
+              "enum": ["remove"]
+            }
+          ]
+        },
+        "attachmentId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]+$"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read"],
+    "route": "storage/attachments/preview",
+    "method": "POST",
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_attachment_add",
+    "title": "Add one attachment",
+    "description": "Link one privately uploaded original to this task after preview. Use the bound asset ID. Reuse the same operation ID and time on retry.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "action",
+        "attachmentId",
+        "epoch",
+        "expectedRevision",
+        "issuedAt",
+        "operationId",
+        "scope",
+        "taskId"
+      ],
+      "properties": {
+        "action": {
+          "const": "add",
+          "type": "string"
+        },
+        "assetId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attachmentId": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]+$"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "attachments:add"],
+    "route": "storage/attachments/add",
+    "method": "POST",
+    "write": true,
+    "destructive": false
+  },
+  {
+    "name": "tasker_attachment_replace",
+    "title": "Replace one attachment",
+    "description": "Replace exactly one original after explicit selection and preview. Upload the replacement first. Preserve the prior attachment on failed upload or revision conflict.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "action",
+        "attachmentId",
+        "epoch",
+        "expectedRevision",
+        "issuedAt",
+        "operationId",
+        "scope",
+        "taskId"
+      ],
+      "properties": {
+        "action": {
+          "const": "replace",
+          "type": "string"
+        },
+        "assetId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attachmentId": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]+$"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "attachments:replace"],
+    "route": "storage/attachments/replace",
+    "method": "POST",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_attachment_remove",
+    "title": "Remove one attachment",
+    "description": "Unlink exactly one selected attachment after preview and user intent. A removal cannot be batched. Report actual releasedBytes and pendingRelease from the receipt.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "action",
+        "attachmentId",
+        "epoch",
+        "expectedRevision",
+        "issuedAt",
+        "operationId",
+        "scope",
+        "taskId"
+      ],
+      "properties": {
+        "action": {
+          "const": "remove",
+          "type": "string"
+        },
+        "assetId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attachmentId": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 136,
+          "pattern": "^project:[A-Za-z0-9_-]+$"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:read", "attachments:remove"],
+    "route": "storage/attachments/remove",
+    "method": "POST",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_task_deletion",
+    "title": "Delete one selected task",
+    "description": "Delete exactly one identified task with its current revision and tasks:delete. For archived tasks also require history:read. Inspect the item and storage estimate first. Return its deletion receipt. Never loop over children to bypass owner-only project removal.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["task.delete"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "type": "object",
+          "maxProperties": 40
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["tasks:delete"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
   }
 ]

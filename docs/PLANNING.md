@@ -78,7 +78,6 @@ availability state, independent of canonical progress and a known pause.
 | New project        | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |
 | Project settings   | `project.update`, `project.features`                           | `projects:write`, native project administration                                            |
 | Agent instructions | `project.configureInstructions`                                | `projects:write`, actual project owner, agent contributions already enabled                |
-| Delete project     | `project.delete`                                               | `projects:write`, project ownership                                                        |
 | Sprint lifecycle   | `sprint.create/update/start/complete/delete`                   | `tasks:write`, native sprint management                                                    |
 | Workflow stages    | `workflow.create/update/delete`                                | `tasks:write`, native project administration                                               |
 | Recurring tasks    | `schedule.create/update/delete`                                | `tasks:write`, native schedule rights                                                      |
@@ -216,3 +215,5 @@ no public changed items. These instructions do not change shared deadlines,
 status, importance, XP or agent execution claims. Reassignment, deletion and
 access changes make affected instructions stale. They belong only to the
 connected owner; another collaborator's instructions are not exposed.
+
+A project or an entire Memory can be removed only through the owner interface. Agents can edit or delete a single authorized Memory page with its current revision. Never emulate removal of a whole space by processing its children.

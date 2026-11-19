@@ -158,7 +158,21 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   });
   t.after(() => client.close());
   const listing = await client.listTools();
-  assert.equal(listing.tools.length, 58);
+  const names = new Set(listing.tools.map((tool) => tool.name));
+  assert.equal(names.size, listing.tools.length);
+  for (const name of [
+    'tasker_storage_files',
+    'tasker_storage_tickets',
+    'tasker_storage_selection',
+    'tasker_attachment_prepare_upload',
+    'tasker_attachment_upload',
+    'tasker_attachment_add',
+    'tasker_attachment_replace',
+    'tasker_attachment_remove',
+    'tasker_edit_task_deletion',
+  ]) {
+    assert.ok(names.has(name), name);
+  }
   assert.ok(listing.tools.some((tool) => tool.name === 'tasker_workflow'));
   const search = await client.callTool({
     name: 'tasker_search',

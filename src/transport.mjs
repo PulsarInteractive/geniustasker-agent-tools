@@ -56,7 +56,10 @@ export class Transport {
     this.timeoutMs = timeoutMs;
     this.signal = signal;
   }
-  async request(path, { method = 'GET', form, json, token, query, bytes, binary = false } = {}) {
+  async request(
+    path,
+    { method = 'GET', form, json, token, query, bytes, partSha256, binary = false } = {},
+  ) {
     if (
       !(path.startsWith('/api/agents/') || path === '/.well-known/oauth-authorization-server') ||
       path.startsWith('//')
@@ -80,17 +83,31 @@ export class Transport {
         }
       }
     }
+    const ticketPart =
+      /^\/api\/agents\/v1\/attachment-uploads\/parts\/(?:[1-9]|1[0-9]|2[0-4])$/.test(url.pathname);
+    const ticketUpload = ticketPart || url.pathname === '/api/agents/v1/attachment-uploads/content';
+    if (
+      (partSha256 !== undefined && !ticketPart) ||
+      (ticketPart && (typeof partSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(partSha256))) ||
+      (ticketUpload && (bytes === undefined || binary || method !== 'PUT'))
+    ) {
+      fail(
+        'invalid_arguments',
+        'Ticket upload bytes require their bound route and a verified part digest.',
+      );
+    }
     const feedbackMedia =
       /^\/api\/agents\/v1\/feedback\/media\/[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\/content$/.test(
         url.pathname,
       );
     if (
       (bytes !== undefined || binary) &&
-      ((!feedbackMedia && url.pathname !== '/api/agents/v1/media/content') ||
+      ((!ticketUpload && !feedbackMedia && url.pathname !== '/api/agents/v1/media/content') ||
         (feedbackMedia &&
           (url.search || (bytes !== undefined ? method !== 'PUT' : method !== 'GET'))) ||
         (bytes !== undefined &&
-          (!Buffer.isBuffer(bytes) || bytes.length > (feedbackMedia ? 4_000_000 : 15_000_000))) ||
+          (!Buffer.isBuffer(bytes) ||
+            bytes.length > (ticketPart ? 8_388_608 : feedbackMedia ? 4_000_000 : 15_000_000))) ||
         (bytes !== undefined && (json !== undefined || form)))
     ) {
       fail('invalid_arguments', 'Binary transfer requires the bounded delegated media endpoint.');
@@ -114,6 +131,7 @@ export class Transport {
         redirect: 'error',
         signal,
         headers: {
+          ...(partSha256 ? { 'x-part-sha256': partSha256 } : {}),
           Accept: binary ? 'application/octet-stream' : 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...(bytes !== undefined
