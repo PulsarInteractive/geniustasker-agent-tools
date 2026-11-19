@@ -169,7 +169,10 @@ dismissed suggestion. Automatic review skips evidence already used on that page
 when its input identifies no new block. For an explicitly requested change in a
 different block based on the same source, check the exact block, evidence kind
 and reference against the page’s handled entries. An already-reviewed
-combination ends the request. Preserve the original reference across retries.
+combination ends the request. The exact index carries the 32 most recent handled
+entries. The service also checks older handled proposals when a command is
+submitted. If it returns `memory_decision_already_reviewed`, stop and leave the
+reviewer’s inbox untouched. Preserve the original reference across retries.
 If the excerpt changed, reread the section and check whether the change is still
 needed. Missing delegation or an unavailable proposal command leaves the draft
 with the human reviewer.
