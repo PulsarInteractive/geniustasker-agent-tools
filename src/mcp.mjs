@@ -383,7 +383,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_memories',
-    'List independent account memories visible to this connection. Memory is not linked to a project. Follow nextAfter even on an empty page.',
+    'List Memory spaces visible to this connection. A project can reference a Memory in its documentation settings. Use tasker_project_documentation for that link. Project access and Memory access are checked separately. Follow nextAfter even on an empty page.',
     z.object({ after: z.string().max(4096).optional() }).strict(),
     (input) => client.get('memories', input),
   );
