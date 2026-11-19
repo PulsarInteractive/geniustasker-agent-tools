@@ -3,7 +3,7 @@ import { posix } from 'node:path';
 import { DocumentationStore, DocumentationDownloads, digest } from './documentation-store.mjs';
 import { readMemoryTree, readMemoryMarkdown } from './documentation.mjs';
 import { exportGraph } from './documentation-graph.mjs';
-import { fail } from './errors.mjs';
+import { AgentError, fail } from './errors.mjs';
 
 const id = z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/);
 const sourceSchema = z
@@ -257,7 +257,8 @@ async function localAsset(client, store, source, tree, assetId, previous, downlo
 export async function syncDocumentation(client, input) {
   const options = parse(documentationSyncSchema, input);
   const store = new DocumentationStore(options.directory, options);
-  return store.run(async () => {
+  let progress;
+  const sync = store.run(async () => {
     const identity = await client.get('me'),
       capabilities = await client.get('capabilities');
     if (!capabilities.documentationSync) {
@@ -289,6 +290,7 @@ export async function syncDocumentation(client, input) {
       fences = [],
       stats = { pagesFetched: 0, pagesReused: 0, pagesResumed: 0, unavailable: [] };
     for (const source of configuration.sources) {
+      progress = { scope: source.scope, phase: 'inventory', preparedPages: 0, selectedPages: null };
       let previous = before?.sources.find((state) => state.scope === source.scope);
       if (previous?.parentId !== (source.parentId ?? null)) {
         previous = null;
@@ -315,6 +317,8 @@ export async function syncDocumentation(client, input) {
       }
       const pages = await collectPages(client, source, tree, previous),
         paths = documentPaths(source, pages);
+      progress.selectedPages = Object.keys(pages).length;
+      progress.phase = 'pages';
       await downloads.prepare(source.scope, pages, tree);
       const state = {
         scope: source.scope,
@@ -404,7 +408,9 @@ export async function syncDocumentation(client, input) {
             assetIds: document.assetIds,
           };
         }
+        progress.preparedPages++;
       }
+      progress.phase = 'resources';
       await exportGraph(client, store, source, tree, previous, state, assets, downloads);
       for (const asset of assets) {
         await ensureAsset(asset);
@@ -439,6 +445,15 @@ export async function syncDocumentation(client, input) {
     // Every participating scope must still match before publishing the new
     // snapshot. An HTTP/ACL/network failure is never interpreted as an empty tree.
     for (const { source, tree } of fences) {
+      const pages = Object.keys(
+        states.find((state) => state.scope === source.scope).documents,
+      ).length;
+      progress = {
+        scope: source.scope,
+        phase: 'verification',
+        preparedPages: pages,
+        selectedPages: pages,
+      };
       try {
         const finalTree = await readMemoryTree(client, {
           scope: source.scope,
@@ -488,6 +503,12 @@ export async function syncDocumentation(client, input) {
       bytes: store.size,
       ...stats,
     };
+  });
+  return sync.catch((error) => {
+    if (progress && error instanceof AgentError && error.status === 429) {
+      error.details.progress = progress;
+    }
+    throw error;
   });
 }
 

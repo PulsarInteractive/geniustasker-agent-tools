@@ -95,6 +95,14 @@ reset therefore does not require downloading the same first pages repeatedly.
 Changed or inaccessible entries are discarded. The temporary cache is bounded
 to twice the selected byte budget and is removed after a successful sync.
 
+The CLI and local MCP return per-scope progress on a rate limit. For example,
+`preparedPages: 137, selectedPages: 500, phase: "pages"` means that 137 page
+bodies were prepared before the interruption. During inventory the total is
+unknown (`null`). Report the remaining scope of work, respect the returned retry
+time, then repeat the same command and destination. On an interrupted first
+sync, pass the configuration file again. The final authorization check runs
+before the complete snapshot becomes visible.
+
 Use `memory tree --scope memory:ID` to inspect a bounded folder. Continue with
 `--after`, `--epoch` and `--checkpoint`. Use `memory markdown --scope memory:ID
 --page PAGE_ID` for one page, optionally with its expected `--revision`.

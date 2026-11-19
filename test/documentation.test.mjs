@@ -280,32 +280,48 @@ test('pagination handles 500 pages, while an interrupted export leaves the compl
   );
 });
 
-test('a throttled initial export resumes downloaded bodies after checking current revisions and permissions', async (t) => {
+test('an exhaustive 500-page review reports 137 prepared at quota and resumes after checking revisions and access', async (t) => {
   const directory = await temporary(t),
     f = clientFixture(directory);
-  for (let i = 0; i < 75; i++) {
+  for (let i = 0; i < 500; i++) {
     f.page('p' + String(i).padStart(3, '0'));
   }
   const get = f.client.get;
-  let allowance = 25;
+  let allowance = 137;
   f.client.get = async (resource, query) => {
     if (resource === 'memory/markdown' && allowance-- <= 0) {
-      throw new AgentError('agent_rate_limited', 'Retry after reset', { retryable: true });
+      throw new AgentError('agent_rate_limited', 'Retry after reset', {
+        status: 429,
+        retryable: true,
+        retryAfterSeconds: 60,
+      });
     }
     return get(resource, query);
   };
-  await assert.rejects(syncDocumentation(f.client, { directory, configuration: f.configuration }), {
-    code: 'agent_rate_limited',
-  });
+  await assert.rejects(
+    syncDocumentation(f.client, { directory, configuration: f.configuration }),
+    (error) => {
+      assert.equal(error.code, 'agent_rate_limited');
+      assert.equal(error.toJSON().retryAfterSeconds, 60);
+      assert.deepEqual(error.toJSON().progress, {
+        scope: 'memory:one',
+        phase: 'pages',
+        preparedPages: 137,
+        selectedPages: 500,
+      });
+      return true;
+    },
+  );
   await assert.rejects(manifest(directory), { code: 'ENOENT' });
   f.page('p000', null, { text: 'New revision after interruption' });
   f.state.pages.delete('p001'); // This page became inaccessible before the next attempt.
   f.state.revision++;
   allowance = Infinity;
   const resumed = await syncDocumentation(f.client, { directory, configuration: f.configuration });
-  assert.equal(resumed.pagesResumed, 23);
-  assert.equal(resumed.pagesFetched, 51);
+  assert.equal(resumed.pagesResumed, 135);
+  assert.equal(resumed.pagesFetched, 364);
   const m = await manifest(directory);
+  assert.equal(Object.keys(m.sources[0].documents).length, 499);
   assert.equal(m.sources[0].documents.p001, undefined);
   assert.match(
     await readFile(join(directory, 'content', m.sources[0].documents.p000.file), 'utf8'),

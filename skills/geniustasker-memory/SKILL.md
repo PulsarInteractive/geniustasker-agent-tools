@@ -40,6 +40,14 @@ Carry `epoch` and `checkpoint` from the first page when continuing an inventory.
 An index omits page bodies; it is not evidence of their contents. After context
 change, restart the read. Access denial is not permission to switch accounts.
 
+For an explicitly exhaustive review of hundreds of pages in an approved local
+directory, use CLI `docs sync` or local MCP `tasker_docs_sync`. If throttled,
+report `progress.preparedPages / selectedPages` for the selected scope and
+respect the reset time. Repeat the same selection and directory; the client
+checks revisions and permissions before reusing downloads. With hosted MCP,
+keep a manifest of page IDs, revisions and block cursors in the approved work
+record. The hosted connector never creates a local snapshot.
+
 For a large library, cross-memory questions or resumable maintenance, read
 [focused knowledge workflows](references/knowledge-workflows.md). It explains
 how to combine search, Graph neighborhoods and targeted pages without downloading
