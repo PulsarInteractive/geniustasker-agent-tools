@@ -21,6 +21,7 @@ import {
   previewMemoryTemplate,
 } from './memory-editorial.mjs';
 import { memoryHistoryRequest } from './memory-history.mjs';
+import { memoryCatalogSchema } from './memory-image.mjs';
 import { readMemoryPages } from './memory-read-pages.mjs';
 import { workflow, workflowTopics } from './workflows.mjs';
 import { readFile } from 'node:fs/promises';
@@ -172,8 +173,9 @@ export const commands = {
     options: ['scope', 'owner', 'id', 'action'],
   },
   'media download': {
-    summary: 'Download an authorized attachment to a new local file.',
-    options: ['scope', 'owner', 'id', 'file'],
+    summary:
+      'Download an authorized original to a new file or choose --view preview for a bounded static image.',
+    options: ['scope', 'owner', 'id', 'file', 'view'],
   },
   'docs sync': {
     summary: 'Refresh selected Memory/Graph sources in a managed local documentation directory.',
@@ -186,6 +188,10 @@ export const commands = {
   'docs unlock': {
     summary: 'Remove a sync lock only when its process on this host has stopped.',
     options: ['directory'],
+  },
+  'memory catalog': {
+    summary: 'Find a bounded page of guides or design variants from a JSON query.',
+    options: ['file'],
   },
   'memory tree': {
     summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
@@ -653,6 +659,12 @@ export async function main(
       data = await (command === 'docs status' ? documentationStatus : unlockDocumentation)({
         directory: options.directory,
       });
+    } else if (command === 'memory catalog') {
+      const input = memoryCatalogSchema.safeParse(await readCommandFile(options.file));
+      if (!input.success) {
+        fail('invalid_arguments', 'Choose one Memory and its supported catalog filters.');
+      }
+      data = await client.get('memory/catalog', input.data);
     } else if (command === 'memory tree') {
       data = await readMemoryTree(client, {
         scope: options.scope,
@@ -741,6 +753,7 @@ export async function main(
         scope: options.scope,
         ownerId: options.owner,
         id: options.id,
+        ...(options.view ? { view: options.view } : {}),
         file: options.file,
       });
     } else if (['memory search', 'graph explore', 'memory resolve'].includes(command)) {

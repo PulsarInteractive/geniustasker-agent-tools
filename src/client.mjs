@@ -174,6 +174,13 @@ export class AgentClient {
   async accessToken() {
     return (await this.authorizedSession()).access_token;
   }
+  async getPreview(query) {
+    return this.transport.request('/api/agents/v1/media/content', {
+      query,
+      binary: true,
+      token: await this.accessToken(),
+    });
+  }
   async get(resource, query) {
     if (
       ![
@@ -191,6 +198,7 @@ export class AgentClient {
         'knowledge',
         'reference',
         'memory/tree',
+        'memory/catalog',
         'memory/markdown',
         'memory/sections',
         'memory/history',

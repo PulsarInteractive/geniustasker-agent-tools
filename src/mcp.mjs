@@ -38,6 +38,13 @@ import {
   memoryReadPagesTool,
   readMemoryPages,
 } from './memory-read-pages.mjs';
+import {
+  memoryImageTool,
+  memoryImageSchema,
+  memoryCatalogTool,
+  memoryCatalogSchema,
+  readMemoryImage,
+} from './memory-image.mjs';
 import { workflow, workflowSchema } from './workflows.mjs';
 import {
   documentationSyncSchema,
@@ -115,6 +122,10 @@ export function createMcpServer(client) {
     run,
     writes = false,
     annotationOverrides = {},
+    present = (data) => ({
+      content: [{ type: 'text', text: JSON.stringify(data) }],
+      structuredContent: { formatVersion: 1, data },
+    }),
   ) =>
     server.registerTool(
       name,
@@ -134,11 +145,7 @@ export function createMcpServer(client) {
           client.invalidateReads?.();
         }
         try {
-          const data = await run(input, context);
-          return {
-            content: [{ type: 'text', text: JSON.stringify(data) }],
-            structuredContent: { formatVersion: 1, data },
-          };
+          return present(await run(input, context));
         } catch (error) {
           const result = { formatVersion: 1, error: safeError(error).toJSON() };
           return {
@@ -329,10 +336,25 @@ export function createMcpServer(client) {
     mediaCompareSchema,
     (input) => compareMedia(client, input),
   );
+  register(memoryCatalogTool.name, memoryCatalogTool.description, memoryCatalogSchema, (input) =>
+    client.get('memory/catalog', input),
+  );
+  register(
+    memoryImageTool.name,
+    memoryImageTool.description,
+    memoryImageSchema,
+    (input) => readMemoryImage(client, input),
+    false,
+    {},
+    ({ type, mimeType, data, metadata }) => ({
+      content: [{ type, mimeType, data }],
+      structuredContent: { formatVersion: 1, data: metadata },
+    }),
+  );
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
-    'Prepare one explicitly selected local image or attachment for Memory. No upload yet; retain operationId.',
+    'Prepare one explicitly selected local image or attachment for Memory. Design also accepts downloadable ZIP and HTML source files up to 15,000,000 bytes. No upload yet; retain operationId.',
     mediaPrepareSchema,
     (input) => media.prepare(input),
     false,

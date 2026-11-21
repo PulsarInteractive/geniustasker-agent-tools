@@ -33,7 +33,9 @@ for (const entry of pack.files) {
   }
   const path = join(root, entry.path),
     stat = await lstat(path);
-  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 100000) {
+  // The shared discovery catalog contains the public schemas for every hosted tool.
+  const limit = entry.path === 'remote/tool-catalog.json' ? 128 * 1024 : 100000;
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > limit) {
     throw Error('Unsafe package entry');
   }
   const text = await readFile(path, 'utf8');

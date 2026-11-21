@@ -163,13 +163,26 @@ export class Transport {
       await response.body?.cancel().catch(() => {});
       throw challenge;
     }
+    const preview =
+      binary &&
+      response.ok &&
+      url.pathname === '/api/agents/v1/media/content' &&
+      url.searchParams.get('view') === 'preview';
+    if (
+      preview &&
+      response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase() !== 'image/webp'
+    ) {
+      await response.body?.cancel();
+      fail('invalid_response', 'The service did not return a WebP preview.');
+    }
+    const binaryLimit = preview ? 512 * 1024 : feedbackMedia ? 1_000_000 : 15_000_000;
     const chunks = [];
     let size = 0;
     try {
       if (response.body) {
         for await (const chunk of response.body) {
           size += chunk.length;
-          if (size > (binary && response.ok ? (feedbackMedia ? 1_000_000 : 15_000_000) : 262144)) {
+          if (size > (binary && response.ok ? binaryLimit : 262144)) {
             fail('invalid_response', 'The API response exceeded the size limit.');
           }
           chunks.push(chunk);
