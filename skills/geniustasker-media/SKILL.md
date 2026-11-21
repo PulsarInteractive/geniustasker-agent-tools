@@ -40,10 +40,12 @@ Design also accepts ZIP or HTML source files up to 15,000,000 bytes. Choose a lo
 
 ## Storage and deletion
 
-Read workflow `storage` for one ticket attachment or a project storage review.
+Read workflow `storage` for one ticket attachment. For a storage review or cleanup inside a project, Memory or the connected user’s own personal space, read workflow `storage-cleanup`. Select only listed files in that space, show their preview and exclusions, and wait for explicit approval. Retain the original operation ID for application, status and actual recovered bytes.
 An agent can edit or retire a single versioned note with its current revision and a change reason. Keep the note ID for history and restoration. Refer the owner to
 the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
+
+For conversation file cleanup, read `personalStorageScope` from `tasker_capabilities`. Use only that returned scope. Offer to review a narrower grant when the account has not authorized it.
 
 For a ticket file, preview the selected attachment, transfer its original, then link the published asset using the current revision. Preserve the upload ID through interruptions. The [file workflow](../../docs/STORAGE.md) lists the exact calls for a conversation file and a local file.
 
