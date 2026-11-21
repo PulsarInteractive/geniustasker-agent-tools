@@ -5,6 +5,10 @@ import { readMemoryImagePixels } from './memory-image-pixels.mjs';
 
 export const memoryImageTool = tools.find((tool) => tool.name === 'tasker_memory_view_image');
 export const memoryCatalogTool = tools.find((tool) => tool.name === 'tasker_memory_catalog');
+export const designDiscussionTool = tools.find(
+  (tool) => tool.name === 'tasker_memory_design_discussion',
+);
+export const designDiscussionSchema = z.fromJSONSchema(designDiscussionTool.inputSchema);
 export const memoryCatalogSchema = z.fromJSONSchema(memoryCatalogTool.inputSchema);
 export const memoryImageSchema = z.fromJSONSchema(memoryImageTool.inputSchema);
 

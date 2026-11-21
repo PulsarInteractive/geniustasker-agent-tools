@@ -1033,6 +1033,7 @@ export default {
     "permissions": [
       "tasks:delete",
       "storage:read",
+      "storage:clean",
       "attachments:add",
       "attachments:replace",
       "attachments:remove",

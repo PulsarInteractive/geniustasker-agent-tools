@@ -21,7 +21,13 @@ import {
   previewMemoryTemplate,
 } from './memory-editorial.mjs';
 import { memoryHistoryRequest } from './memory-history.mjs';
-import { memoryCatalogSchema } from './memory-image.mjs';
+import { memoryCatalogSchema, designDiscussionSchema } from './memory-image.mjs';
+import {
+  scopedStorageTools,
+  scopedStorageCommands,
+  scopedStorageToolFor,
+  clientStorageRequest,
+} from './storage-resources.mjs';
 import { readMemoryPages } from './memory-read-pages.mjs';
 import { workflow, workflowTopics } from './workflows.mjs';
 import { readFile } from 'node:fs/promises';
@@ -188,6 +194,19 @@ export const commands = {
   'docs unlock': {
     summary: 'Remove a sync lock only when its process on this host has stopped.',
     options: ['directory'],
+  },
+  ...Object.fromEntries(
+    Object.entries(scopedStorageCommands).map(([command, suffix]) => [
+      command,
+      {
+        summary: scopedStorageTools.get('tasker_project_' + suffix).tool.description,
+        options: ['file'],
+      },
+    ]),
+  ),
+  'memory design-discussion': {
+    summary: 'Read a page of threads or replies for a design variant.',
+    options: ['file'],
   },
   'memory catalog': {
     summary: 'Find a bounded page of guides or design variants from a JSON query.',
@@ -659,6 +678,18 @@ export async function main(
       data = await (command === 'docs status' ? documentationStatus : unlockDocumentation)({
         directory: options.directory,
       });
+    } else if (Object.hasOwn(scopedStorageCommands, command)) {
+      const input = await readCommandFile(options.file);
+      data = await clientStorageRequest(client, scopedStorageToolFor(command, input), input);
+    } else if (command === 'memory design-discussion') {
+      const input = designDiscussionSchema.safeParse(await readCommandFile(options.file));
+      if (!input.success) {
+        fail(
+          'invalid_arguments',
+          'Choose a design variant and its supported discussion selectors.',
+        );
+      }
+      data = await client.get('memory/design-discussion', input.data);
     } else if (command === 'memory catalog') {
       const input = memoryCatalogSchema.safeParse(await readCommandFile(options.file));
       if (!input.success) {
