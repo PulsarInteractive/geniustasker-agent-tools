@@ -174,6 +174,13 @@ export class AgentClient {
   async accessToken() {
     return (await this.authorizedSession()).access_token;
   }
+  async getHistoricalPreview(query) {
+    return this.transport.request('/api/agents/v1/memory/image-version', {
+      query,
+      binary: true,
+      token: await this.accessToken(),
+    });
+  }
   async getPreview(query) {
     return this.transport.request('/api/agents/v1/media/content', {
       query,

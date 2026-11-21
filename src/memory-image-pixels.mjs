@@ -58,7 +58,59 @@ function readDimensions(bytes) {
 }
 
 export async function readMemoryImagePixels(client, input) {
-  const { scope, pageId, blockId, revision } = input;
+  const { scope, pageId, blockId, revision, atRevision } = input;
+  if (atRevision !== undefined) {
+    if (revision !== undefined) {
+      fail('invalid_arguments', 'Choose either a current revision or a retained Design revision.');
+    }
+    const { bytes, selection } = await client.getHistoricalPreview({
+      scope,
+      pageId,
+      blockId,
+      atRevision,
+    });
+    if (typeof selection !== 'string' || selection.length > 2048) {
+      invalid();
+    }
+    let info;
+    try {
+      info = JSON.parse(selection);
+    } catch {
+      invalid();
+    }
+    if (
+      info?.scope !== scope ||
+      info.pageId !== pageId ||
+      info.blockId !== blockId ||
+      info.revision !== atRevision ||
+      typeof info.assetId !== 'string' ||
+      !/^[a-zA-Z0-9_-]{1,128}$/.test(info.assetId) ||
+      typeof info.assetRevision !== 'string' ||
+      !/^(0|[1-9][0-9]{0,15})$/.test(info.assetRevision) ||
+      !Number.isSafeInteger(info.originalBytes) ||
+      info.originalBytes < 1 ||
+      !['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/gif'].includes(
+        info.originalContentType,
+      )
+    ) {
+      invalid();
+    }
+    return {
+      bytes,
+      metadata: {
+        scope,
+        pageId,
+        blockId,
+        revision: atRevision,
+        assetId: info.assetId,
+        assetRevision: info.assetRevision,
+        originalBytes: info.originalBytes,
+        originalContentType: info.originalContentType,
+        ...readDimensions(bytes),
+        bytes: bytes.length,
+      },
+    };
+  }
   const query = {
     scope,
     pageId,

@@ -83,6 +83,10 @@ export class Transport {
         }
       }
     }
+    const historyPreview =
+      url.pathname === '/api/agents/v1/memory/image-version' &&
+      method === 'GET' &&
+      bytes === undefined;
     const ticketPart =
       /^\/api\/agents\/v1\/attachment-uploads\/parts\/(?:[1-9]|1[0-9]|2[0-4])$/.test(url.pathname);
     const ticketUpload = ticketPart || url.pathname === '/api/agents/v1/attachment-uploads/content';
@@ -102,7 +106,10 @@ export class Transport {
       );
     if (
       (bytes !== undefined || binary) &&
-      ((!ticketUpload && !feedbackMedia && url.pathname !== '/api/agents/v1/media/content') ||
+      ((!ticketUpload &&
+        !feedbackMedia &&
+        !historyPreview &&
+        url.pathname !== '/api/agents/v1/media/content') ||
         (feedbackMedia &&
           (url.search || (bytes !== undefined ? method !== 'PUT' : method !== 'GET'))) ||
         (bytes !== undefined &&
@@ -166,8 +173,9 @@ export class Transport {
     const preview =
       binary &&
       response.ok &&
-      url.pathname === '/api/agents/v1/media/content' &&
-      url.searchParams.get('view') === 'preview';
+      (historyPreview ||
+        (url.pathname === '/api/agents/v1/media/content' &&
+          url.searchParams.get('view') === 'preview'));
     if (
       preview &&
       response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase() !== 'image/webp'
@@ -198,7 +206,10 @@ export class Transport {
       });
     }
     if (binary && response.ok) {
-      return Buffer.concat(chunks);
+      const result = Buffer.concat(chunks);
+      return historyPreview
+        ? { bytes: result, selection: response.headers.get('X-Genius-Image-Version') }
+        : result;
     }
     let data;
     try {
