@@ -14,6 +14,7 @@ import { open } from 'node:fs/promises';
 import { join } from 'node:path';
 import * as z from 'zod/v4';
 import catalog from './command-catalog.mjs';
+import remoteTools from '../remote/tool-catalog.json' with { type: 'json' };
 import commandInputSchemas from './command-input-schemas.mjs';
 import { CredentialStore } from './store.mjs';
 import { AgentError, fail, safeError } from './errors.mjs';
@@ -103,6 +104,15 @@ export function validateCommand(value) {
     );
   }
   validateCommandData(command.kind, command.data);
+  if (
+    command.kind === 'memory.design.pruneRevision' &&
+    BigInt(command.data.revision) >= BigInt(command.data.currentRevision)
+  ) {
+    fail(
+      'invalid_arguments',
+      'Choose a historical Design revision older than the currently visible revision.',
+    );
+  }
   const prefix =
     command.scope.startsWith('personal:') && definition.personalModule
       ? 'personal:'
@@ -144,6 +154,13 @@ export function commandHelp(input) {
   return {
     kind,
     ...definition,
+    ...(kind === 'memory.design.pruneRevision'
+      ? {
+          requiredPermissions: remoteTools.find(
+            (tool) => tool.name === 'tasker_edit_design_history',
+          ).scopes,
+        }
+      : {}),
     ...(schema
       ? {
           requiredFields: schema.required,

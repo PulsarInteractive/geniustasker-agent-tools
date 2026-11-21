@@ -951,6 +951,7 @@
             "goal.update",
             "intent.change",
             "memory.create",
+            "memory.design.pruneRevision",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -1060,6 +1061,7 @@
             "goal.update",
             "intent.change",
             "memory.create",
+            "memory.design.pruneRevision",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -1209,6 +1211,7 @@
             "goal.update",
             "intent.change",
             "memory.create",
+            "memory.design.pruneRevision",
             "memory.edge.create",
             "memory.edge.delete",
             "memory.edge.update",
@@ -4015,6 +4018,87 @@
       "additionalProperties": false
     },
     "scopes": ["tasks:delete"],
+    "route": "commands",
+    "write": true,
+    "destructive": true
+  },
+  {
+    "name": "tasker_edit_design_history",
+    "title": "Remove one selected Design revision",
+    "description": "Permanently remove one obsolete Design variant revision after the owner explicitly selects and confirms it. This keeps the current page and original files. Show the stored revision and the current revision first. Approval evidence and discussion anchors stay protected. Retry only the immutable command with the same operationId.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["memory.design.pruneRevision"]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "data": {
+          "type": "object",
+          "required": ["confirmed", "currentRevision", "revision", "variantId"],
+          "properties": {
+            "variantId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+            },
+            "revision": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,15}$"
+            },
+            "currentRevision": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,15}$"
+            },
+            "confirmed": {
+              "type": "boolean",
+              "enum": [true]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operationId",
+        "issuedAt",
+        "kind",
+        "scope",
+        "id",
+        "epoch",
+        "expectedRevision",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["storage:clean", "history:read", "memory:read", "storage:read", "memory:write"],
     "route": "commands",
     "write": true,
     "destructive": true

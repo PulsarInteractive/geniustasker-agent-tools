@@ -51,7 +51,14 @@ test('every command can request its exact permission without unrelated write gra
         candidate.inputSchema.properties.kind.enum.includes(kind),
     );
     assert.ok(tool, kind);
-    assert.deepEqual(tool.scopes, [command.permission], kind);
+    const prune = kind === 'memory.design.pruneRevision';
+    assert.deepEqual(
+      tool.scopes,
+      prune
+        ? ['storage:clean', 'history:read', 'memory:read', 'storage:read', 'memory:write']
+        : [command.permission],
+      kind,
+    );
     assert.equal(tool.route, 'commands');
     for (const accepted of tool.inputSchema.properties.kind.enum) {
       assert.equal(catalog.commands[accepted].permission, command.permission);
@@ -67,7 +74,19 @@ test('every command can request its exact permission without unrelated write gra
       expectedRevision: null,
       data: {},
     };
+    if (prune) {
+      assert.equal(validate(input), false);
+      Object.assign(input, {
+        scope: 'memory:design',
+        id: 'design',
+        expectedRevision: '8',
+        data: { variantId: 'mobile', revision: '4', currentRevision: '7', confirmed: true },
+      });
+    }
     assert.equal(validate(input), true, kind);
+    if (prune) {
+      assert.equal(validate({ ...input, data: { ...input.data, confirmed: false } }), false);
+    }
     const other = Object.keys(catalog.commands).find(
       (name) => catalog.commands[name].permission !== command.permission,
     );
