@@ -240,6 +240,18 @@ export default {
       "module": "Memory/$",
       "permission": "memory:write"
     },
+    "memory.design.pruneRevision": {
+      "action": "pruneDesignRevision",
+      "fields": [
+        "variantId",
+        "revision",
+        "currentRevision",
+        "confirmed"
+      ],
+      "inputSchema": "GeniusTasker.Contracts.AgentDesignRevisionCleanup",
+      "module": "Memory/$",
+      "permission": "storage:clean"
+    },
     "memory.edge.create": {
       "create": true,
       "fields": [
