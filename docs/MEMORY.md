@@ -45,6 +45,12 @@ with public access tokens or file bytes are embedded in documents.
 
 See the [CLI reference](CLI.md) for document blocks, page roles, node types, images and detailed command examples.
 
+## Illustrate a note and identify its library
+
+Upload the original through the authorized Memory media workflow. Wait for publication, then use the asset ID in an image block. Give the image meaningful alt text in the document’s language. Use a caption when the reader needs to know what a view demonstrates. One picture occupies the document width. Place related image blocks consecutively for a gallery. Text between images starts a separate group. To keep a specific image on its own next to other photos, select Full width in the editor or set its image block’s `fullWidth` field to true when supported. Readers can open each image to inspect the original.
+
+When the deployed `memory.update` command advertises `logoAssetId`, the owner may select a published image from the same Memory as its logo. The selected image becomes visible to every authorized Memory member. Use an official logo or an explicitly chosen image. Check both the current root revision and the asset before updating. Setting the field to null removes the logo from the space and keeps the resource. A project has its own identity and member permissions. Its logo must remain accessible within the project itself.
+
 ## Maintain a project note after a feature changes
 
 At the start of an actual work session, inspect the project's linked library,

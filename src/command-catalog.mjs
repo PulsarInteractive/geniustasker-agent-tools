@@ -227,6 +227,7 @@ export default {
     "memory.create": {
       "create": true,
       "fields": [
+        "logoAssetId",
         "contentRoles",
         "title",
         "productKey",
@@ -395,6 +396,7 @@ export default {
     },
     "memory.update": {
       "fields": [
+        "logoAssetId",
         "contentRoles",
         "title",
         "productKey",
