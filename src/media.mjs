@@ -15,13 +15,15 @@ const types = [
   'image/gif',
   'image/avif',
   'application/pdf',
+  'application/zip',
+  'text/html',
   'text/plain',
 ];
 export const mediaPrepareSchema = z
   .object({
     scope: mediaScope,
     file: z.string().min(1).max(4096),
-    contentType: z.enum(types),
+    contentType: z.enum(types).optional(),
     epoch: z.string().min(1).max(128),
   })
   .strict();
@@ -35,9 +37,9 @@ export const mediaActionSchema = z
   .strict();
 export const mediaDownloadSchema = mediaActionSchema
   .omit({ action: true })
-  .extend({ file: z.string().min(1).max(4096) })
+  .extend({ file: z.string().min(1).max(4096), view: z.literal('preview').optional() })
   .strict();
-export const mediaCompareSchema = mediaDownloadSchema.omit({ ownerId: true });
+export const mediaCompareSchema = mediaDownloadSchema.omit({ ownerId: true, view: true });
 const parse = (schema, value) => {
   const result = schema.safeParse(value);
   if (!result.success) {
@@ -184,6 +186,22 @@ export class MediaJournal {
       id = randomUUID(),
       store = this.store(id);
     const fileName = basename(path);
+    const sourceType = /\.zip$/i.test(fileName)
+      ? 'application/zip'
+      : /\.html?$/i.test(fileName)
+        ? 'text/html'
+        : undefined;
+    const contentType = input.contentType ?? sourceType;
+    if (
+      !contentType ||
+      ((sourceType || ['application/zip', 'text/html'].includes(contentType)) &&
+        contentType !== sourceType)
+    ) {
+      fail(
+        'invalid_arguments',
+        'Choose the content type matching this file. Design sources use .zip or .html.',
+      );
+    }
     if (fileName.length > 200) {
       fail('invalid_arguments', 'Use a filename of at most 200 characters.');
     }
@@ -199,7 +217,7 @@ export class MediaJournal {
           expectedEpoch: input.epoch,
           size: bytes.length,
           sha256: digest(bytes),
-          contentType: input.contentType,
+          contentType,
           fileName,
           kind: 'memory',
         },

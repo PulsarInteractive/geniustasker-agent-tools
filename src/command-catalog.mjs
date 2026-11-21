@@ -227,7 +227,9 @@ export default {
     "memory.create": {
       "create": true,
       "fields": [
+        "logoAssetId",
         "contentRoles",
+        "designFilters",
         "title",
         "productKey",
         "summary",
@@ -325,6 +327,11 @@ export default {
         "title",
         "path",
         "summary",
+        "agentInstructions",
+        "guide",
+        "design",
+        "designReview",
+        "designThread",
         "blocks",
         "tags",
         "provenance",
@@ -377,6 +384,11 @@ export default {
         "title",
         "path",
         "summary",
+        "agentInstructions",
+        "guide",
+        "design",
+        "designReview",
+        "designThread",
         "blocks",
         "tags",
         "provenance",
@@ -395,7 +407,9 @@ export default {
     },
     "memory.update": {
       "fields": [
+        "logoAssetId",
         "contentRoles",
+        "designFilters",
         "title",
         "productKey",
         "summary",

@@ -3,6 +3,8 @@ name: geniustasker-memory
 description: Read and maintain GeniusTasker Memory documents and Graph relations through the connected CLI or MCP. Use for knowledge search, structured documents, linked nodes and authorized imports. Memory access remains independent of project and Graph access.
 ---
 
+For a published procedure, open workflow `space-guides`. In the exact Guides space use `tasker_memory_catalog` with `status: published` and a short search. Select by purpose, check prerequisites and read its page blocks at the returned revision. Cite that revision in the job’s ticket. For visual variants use workflow `space-design`; its catalog filters distinguish mockups from implemented captures.
+
 Delegated document, history, media and Graph operations require an active
 Starter or Pro plan and explicit access to the target. Stop on
 `memory_premium_required` and discard protected content after revocation.
