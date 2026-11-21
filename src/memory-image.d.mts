@@ -11,4 +11,3 @@ export function readMemoryImage(
   },
   input: unknown,
 ): Promise<MemoryMcpImage>;
-export const memoryPreviewBytes: number;
