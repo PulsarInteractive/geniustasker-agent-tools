@@ -28,6 +28,8 @@ alone does not change the environment.
 
 ## Run your first mission
 
+For a concrete request such as “Fix the offline launch bug in this project,” the connected agent tracks the result in the matching ticket. It creates one if needed and authorized, then verifies the saved outcome. Questions such as “Why did we choose this approach?” stay read-only. Use `geniustasker workflow show --topic project-work --json` for the tracking rules.
+
 Ask your connected agent: “Show my GeniusTasker account, the project and what you can do there. Help me pick one ticket. Wait for my choice before starting.” In the CLI, `geniustasker workflow show --topic first-mission --json` opens the same guide. [Follow one ticket through verification](docs/FIRST_MISSION.md).
 
 ## What you can do
