@@ -103,6 +103,7 @@ test('project guidance is served intact by real local MCP without credentials or
   });
   await client.connect(transport);
   const instructions = client.getInstructions();
+  assert.ok(instructions.includes(workflow({ topic: 'project-work' }).summary));
   assert.match(instructions, /InProgress means current identifiable execution/);
   assert.match(instructions, /silence or lease expiry does not prove interruption/);
   assert.match(instructions, /run\.claim can leave a task New.*run\.patch.*read the task back/);
@@ -120,7 +121,7 @@ test('project guidance is served intact by real local MCP without credentials or
     ),
     false,
   );
-  for (const topic of ['projects', 'planning', 'protocols', 'runs', 'checklist']) {
+  for (const topic of ['projects', 'planning', 'protocols', 'runs', 'checklist', 'project-work']) {
     const result = await client.callTool({
       name: 'tasker_workflow',
       arguments: { topic },
@@ -129,6 +130,15 @@ test('project guidance is served intact by real local MCP without credentials or
     const texts = result.content.filter((item) => item.type === 'text');
     assert.equal(texts.length, 1);
     assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
+    if (topic === 'project-work') {
+      const { steps, examples } = result.structuredContent.data;
+      assert.match(steps.join(' '), /incomplete result cannot establish absence/i);
+      assert.match(steps.join(' '), /another ticket’s actual output is required/);
+      assert.match(steps.join(' '), /operationId, receipt and returned identifiers/);
+      assert.ok(examples.some(({ action }) => action.includes('No ticket or status change')));
+      assert.ok(examples.some(({ action }) => action.includes('Reuse the matching open ticket')));
+      assert.ok(examples.some(({ action }) => action.includes('pending Design link')));
+    }
     if (topic === 'runs') {
       const start = result.structuredContent.data.steps.find((step) =>
         step.includes('Working run while the task stays New'),

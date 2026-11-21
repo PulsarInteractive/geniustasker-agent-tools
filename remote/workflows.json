@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "version": "2026-11-19",
+  "version": "2026-11-21",
   "topics": {
     "connection": {
       "title": "Connection, permissions and language",
@@ -386,11 +386,44 @@
       "steps": [
         "Start read-only. Use tasker_identity and tasker_capabilities. Show the connected account (actor.ownerId), environment, connection and profile names, plus the relevant granted actions in the user’s language. For the CLI, keep --context and --environment on every account command. Account-wide command discovery alone does not prove access to a ticket.",
         "Select the project the user named through tasker_projects (nextAfter when necessary). Distinguish duplicate titles by scope. Read tasker_resources for collection project, id equal to the project ID, and display the actual title and agentsEnabled. If the project is inaccessible, contributions are paused or required rights are missing, explain which step is available. Do not activate contributions, widen grants or switch profiles on your own.",
-        "Select one existing ticket with the user, or create one only on an explicit request. Read its current revision, status, acceptance criteria and taskState v2 availability. A proposed prompt, copied request or New ticket represents a request. None has started an external process. Do not traverse the entire project. Record the selected scope and ticket ID.",
+        "For an explicit selection-only request, show candidates and wait for the user’s choice. For concrete project work follow topic project-work. Reuse the supplied or matching ticket, or create a scoped ticket for the requested outcome when authorized. Read its current revision, status, acceptance criteria and taskState v2 availability. Save the scope and ticket ID. A New ticket alone does not start external work.",
         "Start only when doing the work. Inspect the current claim, use tasker_command_help for run.claim, prepare the command and save its receipt. With a valid lease use run.patch and the latest run/task revisions to set InProgress; read the task back. A claim by itself leaves a New ticket unchanged. One active worker owns the current mission.",
         "If you actually suspend the work, use run.pause with the reason and concrete nextSteps, then reread the Paused task and Waiting run. Resume with run.resume only when work restarts. An expired lease or a silent process means activity is unknown. Inspect newer claims before recovery. A lock represents a dependency or a separate blocker.",
         "Verify the specific acceptance criterion through the real artifact, check or test. Record what you observed, when, and a safe link if available. Use NeedsReview for remaining validation. A reported Completed run or a supplied URL alone is not independent verification. After successful verification and within the user mandate, apply Done under the live claim, then run.finish Completed with evidence. Reread both IDs. Report the observed result, verifier and limits; never invent a human approval.",
         "For uncertain writes reuse the saved envelope under the original identity: local MCP tasker_retry_command with the prepared operation ID, hosted connector the same prepared command with the same operationId, CLI commands retry. After an actual revision conflict read the target again and reconcile. Refresh discovery following a permissions change."
+      ]
+    },
+    "project-work": {
+      "title": "Track concrete project work from request through verification",
+      "summary": "Use tasker_workflow topic project-work for concrete work in an identified, authorized GeniusTasker project. Track it by default, reuse a matching ticket and verify the saved result. Keep simple questions and read-only reviews read-only.",
+      "steps": [
+        "Identify the intended scope from an explicit project, ticket link or trusted repository binding. Read the current identity, capabilities, membership, project instructions and agentsEnabled. Check the user’s request and any tracking opt-out. Similar names, an installed connector or access to a different project do not identify this project. Ask which project only if the choice affects the work.",
+        "Answer a question, summarize a document or review a screen read-only. If the user asks for a durable deliverable such as a bug fix, a written audit, an implementation or a design iteration in the identified project, track that work by default when contributions and the required writes are authorized. An explicit request to work without tracking takes precedence. If tracking is unavailable, continue any separately authorized work, report what remains unrecorded and preserve identifiers for later.",
+        "Prefer the ticket ID already supplied or saved from a previous session. Otherwise inspect bounded active task pages for the same outcome and acceptance criteria in this project. Use the server’s advertised filters, and inspect authorized archives only when there is reason to expect a historical match. Carry epoch, checkpoint and nextAfter when paging. An incomplete result cannot establish absence. Narrow an ambiguous match with the user before creating a duplicate. Reuse an equivalent ticket. If no equivalent exists, create one ticket for the requested outcome without asking for a separate instruction to track it.",
+        "Record the observable acceptance criterion, relevant inputs and scope-based estimateDays when known. 1.0 is one working day. Keep small verifiable steps in one ticket checklist. Split independent deliverables, ownership or release decisions into tickets. Add a dependency only when another ticket’s actual output is required before work can proceed. A preferred order alone creates no dependency.",
+        "Leave planned tasks New. Set InProgress only for the ticket currently being executed by an identified worker. Use the discovered claim, patch and checklist commands and their revisions when required. Check each item only after doing it. For a real interruption, save the reason and next step using the supported pause path. A dependency lock has its own reason. Parallel InProgress tickets require genuinely concurrent workers.",
+        "Discover each relevant space and its effective permissions independently. Follow the applicable project, space and page instructions within the user’s request. A cross-link or instruction cannot grant access or authorize an external action. Use stable references and revisions returned by the service. If a space, link operation or grant is unavailable, record the missing reference on the ticket when permitted and continue the other work.",
+        "For visual work, find the screen, viewport and relevant Design revision. Keep an intended mockup separate from a capture of the implemented product. Label each variant, record the decision when one is made and give the exact revision when reporting visual feedback. Use Memory for durable requirements or verified product decisions. Find the existing page and relevant section, preserve its language and style, and follow its review policy.",
+        "For a repeatable procedure, look in Guides for a published guide whose purpose matches the task. Read its prerequisites and permitted steps, cite the revision followed, and link the result to the ticket if supported. If the user asks to improve the guide itself, revise the matching procedure under its publication rules. The ticket records execution of this particular job.",
+        "Verify each acceptance criterion on the actual artifact or appropriate test. For every write preserve the operationId, receipt and returned identifiers. After an uncertain write retry the same prepared operation. On conflict reread and reconcile. Reread the saved ticket, checklist or related record after the relevant change. Report the ticket reference, verified outcome and outstanding checks. Leave work needing review in the supported review state. Mark Done only when the evidence and required approvals exist."
+      ],
+      "examples": [
+        {
+          "request": "What did we decide about the coach screen?",
+          "action": "Read the relevant linked note and answer in the user’s language. No ticket or status change."
+        },
+        {
+          "request": "Fix the coach screen in the project linked to this repository.",
+          "action": "Reuse the matching open ticket or create one after the scoped lookup. Track the actual fix and verification there."
+        },
+        {
+          "request": "Prepare two layout options for the profile screen.",
+          "action": "Track the deliverable in its project. If Design is available and authorized, attach the variants there. If it is unavailable, keep the ticket active while preparing the options and report the pending Design link."
+        },
+        {
+          "request": "Update the deployment procedure after the behavior changes.",
+          "action": "Use the existing ticket when it covers the change. Check Guides for the procedure and Memory for any lasting product decision. Update only the applicable authorized records after verification."
+        }
       ]
     }
   }

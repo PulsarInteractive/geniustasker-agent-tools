@@ -1,10 +1,10 @@
 # Your first agent mission
 
-Start from a real ticket with one observable result. For example, ask an agent to verify that the install command in a project's README works in an empty directory. The person asking chooses the project and ticket. The agent runs the check in its own environment and sends the result back to GeniusTasker.
+Start from a real ticket with one observable result. For example, ask an agent to verify that the install command in a project's README works in an empty directory. A ticket link or a known project binding can identify the intended work. When you ask for a concrete deliverable, the agent checks the project and reuses the ticket that covers it. If it finds no match, it creates one when authorized. Asking a question or browsing stays read-only. The agent runs the check in its own environment and sends the result back to GeniusTasker.
 
 ## Find the right connection and ticket
 
-Ask in ChatGPT or another MCP client:
+If you want to choose the ticket yourself before work begins, ask in ChatGPT or another MCP client:
 
 > Show my connected GeniusTasker account, environment and agent profile. Find the project I named. Tell me whether you can read its tickets and report work there. Help me choose one ticket and wait for my choice before starting.
 
@@ -21,6 +21,8 @@ geniustasker resources list --scope project:PROJECT_ID --collection tasks --id T
 ```
 
 Follow a returned project cursor only as far as necessary to identify your project. Missing results on a partial page do not establish that a project is absent. For read-only access, the agent can describe the selected ticket and its acceptance criteria.
+
+For recurring work, ask “Fix the launch regression in this project and test the offline path.” The agent looks for that outcome in the project, records the failing and passing checks under the same ticket and verifies its saved state. Review the full guidance with `geniustasker workflow show --topic project-work --json` or the connector’s `tasker_workflow`.
 
 ## Follow the work
 
