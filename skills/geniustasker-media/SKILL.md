@@ -45,6 +45,8 @@ An agent can edit or retire a single versioned note with its current revision an
 the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
 
+For conversation file cleanup, read `personalStorageScope` from `tasker_capabilities`. Use only that returned scope. Offer to review a narrower grant when the account has not authorized it.
+
 For a ticket file, preview the selected attachment, transfer its original, then link the published asset using the current revision. Preserve the upload ID through interruptions. The [file workflow](../../docs/STORAGE.md) lists the exact calls for a conversation file and a local file.
 
 Before archiving a ticket, read its file list and offer an export of any originals the user wants to keep. Show the server’s `expiresIfArchivedNow` before archiving and `expiresAt` after archiving. Explain when a date is unavailable. A link in Memory points to the source file. Restoring preserves originals that still exist while the ticket stays active.
