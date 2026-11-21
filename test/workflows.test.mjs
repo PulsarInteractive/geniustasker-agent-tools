@@ -42,6 +42,13 @@ test('workflow discovery is exhaustive, bounded, and rejects unknown topics', as
   }
 });
 
+test('the base Memory guide covers safe imports and clients with a limited topic list', () => {
+  const instructions = workflow({ topic: 'memory' }).steps.join(' ');
+  assert.match(instructions, /UUID v4.*both id and epoch/);
+  assert.match(instructions, /checkpoint, epoch and continuation/);
+  assert.match(instructions, /existing note in its language and style/);
+});
+
 test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {
   for (const args of [['--help'], [], ['--topic', 'checklists']]) {
     let output = '';
