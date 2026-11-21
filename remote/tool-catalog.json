@@ -837,6 +837,7 @@
             "project.configureInstructions",
             "project.create",
             "project.features",
+            "project.setPhoto",
             "project.update",
             "protocol.apply",
             "protocol.cancel",
@@ -946,6 +947,7 @@
             "project.configureInstructions",
             "project.create",
             "project.features",
+            "project.setPhoto",
             "project.update",
             "protocol.apply",
             "protocol.cancel",
@@ -1095,6 +1097,7 @@
             "project.configureInstructions",
             "project.create",
             "project.features",
+            "project.setPhoto",
             "project.update",
             "protocol.apply",
             "protocol.cancel",
@@ -1933,7 +1936,7 @@
   {
     "name": "tasker_edit_projects",
     "title": "Manage projects",
-    "description": "Create, configure or delete a project with projects:write and the native owner/admin rights. New projects require all-resources consent and start with agent contributions enabled. Existing project opt-outs and memberships cannot be changed by this tool. Use command_help then prepare_command; preserve immutable operations for retry.",
+    "description": "Create or configure a project, including its photo, with projects:write and native owner/admin rights. New projects require all-resources consent and start with agent contributions enabled. Existing project opt-outs and memberships cannot be changed by this tool. Use command_help then prepare_command; preserve immutable operations for retry.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1952,6 +1955,7 @@
             "project.configureInstructions",
             "project.create",
             "project.features",
+            "project.setPhoto",
             "project.update"
           ]
         },

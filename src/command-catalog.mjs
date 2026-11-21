@@ -546,6 +546,15 @@ export default {
       "module": "Project/$",
       "permission": "projects:write"
     },
+    "project.setPhoto": {
+      "action": "setPhoto",
+      "fields": [
+        "assetId"
+      ],
+      "inputSchema": "GeniusTasker.Contracts.AgentProjectPhoto",
+      "module": "Project/$",
+      "permission": "projects:write"
+    },
     "project.update": {
       "fields": [
         "title",

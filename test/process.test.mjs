@@ -4,6 +4,8 @@ import { createServer } from 'node:http';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { fixture, tokens } from './helpers.mjs';
@@ -427,4 +429,131 @@ test('official MCP stdio manages and selects a profile without emitting credenti
   assert.equal((await f.store.read()).profile_id, id);
   assert.ok(!JSON.stringify(results).includes('gta1.'));
   assert.equal(errors, '');
+});
+
+test('stdio MCP stages a chosen image and sets a project icon using its reread revision', async (t) => {
+  const id = 'review',
+    scope = 'project:' + id,
+    epoch = 'epoch';
+  const image = Buffer.from('89504e470d0a1a0a', 'hex');
+  let revision = 7,
+    assetId,
+    published = false,
+    icon = 'layers',
+    transfers = 0;
+  const origin = await http(t, async (req, res) => {
+    assert.equal(req.headers.authorization, 'Bearer ' + tokens().access_token);
+    const url = new URL(req.url, 'http://localhost');
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const raw = Buffer.concat(chunks);
+    res.setHeader('Content-Type', 'application/json');
+    const reply = (obj) => res.end(JSON.stringify(obj));
+    if (url.pathname.endsWith('/resources')) {
+      assert.equal(url.searchParams.get('collection'), 'project');
+      assert.equal(url.searchParams.get('id'), id);
+      assert.equal(url.searchParams.get('scope'), scope);
+      return reply({
+        collection: 'project',
+        scope,
+        epoch,
+        checkpoint: String(revision),
+        items: [{ id, revision: String(revision), data: { icon } }],
+      });
+    }
+    const session = () => ({ id: assetId, size: image.length, ownerId: 'owner', published });
+    if (url.pathname.endsWith('/media/sessions')) {
+      const opened = JSON.parse(raw);
+      assert.equal(opened.kind, 'project');
+      assert.equal(opened.scope, scope);
+      assert.equal(opened.expectedEpoch, epoch);
+      assert.equal(opened.purpose, 'projectPhoto');
+      if (assetId) {
+        assert.equal(opened.id, assetId);
+      }
+      assetId = opened.id;
+      return reply(session());
+    }
+    if (url.pathname.endsWith('/media/content')) {
+      assert.equal(req.method, 'PUT');
+      assert.equal(url.searchParams.get('id'), assetId);
+      assert.deepEqual(raw, image);
+      transfers++;
+      return reply({});
+    }
+    if (url.pathname.endsWith('/media/actions')) {
+      assert.deepEqual(JSON.parse(raw), {
+        scope,
+        ownerId: 'owner',
+        id: assetId,
+        action: 'publish',
+      });
+      published = true;
+      revision++;
+      return reply(session());
+    }
+    assert.equal(url.pathname, '/api/agents/v1/commands');
+    const command = JSON.parse(raw);
+    assert.equal(command.kind, 'project.setPhoto');
+    assert.equal(command.id, id);
+    assert.equal(command.expectedRevision, String(revision));
+    assert.equal(command.scope, scope);
+    assert.deepEqual(command.data, { assetId });
+    icon = '/api/v2/media/owner/' + assetId;
+    revision++;
+    return reply({
+      operationId: command.operationId,
+      scope,
+      kind: command.kind,
+      epoch,
+      cursor: String(revision),
+      affectedCollections: ['project'],
+      items: [{ id, revision: String(revision), collection: 'project', deleted: false }],
+    });
+  });
+  const f = await fixture(t, undefined, { authenticated: false });
+  await f.store.locked(() => f.store.write(credentials(tokens(), origin)));
+  const file = join(f.directory, 'selected.png');
+  await writeFile(file, image);
+  const client = new Client({ name: 'project-photo-review', version: '1' });
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [executable, 'mcp', f.directory, origin],
+    stderr: 'pipe',
+  });
+  await client.connect(transport);
+  t.after(() => client.close());
+  const call = async (name, args) => {
+    const result = await client.callTool({ name, arguments: args });
+    assert.notEqual(result.isError, true, JSON.stringify(result));
+    return result.structuredContent.data;
+  };
+  const read = () => call('tasker_resources', { scope, collection: 'project', id });
+  const initial = await read();
+  const prepare = await call('tasker_media_prepare', {
+    scope,
+    purpose: 'projectPhoto',
+    epoch: initial.epoch,
+    contentType: 'image/png',
+    file,
+  });
+  const upload = () => call('tasker_media_upload', { operationId: prepare.operationId });
+  const receipt = await upload();
+  assert.equal((await upload()).assetId, receipt.assetId);
+  assert.equal(transfers, 1);
+  const current = await read();
+  assert.equal(current.items[0].data.icon, initial.items[0].data.icon);
+  assert.notEqual(current.items[0].revision, initial.items[0].revision);
+  const link = await call('tasker_prepare_command', {
+    kind: 'project.setPhoto',
+    scope,
+    id,
+    epoch: current.epoch,
+    expectedRevision: current.items[0].revision,
+    data: { assetId: receipt.assetId },
+  });
+  await call('tasker_execute_command', link.request);
+  assert.equal((await read()).items[0].data.icon, '/api/v2/media/owner/' + receipt.assetId);
 });

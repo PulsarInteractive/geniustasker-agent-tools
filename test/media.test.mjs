@@ -119,3 +119,66 @@ test('private downloads are explicit, exclusive files; binary transport is bound
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('project photos stage in their own project, resume the same ID and leave linking to the reviewed command', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'tasker-project-photo-'));
+  try {
+    const file = join(directory, 'cover.png');
+    await writeFile(file, Buffer.from('89504e470d0a1a0a', 'hex'));
+    let input;
+    let published = false;
+    const calls = [];
+    const client = {
+      store: { directory, context: 'project-photo-test' },
+      authorizedSession: async () => ({
+        origin: 'https://api.example.test',
+        connection_id: 'grant',
+        profile_id: 'profile',
+        session_id: 'session',
+        access_token: 'synthetic',
+      }),
+      transport: {
+        request: async (path, options) => {
+          calls.push(path);
+          if (path.endsWith('/sessions')) {
+            input = options.json;
+            assert.equal(input.scope, 'project:chosen');
+            assert.equal(input.kind, 'project');
+            assert.equal(input.purpose, 'projectPhoto');
+          } else if (path.endsWith('/content')) {
+            assert.equal(options.query.scope, 'project:chosen');
+            assert.equal(options.bytes.length, 8);
+          } else {
+            assert.equal(options.json.scope, 'project:chosen');
+            assert.equal(options.json.action, 'publish');
+            published = true;
+          }
+          return { id: input.id, size: input.size, ownerId: 'owner', published };
+        },
+      },
+    };
+    const journal = new MediaJournal(client);
+    const args = {
+      scope: 'project:chosen',
+      epoch: 'read-project-epoch',
+      file,
+      contentType: 'image/png',
+      purpose: 'projectPhoto',
+    };
+    for (const invalid of [
+      { ...args, purpose: undefined },
+      { ...args, contentType: 'text/plain' },
+      { ...args, scope: 'memory:chosen' },
+    ]) {
+      await assert.rejects(journal.prepare(invalid), { code: 'invalid_arguments' });
+    }
+    const { operationId } = await journal.prepare(args);
+    assert.equal(calls.length, 0);
+    assert.equal((await journal.upload(operationId)).assetId, operationId);
+    assert.equal((await journal.upload(operationId)).assetId, operationId);
+    assert.equal(calls.filter((x) => x.endsWith('/content')).length, 1);
+    assert.ok(calls.every((x) => x.startsWith('/api/agents/v1/media/')));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

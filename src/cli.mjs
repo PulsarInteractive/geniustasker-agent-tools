@@ -160,15 +160,17 @@ export const commands = {
     options: ['scope', 'id', 'file'],
   },
   'media prepare': {
-    summary: 'Prepare a local private attachment; retain its operation ID.',
-    options: ['scope', 'file', 'content-type', 'epoch'],
+    summary:
+      'Prepare one selected Memory file or a project image (--purpose projectPhoto). Retain its operation ID.',
+    options: ['scope', 'file', 'content-type', 'epoch', 'purpose'],
   },
   'media upload': {
     summary: 'Upload or safely retry the prepared operation.',
     options: ['operation'],
   },
   'media action': {
-    summary: 'Inspect, publish, cancel or remove a private attachment.',
+    summary:
+      'Inspect or publish a project photo. Memory files also support cancellation and removal.',
     options: ['scope', 'owner', 'id', 'action'],
   },
   'media download': {
@@ -726,6 +728,7 @@ export async function main(
         file: options.file,
         contentType: options['content-type'],
         epoch: options.epoch,
+        purpose: options.purpose,
       });
     } else if (command === 'media upload') {
       data = await new MediaJournal(client).upload(options.operation);

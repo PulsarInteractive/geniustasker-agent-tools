@@ -1,6 +1,6 @@
 ---
 name: geniustasker-media
-description: Manage GeniusTasker ticket originals and Memory resources. Use for file upload, replacement, removal, storage diagnostics, document images or Graph thumbnails.
+description: Manage GeniusTasker project photos, ticket originals and Memory resources. Use for project logos, file upload, replacement, removal, storage diagnostics, document images or Graph thumbnails.
 ---
 
 # Memory resources
@@ -42,3 +42,7 @@ action with a sequence of child deletions.
 For a ticket file, preview the selected attachment, transfer its original, then link the published asset using the current revision. Preserve the upload ID through interruptions. The [file workflow](../../docs/STORAGE.md) lists the exact calls for a conversation file and a local file.
 
 Before archiving a ticket, read its file list and offer an export of any originals the user wants to keep. Show the server’s `expiresIfArchivedNow` before archiving and `expiresAt` after archiving. Explain when a date is unavailable. A link in Memory points to the source file. Restoring preserves originals that still exist while the ticket stays active.
+
+## Project photos
+
+For a project logo, follow the [project photo workflow](../../docs/STORAGE.md#project-photos). Prepare one selected image for the exact project, transfer it, reread the project root and apply `project.setPhoto` against its current revision. Confirm the saved icon by rereading that root. ChatGPT uses its selected-file prepare/upload tools, while local MCP/CLI uses the media journal with purpose `projectPhoto`. Keep the published asset ID when resuming. Check for a conflicting photo change before replacing it.

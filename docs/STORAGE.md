@@ -36,3 +36,11 @@ Free normally allows 30 days for an archived original and Starter/Pro 90. A late
 ## Notes and project ownership
 
 An agent may update a single Memory note or use `memory.page.delete` to retire it from the active tree and search. Include a concise `changeReason`, retain the page ID and read its version history to recover earlier content. The selected earlier revision can be restored with the current revision. The retained page and history still count toward quota. The owner manages deletion of an entire project or Memory in the application. Never simulate bulk cleanup by deleting its children.
+
+### Project photos
+
+Use the specific project the user chose. Read its root with collection `project` and its own ID to obtain the current scope epoch and the existing icon. The connection needs `projects:read` for that read and `projects:write` with project management access for the change.
+
+- With a local file, call `tasker_media_prepare` or `geniustasker media prepare --scope project:ID --purpose projectPhoto --epoch EPOCH --content-type image/png --file logo.png`, then transfer using `tasker_media_upload` or `geniustasker media upload --operation UUID`. Retain the operation ID across retries.
+- With a file selected in ChatGPT, call `tasker_project_photo_prepare_host_file` and `tasker_project_photo_upload_host_file` with the same selected image and prepared metadata. An expired file selection can be renewed with identical bytes. Keep its asset ID on a retry. JPEG, PNG, WebP, GIF and AVIF are supported up to 15,000,000 bytes.
+- Publication stages the image. Reread collection `project` for the exact project after publication. Prepare and execute `project.setPhoto` with that record’s ID, scope, epoch and current revision, supplying only `{"assetId":"PUBLISHED_UUID"}` as data. Reread the root and verify its `icon` references the published asset. Compare against the existing icon before linking. If someone has already changed the photo, ask whether to replace their choice. Use the exact prepared command through `tasker_edit_projects` in ChatGPT or `tasker_execute_command` in local MCP. Project photos, ticket attachments and Memory covers have separate scopes and lifecycles.

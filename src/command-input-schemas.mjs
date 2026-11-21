@@ -910,6 +910,18 @@ export default {
     },
     "additionalProperties": false
   },
+  "project.setPhoto": {
+    "type": "object",
+    "required": [
+      "assetId"
+    ],
+    "properties": {
+      "assetId": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  },
   "protocol.apply": {
     "type": "object",
     "required": [

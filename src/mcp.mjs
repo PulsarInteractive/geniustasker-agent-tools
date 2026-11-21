@@ -331,7 +331,7 @@ export function createMcpServer(client) {
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
-    'Prepare one explicitly selected local image or attachment for Memory. No upload yet; retain operationId.',
+    'Prepare one explicitly selected local file. Supply purpose projectPhoto for an image in an exact project scope, or omit it for a Memory resource. Retain operationId for transfer.',
     mediaPrepareSchema,
     (input) => media.prepare(input),
     false,
@@ -339,7 +339,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_media_upload',
-    'Upload a prepared file using the same operationId after an uncertain response. Charges the Memory owner storage quota.',
+    'Upload a prepared file using the same operationId after an uncertain response. For a project photo, reread the project revision and link the published asset with project.setPhoto.',
     z.object({ operationId: operationIdSchema }).strict(),
     (input) => media.upload(input.operationId),
     true,
@@ -347,7 +347,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_media_action',
-    'Inspect, publish, cancel or remove a private Memory asset; removal does not delete document blocks.',
+    'Inspect or publish a project photo. Memory resources also support cancellation and removal.',
     mediaActionSchema,
     (input) => mediaAction(client, input),
     true,

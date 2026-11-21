@@ -7,7 +7,8 @@ import { CredentialStore } from './store.mjs';
 import { operationIdSchema } from './commands.mjs';
 import { AgentError, fail } from './errors.mjs';
 
-const mediaScope = z.string().regex(/^memory:[a-zA-Z0-9_-]{1,128}$/);
+const memoryScope = z.string().regex(/^memory:[a-zA-Z0-9_-]{1,128}$/);
+const mediaScope = z.string().regex(/^(?:memory|project):[a-zA-Z0-9_-]{1,128}$/);
 const types = [
   'image/png',
   'image/jpeg',
@@ -22,6 +23,7 @@ export const mediaPrepareSchema = z
     scope: mediaScope,
     file: z.string().min(1).max(4096),
     contentType: z.enum(types),
+    purpose: z.literal('projectPhoto').optional(),
     epoch: z.string().min(1).max(128),
   })
   .strict();
@@ -37,14 +39,13 @@ export const mediaDownloadSchema = mediaActionSchema
   .omit({ action: true })
   .extend({ file: z.string().min(1).max(4096) })
   .strict();
-export const mediaCompareSchema = mediaDownloadSchema.omit({ ownerId: true });
+export const mediaCompareSchema = mediaDownloadSchema
+  .omit({ ownerId: true })
+  .extend({ scope: memoryScope });
 const parse = (schema, value) => {
   const result = schema.safeParse(value);
   if (!result.success) {
-    fail(
-      'invalid_arguments',
-      'Invalid media arguments. Supply the Memory scope, epoch and a supported private file.',
-    );
+    fail('invalid_arguments', 'Check the selected media scope, file and operation.');
   }
   return result.data;
 };
@@ -56,7 +57,7 @@ async function fileBytes(path) {
     if (!stat.isFile() || stat.size < 1 || stat.size > 15000000) {
       fail('invalid_arguments', 'Use a regular file between 1 and 15,000,000 bytes.');
     }
-    const bytes = Buffer.alloc(15000001);
+    const bytes = Buffer.alloc(stat.size + 1);
     let size = 0;
     while (size < bytes.length) {
       const result = await handle.read(bytes, size, bytes.length - size, size);
@@ -177,13 +178,24 @@ export class MediaJournal {
     });
   }
   async prepare(value) {
-    const input = parse(mediaPrepareSchema, value),
-      session = await this.client.authorizedSession();
+    const input = parse(mediaPrepareSchema, value);
+    const project = input.scope.startsWith('project:');
+    if (
+      project !== (input.purpose === 'projectPhoto') ||
+      (project && !input.contentType.startsWith('image/'))
+    ) {
+      fail(
+        'invalid_arguments',
+        'Project photos require a project scope, purpose projectPhoto and an image. Memory resources omit purpose.',
+      );
+    }
+    const session = await this.client.authorizedSession();
     const path = resolve(input.file),
       bytes = await fileBytes(path),
       id = randomUUID(),
       store = this.store(id);
     const fileName = basename(path);
+    const sha256 = digest(bytes);
     if (fileName.length > 200) {
       fail('invalid_arguments', 'Use a filename of at most 200 characters.');
     }
@@ -198,10 +210,10 @@ export class MediaJournal {
           scope: input.scope,
           expectedEpoch: input.epoch,
           size: bytes.length,
-          sha256: digest(bytes),
+          sha256,
           contentType: input.contentType,
           fileName,
-          kind: 'memory',
+          ...(project ? { kind: 'project', purpose: 'projectPhoto' } : { kind: 'memory' }),
         },
       }),
     );
@@ -210,7 +222,7 @@ export class MediaJournal {
       scope: input.scope,
       fileName,
       size: bytes.length,
-      sha256: digest(bytes),
+      sha256,
       prepared: true,
     };
   }
@@ -281,6 +293,9 @@ export class MediaJournal {
 }
 export async function mediaAction(client, value) {
   const input = parse(mediaActionSchema, value);
+  if (input.scope.startsWith('project:') && !['inspect', 'publish'].includes(input.action)) {
+    fail('invalid_arguments', 'Use inspect or publish for a project photo.');
+  }
   return client.transport.request('/api/agents/v1/media/actions', {
     method: 'POST',
     json: input,
