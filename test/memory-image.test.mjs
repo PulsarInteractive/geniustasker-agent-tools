@@ -129,3 +129,60 @@ test('a mismatched, unavailable or revoked selection never returns image bytes',
     }
   }
 });
+
+test('retained Design versions select and verify the raster of the exact dated block', async () => {
+  const past = {
+    scope: selected.scope,
+    pageId: selected.pageId,
+    blockId: selected.blockId,
+    atRevision: '4',
+  };
+  const proof = {
+    ...past,
+    revision: '4',
+    assetId: 'older',
+    assetRevision: '2',
+    originalBytes: 520,
+    originalContentType: 'image/png',
+  };
+  delete proof.atRevision;
+  const api = {
+    async getHistoricalPreview(query) {
+      assert.deepEqual(query, past);
+      return { bytes: Buffer.from(image, 'base64'), selection: JSON.stringify(proof) };
+    },
+  };
+  const result = await readMemoryImage(api, past);
+  assert.equal(result.data, image);
+  assert.equal(result.metadata.assetId, 'older');
+  assert.equal(result.metadata.revision, '4');
+  await assert.rejects(readMemoryImage(api, { ...past, revision: '7' }));
+  for (const changed of [
+    { pageId: 'other' },
+    { scope: 'memory:private' },
+    { revision: '5' },
+    { blockId: 'unrelated' },
+  ]) {
+    await assert.rejects(
+      readMemoryImage(
+        {
+          getHistoricalPreview: async () => ({
+            bytes: Buffer.from(image, 'base64'),
+            selection: JSON.stringify({ ...proof, ...changed }),
+          }),
+        },
+        past,
+      ),
+    );
+  }
+  await assert.rejects(
+    readMemoryImage(
+      {
+        getHistoricalPreview: async () => {
+          throw Error('memory_image_unavailable');
+        },
+      },
+      past,
+    ),
+  );
+});
