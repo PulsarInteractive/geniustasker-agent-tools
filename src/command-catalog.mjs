@@ -229,6 +229,7 @@ export default {
       "fields": [
         "logoAssetId",
         "contentRoles",
+        "designResolutions",
         "designFilters",
         "designReviewSettings",
         "title",
@@ -429,6 +430,7 @@ export default {
       "fields": [
         "logoAssetId",
         "contentRoles",
+        "designResolutions",
         "designFilters",
         "designReviewSettings",
         "title",
