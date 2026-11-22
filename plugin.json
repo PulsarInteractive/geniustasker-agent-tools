@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "geniustasker",
   "version": "0.1.0-beta.20",
-  "description": "Track project work and independent product memories with your own agents.",
+  "description": "Track project work, maintain Guides and follow published Skills with your agents.",
   "author": {
     "name": "Pulsar Interactive"
   },
@@ -13,7 +13,7 @@
     "com.openai": {
       "interface": {
         "displayName": "GeniusTasker",
-        "shortDescription": "Projects, progress and memory for your agents",
+        "shortDescription": "Projects, Guides and Skills for your agents",
         "developerName": "Pulsar Interactive",
         "category": "Productivity",
         "capabilities": ["Read", "Write"],

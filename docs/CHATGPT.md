@@ -60,7 +60,10 @@ CLI, local MCP and hosted ChatGPT use the verified account’s current subscript
 
 - “Use GeniusTasker to show my current project tasks, then propose priorities.”
 - “Move this task to next week after showing me the exact change.”
-- “Find the release notes in Memory and the related Graph references.”
+- “Find the release notes in Guides and the related Graph references.”
+- « Cherche les critères de livraison dans Guides et donne-moi la page où ils sont définis. »
+- “Find the published skill for preparing a release in Skills and cite its revision.”
+- « Dans Skills, retrouve la procédure de livraison publiée et vérifie que ses prérequis sont réunis. »
 
 ## Scope and troubleshooting
 

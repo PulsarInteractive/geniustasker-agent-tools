@@ -1,15 +1,16 @@
 # GeniusTasker workflows
 
-| What you want               | Guide topic  | Operations                                                                                                                 |
-| --------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Reuse a task procedure      | `protocols`  | Inspect immutable versions, bind variables, preview and explicitly materialize bounded batches                             |
-| Work on a project           | `projects`   | Read project/member configuration; create/edit/archive/restore tasks; create and plan tickets in existing backlogs/sprints |
-| Prepare a shared workflow   | `projects`   | Project tags and saved filters; sprint, recurring schedule and workflow lifecycle                                          |
-| Collaborate                 | `projects`   | Comments, work reports, questions, exact action approvals and member goals                                                 |
-| Organize knowledge          | `memory`     | Independent Memory spaces, folders/documents, role-restricted content and resource references                              |
-| Connect knowledge           | `graph`      | Typed nodes and relations; authorized references across memories                                                           |
-| Recover an interrupted edit | `mutations`  | Preserve the exact request; read back; reconcile a revision conflict                                                       |
-| Connect or fix permissions  | `connection` | Correct account, consent, reconnect and shared quota                                                                       |
+| What you want               | Guide topic    | Operations                                                                                                                 |
+| --------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Reuse a task procedure      | `protocols`    | Inspect immutable versions, bind variables, preview and explicitly materialize bounded batches                             |
+| Work on a project           | `projects`     | Read project/member configuration; create/edit/archive/restore tasks; create and plan tickets in existing backlogs/sprints |
+| Prepare a shared workflow   | `projects`     | Project tags and saved filters; sprint, recurring schedule and workflow lifecycle                                          |
+| Collaborate                 | `projects`     | Comments, work reports, questions, exact action approvals and member goals                                                 |
+| Organize knowledge          | `memory`       | Guides pages, nested pages, role-restricted content and resource references                                                |
+| Follow a published skill    | `space-skills` | Find the procedure in Skills and read its prerequisites, steps and revision                                                |
+| Connect knowledge           | `graph`        | Typed nodes and relations; authorized references across memories                                                           |
+| Recover an interrupted edit | `mutations`    | Preserve the exact request; read back; reconcile a revision conflict                                                       |
+| Connect or fix permissions  | `connection`   | Correct account, consent, reconnect and shared quota                                                                       |
 
 Use `tasker_workflow` in MCP or `geniustasker workflow show --topic TOPIC`.
 Discover commands before editing. A readable collection does not imply a matching

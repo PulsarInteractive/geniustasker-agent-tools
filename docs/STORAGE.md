@@ -57,3 +57,7 @@ For listing, preview and status, the connection needs `storage:read`, `history:r
 ### Remove a Design revision
 
 The owner can permanently remove one obsolete and unreferenced variant revision after reviewing it. Read the historical revision, the current variant revision and the Design space root revision. Apply the prepared `memory.design.pruneRevision` command with `tasker_edit_design_history` in ChatGPT, or retry the same local CLI/MCP operation. This action preserves current content, protected review evidence and original files. A separate, confirmed storage operation can reclaim eligible originals.
+
+## Reading file usage
+
+The resource inventory returns the largest files first. When a row includes `sources`, each entry identifies a source currently readable by the caller through its kind, ID and title. A missing or empty list is not evidence that the file is unused. The cleanup preview determines whether a file can be reclaimed, and its receipt confirms how much space was freed.
