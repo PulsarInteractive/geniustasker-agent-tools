@@ -87,6 +87,46 @@ test('one selected component batch respects grant placeholders and the byte and 
   }
   assert.equal(spaceCommands.get('guides components').tool.write, false);
 });
+test('linked Guide cards carry their derived inline preview and keep inaccessible cards opaque', async () => {
+  const plain = {
+    blockId: 'work',
+    status: 'available',
+    kind: 'guide',
+    scope,
+    targetId: 'paper',
+    targetStamp: 'target-checkpoint',
+    presentation: 'card',
+    title: 'Paper',
+    revision: '1',
+  };
+  const hidden = { blockId: 'linked', status: 'unavailable' };
+  for (const fields of [
+    { headerAssetId: 'first', headerAlt: 'Paper' },
+    { headerAssetId: 'second', headerAlt: 'Ink' },
+    {},
+  ]) {
+    const visible = { ...plain, ...fields };
+    const expected = { ...response, sourceStamp: 'source-checkpoint', items: [visible, hidden] };
+    assert.deepEqual(
+      await spaceRequest(
+        client(async () => expected),
+        'guides components',
+        query,
+      ),
+      expected,
+    );
+  }
+  const leaked = { ...response, items: [plain, { ...hidden, headerAssetId: 'secret' }] };
+  await assert.rejects(
+    spaceRequest(
+      client(async () => leaked),
+      'guides components',
+      query,
+    ),
+    { code: 'invalid_response' },
+  );
+});
+
 test('component outlines remain readable without disclosing an embedded target', async () => {
   const source = {
     scope,

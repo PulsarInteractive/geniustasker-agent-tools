@@ -676,7 +676,7 @@ For project diagnostics, distinct permissions, resumable file uploads and per-it
 geniustasker guides components --file selected-components.json
 geniustasker design grid --file gallery-filters.json
 geniustasker design review --file selected-image-decisions.json
-geniustasker media prepare --scope memory:studio --epoch EPOCH --file cover.png --content-type image/png --purpose pageCover
+geniustasker media prepare --scope memory:studio --epoch EPOCH --file illustration.png --content-type image/png
 ```
 
-The first two commands read one bounded selection. The review command records one requested criterion on particular image blocks and returns each outcome. The media command prepares a local file. Upload it using the returned operation ID; use `designVisual` for a gallery image or omit the purpose for an original. See the [Guide and Design selections](MEMORY.md#live-components-in-guides).
+The first two commands read one bounded selection. The review command records one requested criterion on particular image blocks and returns each outcome. The media command prepares a local file. Upload it with the returned operation ID, then place the image asset in the selected Guide’s body. Linked Guide cards use the first accessible image in reading order. Design also supports `designVisual` for a gallery image and `pageCover` for an explicit Design page cover. See the [Guide and Design selections](MEMORY.md#live-components-in-guides).

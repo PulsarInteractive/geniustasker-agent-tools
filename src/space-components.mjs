@@ -33,6 +33,7 @@ const linked = z.discriminatedUnion('status', [
       targetId: z.string().regex(baseId),
       presentation: z.enum(['link', 'card', 'status', 'checklist']),
       title: z.string(),
+      targetStamp: z.string().nullish(),
       revision: z.string().regex(revision),
       taskStatus: z.string().nullish(),
       checklistCount: z.number().int().nonnegative().nullish(),
@@ -50,6 +51,9 @@ function validateGuide(input, result) {
     result?.scope !== input.scope ||
     result.pageId !== input.pageId ||
     !matches(revision, result.revision) ||
+    (result.sourceStamp !== undefined &&
+      result.sourceStamp !== null &&
+      typeof result.sourceStamp !== 'string') ||
     !Array.isArray(result.items) ||
     result.items.length !== input.blockIds.length ||
     Buffer.byteLength(JSON.stringify(result)) > 32768
@@ -66,6 +70,7 @@ function validateGuide(input, result) {
     scope: input.scope,
     pageId: input.pageId,
     revision: result.revision,
+    ...(result.sourceStamp === undefined ? {} : { sourceStamp: result.sourceStamp }),
     items: result.items,
   };
 }

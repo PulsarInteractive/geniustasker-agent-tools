@@ -185,3 +185,5 @@ Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
 the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
+
+A Guide displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.

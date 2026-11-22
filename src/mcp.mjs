@@ -388,7 +388,7 @@ export function createMcpServer(client) {
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
-    'Prepare a selected local file in Guides or Design. Use purpose pageCover for an editorial cover or designVisual for gallery images. Both accept PNG, JPEG or WebP and the server compresses them. Omit purpose for an original attachment, including ZIP or HTML source files. Retain operationId for upload.',
+    'Prepare a selected local file in Guides or Design. A Guide card uses the first accessible inline image of its linked page. Publish the selected image as an ordinary image asset, then insert it in a body block. Use pageCover for a Design page cover or designVisual for Design gallery images. Omit purpose for an original attachment such as ZIP or HTML. Retain operationId for upload.',
     mediaPrepareSchema,
     (input) => media.prepare(input),
     false,

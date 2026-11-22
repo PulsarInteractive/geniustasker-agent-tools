@@ -32,7 +32,7 @@ local media are derived snapshots; do not hand-edit them and claim the source wa
 updated. Report actual IDs, changed references and verification, without exposing
 unrelated private source content.
 
-Choose `pageCover` for a Guide header or `designVisual` for a Design gallery image; both accept PNG, JPEG or WebP. A ZIP, HTML source, or an image explicitly requested as an original uses the ordinary upload. Publish the file before applying an edit to the selected page. On hosts advertising selected-file tools, use `tasker_space_prepare_host_file` then `tasker_space_upload_host_file` with the exact prepared metadata. Keep filesystem paths local to the CLI. When matching a transformed file, compare the source digest or the published bytes as appropriate.
+For a Guide, upload the selected image to its space and place a published image asset in an inline block at the requested position. A card linking to that page uses its first accessible inline image in reading order. For Design use `pageCover` for an explicit page cover or `designVisual` for a gallery image. Both accept PNG, JPEG or WebP. A ZIP, HTML source, or an image explicitly requested as an original uses the ordinary upload. Publish the file before applying an edit to the selected page. On hosts advertising selected-file tools, use `tasker_space_prepare_host_file` then `tasker_space_upload_host_file` with the exact prepared metadata. Keep filesystem paths local to the CLI. When matching a transformed file, compare the source digest or the published bytes as appropriate.
 
 ## Inspect a design image
 
