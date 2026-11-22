@@ -5,6 +5,8 @@ description: Read and maintain pages in GeniusTasker Guides, find published Skil
 
 Guides (`library`, formerly Memory) contains reference pages. Any page can have children. Use the existing `memory:ID` scope and `tasker_memory_*` tools.
 
+When asked to open a space, call `tasker_memory_tree` with its granted scope and `outline: home`. One read returns its description, destinations and first root page of titles. Follow the destination the user wants. In Guides, open a selected page or expand it with `parentId`. In Design, expand pages with `outline: design` and `parentId`, or go directly to the gallery or an enabled review. A page can hold its own content and children. For new Design pages use kind `design-screen`, optionally under a parent page. For a legacy `design-group`, expand it with its existing ID and use `groupId` to read its gallery. In Skills, search for a procedure to follow with `status: published`. A known page, image or procedure can be opened directly. Seeing Settings never authorizes a change.
+
 For a published procedure, open workflow `space-skills` (on older connectors, `space-guides`). In the exact Skills space (`playbooks`) use `tasker_memory_catalog` with `status: published` and a short search. Select by purpose, check prerequisites and read its page blocks at the returned revision. Cite that revision in the job’s ticket. For visual variants use workflow `space-design`; its catalog filters distinguish mockups from implemented captures.
 
 Delegated document, history, media and Graph operations require an active
@@ -49,7 +51,7 @@ See [tracked decision example](../../docs/MEMORY.md#tracked-decisions).
 
 1. Call `tasker_identity` and `tasker_capabilities` (CLI `whoami`, `capabilities`).
 2. Use `tasker_memories` / `memories list`. Follow `nextAfter`, including empty pages.
-3. When `documentationSync` is advertised, use `tasker_memory_tree` to browse a page’s children and compare branch versions. Otherwise read `tasker_resources` with `collection: pageIndex`.
+3. When `documentationSync` is advertised, use `tasker_memory_tree` to browse a page’s children and compare branch versions. Use the same selector and access context with an ETag. On older services without the home outline, browse the existing tree, published catalog or gallery directly. When the tree is unavailable use `tasker_resources` with `collection: pageIndex`. A permission refusal applies to the target across these entry points.
 4. On a service supporting note sections, use `tasker_memory_read_pages` (CLI
    `memory read-pages --file selection.json`) for a maximum of five particular
    pages. See workflow `memory-reading` for continuations and coverage at scale.

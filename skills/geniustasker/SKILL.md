@@ -37,6 +37,8 @@ decision in Account → Agents; an agent cannot exceed that owner's rights.
 
 ## Read only what the task needs
 
+For a request to open Guides, Design or Skills, start with `tasker_memory_tree`, the authorized space and `outline: home`. Choose Pages, Gallery, Review or published Skills according to the request. If the exact destination ID is already known, open it directly. See the [knowledge skill](../geniustasker-memory/SKILL.md) for parent/child pages, formats and version-specific images.
+
 List projects, then select a scope from the returned data. Read a collection
 listed in capabilities with `resources list --scope project:ID --collection
 tasks --json`, or MCP `tasker_resources`. Collections include tasks, comments,

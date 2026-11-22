@@ -12,6 +12,43 @@ export const designDiscussionSchema = z.fromJSONSchema(designDiscussionTool.inpu
 export const memoryCatalogSchema = z.fromJSONSchema(memoryCatalogTool.inputSchema);
 export const memoryImageSchema = z.fromJSONSchema(memoryImageTool.inputSchema);
 
+/** Scope, publication and revision bind the catalog result to a subsequent page read. */
+export async function readMemoryCatalog(client, input) {
+  const query = memoryCatalogSchema.safeParse(input);
+  if (!query.success) {
+    fail('invalid_arguments', 'Choose one space and its supported catalog filters.');
+  }
+  const selected = query.data;
+  const result = await client.get('memory/catalog', selected);
+  if (
+    result?.scope !== selected.scope ||
+    !Array.isArray(result.items) ||
+    result.items.length > 16 ||
+    result.items.some(
+      (item) =>
+        !item ||
+        typeof item.id !== 'string' ||
+        !/^[a-zA-Z0-9_-]{1,128}$/.test(item.id) ||
+        typeof item.revision !== 'string' ||
+        !/^(0|[1-9][0-9]{0,31})$/.test(item.revision) ||
+        (selected.status !== undefined && item.guide?.status !== selected.status) ||
+        (selected.track !== undefined && item.design?.track !== selected.track) ||
+        (selected.parentId !== undefined && item.parentId !== selected.parentId),
+    ) ||
+    new Set(result.items.map((item) => item.id)).size !== result.items.length ||
+    (result.nextCursor !== null &&
+      (typeof result.nextCursor !== 'string' ||
+        !result.nextCursor.length ||
+        result.nextCursor.length > 200 ||
+        result.nextCursor === selected.cursor))
+  ) {
+    fail('invalid_response', 'The catalog returned an inconsistent scope, page or continuation.', {
+      status: 502,
+    });
+  }
+  return result;
+}
+
 export async function readMemoryImage(client, input) {
   const parsed = memoryImageSchema.safeParse(input);
   if (!parsed.success) {

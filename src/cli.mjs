@@ -22,7 +22,7 @@ import {
   previewMemoryTemplate,
 } from './memory-editorial.mjs';
 import { memoryHistoryRequest } from './memory-history.mjs';
-import { memoryCatalogSchema, designDiscussionSchema } from './memory-image.mjs';
+import { readMemoryCatalog, designDiscussionSchema } from './memory-image.mjs';
 import {
   scopedStorageTools,
   scopedStorageCommands,
@@ -51,7 +51,13 @@ import { previewProtocol } from './protocols.mjs';
 import { readIntents, previewIntent } from './intents.mjs';
 import { reportRunEvent } from './run-events.mjs';
 import { readResources, readMetrics } from './resources.mjs';
-import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
+import {
+  MediaJournal,
+  mediaAction,
+  downloadMedia,
+  downloadPageImage,
+  compareMedia,
+} from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 import { checkUpdate, installUpdate, maybeNotifyUpdate } from './update.mjs';
 import { acquireRuntime } from './update-runtime.mjs';
@@ -219,8 +225,14 @@ export const commands = {
     summary: 'Find skills or design variants using a bounded catalog query.',
     options: ['file'],
   },
+  'memory view-image': {
+    summary:
+      'Save the selected image block to a new WebP file. Choose --revision for the current page or --at-revision for a retained Design version.',
+    options: ['scope', 'page', 'block', 'revision', 'at-revision', 'file'],
+  },
   'memory tree': {
-    summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
+    summary:
+      'Open a space with --outline home; browse a page with --parent or a Design branch with --outline design. Continuations use --after, --epoch and --checkpoint.',
     options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match', 'outline'],
   },
   ...Object.fromEntries(
@@ -699,12 +711,16 @@ export async function main(
         );
       }
       data = await client.get('memory/design-discussion', input.data);
+    } else if (command === 'memory view-image') {
+      data = await downloadPageImage(client, options.file, {
+        scope: options.scope,
+        pageId: options.page,
+        blockId: options.block,
+        ...(options.revision === undefined ? {} : { revision: options.revision }),
+        ...(options['at-revision'] === undefined ? {} : { atRevision: options['at-revision'] }),
+      });
     } else if (command === 'memory catalog') {
-      const input = memoryCatalogSchema.safeParse(await readCommandFile(options.file));
-      if (!input.success) {
-        fail('invalid_arguments', 'Choose one Memory and its supported catalog filters.');
-      }
-      data = await client.get('memory/catalog', input.data);
+      data = await readMemoryCatalog(client, await readCommandFile(options.file));
     } else if (command === 'memory tree') {
       data = await readMemoryTree(client, {
         scope: options.scope,

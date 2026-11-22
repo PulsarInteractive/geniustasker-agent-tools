@@ -6,6 +6,8 @@ import * as z from 'zod/v4';
 import { CredentialStore } from './store.mjs';
 import { operationIdSchema } from './commands.mjs';
 import { AgentError, fail } from './errors.mjs';
+import { memoryImageSchema } from './memory-image.mjs';
+import { readMemoryImagePixels } from './memory-image-pixels.mjs';
 
 const mediaScope = z.string().regex(/^memory:[a-zA-Z0-9_-]{1,128}$/);
 const types = [
@@ -344,6 +346,23 @@ export async function downloadMedia(client, value) {
     binary: true,
     token: await client.accessToken(),
   });
+  return saveMediaFile(file, bytes);
+}
+
+/** Bind a local preview to the same page, block and revision selection as MCP. */
+export async function downloadPageImage(client, file, value) {
+  if (typeof file !== 'string' || file.length < 1 || file.length > 4096) {
+    fail('invalid_arguments', 'Choose a new file for the selected WebP image.');
+  }
+  const selection = memoryImageSchema.safeParse(value);
+  if (!selection.success) {
+    fail('invalid_arguments', 'Select one authorized page, image block and revision.');
+  }
+  const { bytes, metadata } = await readMemoryImagePixels(client, selection.data);
+  return { ...metadata, ...(await saveMediaFile(file, bytes)) };
+}
+
+async function saveMediaFile(file, bytes) {
   const path = resolve(file);
   const handle = await open(path, 'wx', 0o600);
   try {

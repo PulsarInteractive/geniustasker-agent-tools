@@ -53,7 +53,32 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     requests.push(request.url);
     response.setHeader('Content-Type', 'application/json');
     const url = new URL(request.url, 'http://local');
-    if (url.pathname.endsWith('/memory/guide-components')) {
+    if (url.pathname.endsWith('/memory/tree')) {
+      assert.equal(request.method, 'GET');
+      assert.equal(url.searchParams.get('outline'), 'home');
+      response.end(
+        JSON.stringify({
+          scope: 'memory:one',
+          epoch: 'e',
+          checkpoint: '7',
+          accessRevision: '3',
+          parentId: null,
+          title: 'Studio',
+          parent: null,
+          version: 'a'.repeat(64),
+          etag: 'a'.repeat(64),
+          notModified: false,
+          items: [],
+          totalChildren: 0,
+          nextAfter: null,
+          home: {
+            kind: 'skills',
+            description: 'Print procedures',
+            destinations: ['pages', 'skills', 'settings'],
+          },
+        }),
+      );
+    } else if (url.pathname.endsWith('/memory/guide-components')) {
       assert.equal(request.method, 'POST');
       response.end(
         JSON.stringify({
@@ -198,6 +223,15 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     assert.ok(names.has(name), name);
   }
   assert.ok(listing.tools.some((tool) => tool.name === 'tasker_workflow'));
+  const opening = await client.callTool({
+    name: 'tasker_memory_tree',
+    arguments: { scope: 'memory:one', outline: 'home' },
+  });
+  assert.deepEqual(opening.structuredContent.data.home.destinations, [
+    'pages',
+    'skills',
+    'settings',
+  ]);
   const components = await client.callTool({
     name: 'tasker_guide_components',
     arguments: { scope: 'memory:one', pageId: 'guide', blockIds: ['policy'] },

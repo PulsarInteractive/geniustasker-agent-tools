@@ -226,47 +226,50 @@
   },
   {
     "name": "tasker_memory_tree",
-    "title": "Browse a page and its children",
-    "description": "Read one branch of authorized pages in Guides. A page can contain text and child pages. Follow its continuation with the original epoch and checkpoint. Use childCount and subtreeVersion when selecting branches.",
+    "title": "Open a space or browse its child pages",
+    "description": "Use outline=home at the root of Guides, Design or Skills to read its description, available destinations and first page of authorized titles. Open a child branch with parentId. In Design use outline=design for pages and legacy groups. A page can contain content and children. Continue the same scope, parent and outline with nextAfter, epoch and checkpoint. Reading a destination grants no write permission.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "scope": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$"
         },
         "parentId": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$"
         },
         "after": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 4096
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$"
         },
         "epoch": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 256
+          "maxLength": 128
         },
         "checkpoint": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "maxLength": 32,
+          "pattern": "^(0|[1-9][0-9]*)$"
+        },
+        "ifNoneMatch": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Reuse the returned etag only for the same authorized branch, outline and cursor."
         },
         "outline": {
           "type": "string",
-          "pattern": "^design$",
-          "description": "Use design to list only screen groups, screens and their children, excluding individual variants and review entries. Preserve this filter with the cursor."
+          "pattern": "^(design|home)$",
+          "description": "home opens the root only. design selects the Design page tree for drilling into a selected page or existing group. Keep the outline on continuation."
         }
       },
       "required": ["scope"],
       "additionalProperties": false
     },
     "scopes": ["memory:read"],
-    "route": "memory/tree"
+    "route": "memory/tree",
+    "write": false
   },
   {
     "name": "tasker_memory_markdown",

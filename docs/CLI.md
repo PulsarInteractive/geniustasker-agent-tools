@@ -8,6 +8,10 @@ external model tokens.
 Run `geniustasker workflow show --help` to list the guide topics included in your installation.
 For example, `geniustasker workflow show --topic checklist --json` explains how to track steps within a ticket.
 
+## Open Guides, Design and Skills
+
+Use `memory tree --scope memory:SPACE --outline home` to open a space, then `memory tree --scope memory:SPACE --parent PAGE` to expand a Guides page. For a Design branch add `--outline design`. `memory catalog --file filters.json` with `status: "published"` finds published Skills. `design grid --file filters.json` reads Design images and reviews by format. Use `memory view-image --help` to save the exact current or historical image. See the [space and image selectors](MEMORY.md#open-a-space-and-choose-its-content).
+
 ## Custom metric definitions
 
 For custom measurement definitions, use `metrics list --scope project:ID --json`

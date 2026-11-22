@@ -47,6 +47,7 @@ import {
   designDiscussionSchema,
   memoryCatalogTool,
   memoryCatalogSchema,
+  readMemoryCatalog,
   readMemoryImage,
 } from './memory-image.mjs';
 import { workflow, workflowSchema } from './workflows.mjs';
@@ -270,7 +271,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_memory_tree',
-    'Browse a Guides page and its readable children, with branch versions. Use this before fetching Markdown; compare subtreeVersion to skip unchanged branches. A continuation needs epoch and checkpoint. Check documentationSync in capabilities first.',
+    remoteTools.find((tool) => tool.name === 'tasker_memory_tree').description,
     memoryTreeSchema,
     (input) => readMemoryTree(client, input),
   );
@@ -371,7 +372,7 @@ export function createMcpServer(client) {
     (input) => compareMedia(client, input),
   );
   register(memoryCatalogTool.name, memoryCatalogTool.description, memoryCatalogSchema, (input) =>
-    client.get('memory/catalog', input),
+    readMemoryCatalog(client, input),
   );
   register(
     memoryImageTool.name,
