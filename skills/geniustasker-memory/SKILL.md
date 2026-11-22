@@ -1,9 +1,11 @@
 ---
 name: geniustasker-memory
-description: Read and maintain GeniusTasker Memory documents and Graph relations through the connected CLI or MCP. Use for knowledge search, structured documents, linked nodes and authorized imports. Memory access remains independent of project and Graph access.
+description: Read and maintain pages in GeniusTasker Guides, find published Skills, and explore Graph relations through CLI or MCP. Use for knowledge search, structured documentation, reusable procedures, linked nodes and authorized imports. Project and space permissions are independent.
 ---
 
-For a published procedure, open workflow `space-guides`. In the exact Guides space use `tasker_memory_catalog` with `status: published` and a short search. Select by purpose, check prerequisites and read its page blocks at the returned revision. Cite that revision in the job’s ticket. For visual variants use workflow `space-design`; its catalog filters distinguish mockups from implemented captures.
+Guides (`library`, formerly Memory) contains reference pages. Any page can have children. Use the existing `memory:ID` scope and `tasker_memory_*` tools.
+
+For a published procedure, open workflow `space-skills` (on older connectors, `space-guides`). In the exact Skills space (`playbooks`) use `tasker_memory_catalog` with `status: published` and a short search. Select by purpose, check prerequisites and read its page blocks at the returned revision. Cite that revision in the job’s ticket. For visual variants use workflow `space-design`; its catalog filters distinguish mockups from implemented captures.
 
 Delegated document, history, media and Graph operations require an active
 Starter or Pro plan and explicit access to the target. Stop on
@@ -41,7 +43,7 @@ See [tracked decision example](../../docs/MEMORY.md#tracked-decisions).
 
 1. Call `tasker_identity` and `tasker_capabilities` (CLI `whoami`, `capabilities`).
 2. Use `tasker_memories` / `memories list`. Follow `nextAfter`, including empty pages.
-3. When `documentationSync` is advertised, use `tasker_memory_tree` to navigate folders and compare branch versions. Otherwise read `tasker_resources` with `collection: pageIndex`.
+3. When `documentationSync` is advertised, use `tasker_memory_tree` to browse a page’s children and compare branch versions. Otherwise read `tasker_resources` with `collection: pageIndex`.
 4. On a service supporting note sections, use `tasker_memory_read_pages` (CLI
    `memory read-pages --file selection.json`) for a maximum of five particular
    pages. See workflow `memory-reading` for continuations and coverage at scale.
@@ -148,7 +150,7 @@ exposing private source content.
 A memory can define `contentRoles` (stable IDs and display names). Membership
 assignments are managed in the application. Page `visibility` is `inherit`,
 `restricted`, or `private`; `readRoles` selects defined roles for a restricted
-page. Restrictions apply through parent folders and to attached files. Content
+page. Restrictions apply through parent pages and to attached files. Content
 roles never grant editing rights. Only memory administrators can change page
 restrictions or move existing pages between parents. Never change sharing as a
 workaround for denied reads.

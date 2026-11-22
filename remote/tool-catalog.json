@@ -47,7 +47,7 @@
   {
     "name": "tasker_memories",
     "title": "Find memories and graphs",
-    "description": "List independent memories and graphs available to this connection.",
+    "description": "List authorized spaces. Guides contains project documentation (library), Skills contains published procedures and drafts (playbooks), and Design contains visual work (design). A project link does not grant access.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -226,8 +226,8 @@
   },
   {
     "name": "tasker_memory_tree",
-    "title": "Browse documentation folders",
-    "description": "Read one folder of a memory. Follow continuation; do not download an entire memory for one question.",
+    "title": "Browse a page and its children",
+    "description": "Read one branch of authorized pages in Guides. A page can contain text and child pages. Follow its continuation with the original epoch and checkpoint. Use childCount and subtreeVersion when selecting branches.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -659,8 +659,8 @@
   },
   {
     "name": "tasker_memory_catalog",
-    "title": "Find guides or design variants",
-    "description": "List one bounded page of authorized Guide or Design references in one space. For ordinary guide use choose status published, then open the exact page/revision and its prerequisites. For Design filter by track, viewport and context. Use previewBlockId to see the image. Request includeCoverage only for a coverage review. Continue the same filters with nextCursor.",
+    "title": "Find skills or design variants",
+    "description": "List one bounded page of authorized Skills or Design entries in one space. To follow a skill, choose status published, then open the exact page/revision and its prerequisites. For Design filter by track, viewport and context. Use previewBlockId to see the image. Request includeCoverage only for a coverage review. Continue the same filters with nextCursor.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -2181,9 +2181,10 @@
             "storage",
             "first-mission",
             "project-work",
-            "space-guides",
             "space-design",
-            "storage-cleanup"
+            "storage-cleanup",
+            "space-skills",
+            "space-guides"
           ]
         }
       },

@@ -1,4 +1,14 @@
-# Memory and Graph
+# Guides, Skills and Graph
+
+Guides is the space for project documentation. Skills contains reusable procedures, including when to apply them and what they require. These space names appear in both English and French. Existing command names, IDs, permissions and links stay valid.
+
+| App                      | Kind        | Agent workflow                                                              |
+| ------------------------ | ----------- | --------------------------------------------------------------------------- |
+| Guides (formerly Memory) | `library`   | `memory-reading` for reference pages and their children                     |
+| Skills (formerly Guides) | `playbooks` | `space-skills` for published procedures; `space-guides` on older clients    |
+| Design                   | `design`    | `space-design` for visual variants and their files at the selected revision |
+
+Dans l’application, **Guides** rassemble les pages de référence d’un projet. Une page peut contenir ses propres sous-pages. **Skills** regroupe les procédures réutilisables. Pour en suivre une, vérifiez son déclencheur et ses prérequis, puis citez la révision publiée dans le ticket. Les espaces existants gardent leurs titres et leurs instructions personnalisées.
 
 Delegated access to Memory documents, history, assets and Graph through the CLI,
 local MCP and ChatGPT requires a current Starter or Pro account and explicit

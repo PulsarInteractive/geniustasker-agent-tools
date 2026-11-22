@@ -209,7 +209,7 @@ export const commands = {
     options: ['file'],
   },
   'memory catalog': {
-    summary: 'Find a bounded page of guides or design variants from a JSON query.',
+    summary: 'Find skills or design variants using a bounded catalog query.',
     options: ['file'],
   },
   'memory tree': {

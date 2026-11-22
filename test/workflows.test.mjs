@@ -42,6 +42,18 @@ test('workflow discovery is exhaustive, bounded, and rejects unknown topics', as
   }
 });
 
+test('Guides pages and published Skills have distinct workflows while the previous procedure topic retains its meaning', () => {
+  const reference = workflow({ topic: 'memory' });
+  const skill = workflow({ topic: 'space-skills' });
+  const prior = workflow({ topic: 'space-guides' });
+  assert.deepEqual({ ...prior, topic: 'space-skills' }, skill);
+  assert.match(reference.steps.join(' '), /parentId/);
+  assert.match(reference.examples.fr, /dans Guides/);
+  assert.match(skill.examples.fr, /skill publiée/);
+  assert.match(skill.steps.join(' '), /Skills space \(kind playbooks\).*status published/);
+  assert.match(workflow({ topic: 'project-work' }).summary, /Guides.*library.*Skills.*playbooks/);
+});
+
 test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {
   for (const args of [['--help'], [], ['--topic', 'checklists']]) {
     let output = '';

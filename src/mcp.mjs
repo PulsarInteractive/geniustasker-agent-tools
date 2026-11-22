@@ -269,7 +269,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_memory_tree',
-    'Inspect one Memory folder with versions of its readable descendants. Use this before fetching Markdown; compare subtreeVersion to skip unchanged branches. A continuation needs epoch and checkpoint. Check documentationSync in capabilities first.',
+    'Browse a Guides page and its readable children, with branch versions. Use this before fetching Markdown; compare subtreeVersion to skip unchanged branches. A continuation needs epoch and checkpoint. Check documentationSync in capabilities first.',
     memoryTreeSchema,
     (input) => readMemoryTree(client, input),
   );
@@ -461,7 +461,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_memories',
-    'List Memory spaces visible to this connection. A project can reference a Memory in its documentation settings. Use tasker_project_documentation for that link. Project access and Memory access are checked separately. Follow nextAfter even on an empty page.',
+    'List authorized spaces. Guides holds documentation (library), Skills holds reusable procedures (playbooks), and Design holds visual variants (design). A project can reference a Memory in its documentation settings. Use tasker_project_documentation for that link. Project access and Memory access are checked separately. Follow nextAfter even on an empty page.',
     z.object({ after: z.string().max(4096).optional() }).strict(),
     (input) => client.get('memories', input),
   );
