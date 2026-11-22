@@ -1,3 +1,4 @@
+import { spaceCommands, spaceRequest } from './space-components.mjs';
 import { withFeedbackDiscovery } from './presentation.mjs';
 import {
   readFeedbackCapabilities,
@@ -168,7 +169,7 @@ export const commands = {
   },
   'media prepare': {
     summary: 'Prepare a local private attachment; retain its operation ID.',
-    options: ['scope', 'file', 'content-type', 'epoch'],
+    options: ['scope', 'file', 'content-type', 'epoch', 'purpose'],
   },
   'media upload': {
     summary: 'Upload or safely retry the prepared operation.',
@@ -204,6 +205,12 @@ export const commands = {
       },
     ]),
   ),
+  ...Object.fromEntries(
+    [...spaceCommands].map(([command, { tool }]) => [
+      command,
+      { summary: tool.description, options: ['file'] },
+    ]),
+  ),
   'memory design-discussion': {
     summary: 'Read a page of threads or replies for a design variant.',
     options: ['file'],
@@ -214,7 +221,7 @@ export const commands = {
   },
   'memory tree': {
     summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
-    options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match'],
+    options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match', 'outline'],
   },
   ...Object.fromEntries(
     [...ticketStorageTools].map(([command, { tool }]) => [
@@ -681,6 +688,8 @@ export async function main(
     } else if (Object.hasOwn(scopedStorageCommands, command)) {
       const input = await readCommandFile(options.file);
       data = await clientStorageRequest(client, scopedStorageToolFor(command, input), input);
+    } else if (spaceCommands.has(command)) {
+      data = await spaceRequest(client, command, await readCommandFile(options.file));
     } else if (command === 'memory design-discussion') {
       const input = designDiscussionSchema.safeParse(await readCommandFile(options.file));
       if (!input.success) {
@@ -704,6 +713,7 @@ export async function main(
         epoch: options.epoch,
         checkpoint: options.checkpoint,
         ifNoneMatch: options['if-none-match'],
+        outline: options.outline,
       });
     } else if (command === 'attachment prepare-upload') {
       data = await prepareTicketUpload(client, await readCommandFile(options.file));
@@ -769,6 +779,7 @@ export async function main(
         file: options.file,
         contentType: options['content-type'],
         epoch: options.epoch,
+        purpose: options.purpose,
       });
     } else if (command === 'media upload') {
       data = await new MediaJournal(client).upload(options.operation);

@@ -19,6 +19,12 @@ CLI/MCP invocations. Use a distinct context; its name alone does not select an
 environment. The browser lets them select resources and permissions.
 Do not collect passwords or tokens, approve your own consent, or edit credentials.
 
+## Linked Guide pages and Design images
+
+A Guide outline can contain `component` blocks. Ask `tasker_guide_components` for the particular block IDs needed from one page. Keep each result with its source revision. When an item is unavailable, keep its placeholder. On a page-body edit, preserve each untouched occurrence including its opaque `componentStamp` when supplied. Open workflow `guide-components` for authoring and optional covers.
+
+For a gallery or per-image verdict, use workflow `design-image-review`. Filter by the requested track, viewport, pair or criterion. Inspect the selected revision's pixels before claiming a visual result. For a review, preserve each target's block, revision and expected decision; report individual conflicts.
+
 ## Decide when a note should change
 
 Read `tasker_workflow` topic `memory-editorial` when starting project work,

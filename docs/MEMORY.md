@@ -186,3 +186,25 @@ reviewer’s inbox untouched. Preserve the original reference across retries.
 If the excerpt changed, reread the section and check whether the change is still
 needed. Missing delegation or an unavailable proposal command leaves the draft
 with the human reviewer.
+
+## Live components in Guides
+
+A Guide can refer to another Guide, a Design page, a Skill or a project task. The same destination may appear twice with different presentations. Read the source page outline to find the IDs of the occurrences. A batch selects 1–16 particular block IDs from a single page.
+
+```json
+{
+  "scope": "memory:field-guide",
+  "pageId": "release",
+  "blockIds": ["acceptance", "mobile-visual"]
+}
+```
+
+Pass this file to `geniustasker guides components --file selection.json` or call `tasker_guide_components` with its contents. Each available result contains the selected presentation, destination and revision. The current permissions of the source and destination are checked for this read. An unavailable element contains its block ID and status. Re-read after an access change. A preview returns metadata and fetches no image originals.
+
+To author a component, read the current source and select the authorized destination. For an unrelated edit, omit `blocks` or preserve the opaque occurrence from the read response (its ID, `kind: component`, empty text and `componentStamp` whenever supplied). The stamp identifies changes to the occurrence and must be copied without interpreting it. To change that occurrence, explicitly supply its new destination and presentation. Link and card presentations work across destinations. Tasks can also show status or their checklist summary. For a removal, include its occurrence ID in `componentRemovalIds`. Use `tasker_workflow` topic `guide-components` for the full sequence.
+
+## Image reviews in Design
+
+`geniustasker design grid --file filters.json` and `tasker_design_grid` browse the same gallery. Start with only the Design space scope for all formats or choose filters for one group, page, viewport, track, pair, criterion or verdict. An image is identified by its variant and block. Keep the filters unchanged on continuation. Ask the image tool for the exact revision to inspect its pixels.
+
+An enabled space rubric applies to its track. A screen can add its own criteria. Child screens use their own local criteria. Each cell carries the current decision ID. To record requested evidence, `geniustasker design review --file decision.json` and `tasker_design_grid_decisions` take one criterion, one verdict and 1–16 explicit targets. A target contains `variantId`, `blockId`, `revision` and `expectedDecisionId`. Use `null` when no prior decision exists. Send a stable operation ID and timestamp. Read the individual receipts before reporting completion. The `design-image-review` workflow covers optional observations, explicit pairing, evidence selection and conflicts.

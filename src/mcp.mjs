@@ -1,3 +1,4 @@
+import { spaceCommands, spaceRequest } from './space-components.mjs';
 import {
   readProjectDocumentation,
   documentationTool,
@@ -313,6 +314,16 @@ export function createMcpServer(client) {
       },
     );
   }
+  for (const [command, { tool, schema }] of spaceCommands) {
+    register(
+      tool.name,
+      tool.description,
+      schema,
+      (input) => spaceRequest(client, command, input),
+      tool.write,
+      { destructiveHint: false, idempotentHint: true },
+    );
+  }
   register(
     designDiscussionTool.name,
     designDiscussionTool.description,
@@ -377,7 +388,7 @@ export function createMcpServer(client) {
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
-    'Prepare one explicitly selected local image or attachment for Memory. Design also accepts downloadable ZIP and HTML source files up to 15,000,000 bytes. No upload yet; retain operationId.',
+    'Prepare a selected local file in Guides or Design. Use purpose pageCover for an editorial cover or designVisual for gallery images. Both accept PNG, JPEG or WebP and the server compresses them. Omit purpose for an original attachment, including ZIP or HTML source files. Retain operationId for upload.',
     mediaPrepareSchema,
     (input) => media.prepare(input),
     false,

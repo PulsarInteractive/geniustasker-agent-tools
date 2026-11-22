@@ -669,3 +669,14 @@ historical access when needed.
 ## Ticket files and storage
 
 For project diagnostics, distinct permissions, resumable file uploads and per-item receipts, follow the [ticket attachment workflow](STORAGE.md).
+
+### Guide components and Design review
+
+```sh
+geniustasker guides components --file selected-components.json
+geniustasker design grid --file gallery-filters.json
+geniustasker design review --file selected-image-decisions.json
+geniustasker media prepare --scope memory:studio --epoch EPOCH --file cover.png --content-type image/png --purpose pageCover
+```
+
+The first two commands read one bounded selection. The review command records one requested criterion on particular image blocks and returns each outcome. The media command prepares a local file. Upload it using the returned operation ID; use `designVisual` for a gallery image or omit the purpose for an original. See the [Guide and Design selections](MEMORY.md#live-components-in-guides).

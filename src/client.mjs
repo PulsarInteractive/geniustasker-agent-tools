@@ -201,6 +201,7 @@ export class AgentClient {
         'storage/resources',
         'storage/cleanup/status',
         'memory/design-discussion',
+        'memory/design-grid',
         'tasks/archive/detail',
         'tasks/archive/comments',
         'memories',

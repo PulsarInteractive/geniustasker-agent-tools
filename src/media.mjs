@@ -24,6 +24,7 @@ export const mediaPrepareSchema = z
     scope: mediaScope,
     file: z.string().min(1).max(4096),
     contentType: z.enum(types).optional(),
+    purpose: z.enum(['pageCover', 'designVisual']).optional(),
     epoch: z.string().min(1).max(128),
   })
   .strict();
@@ -130,14 +131,20 @@ export async function compareMedia(client, value) {
   ) {
     fail('invalid_response', 'The resource has an invalid verified digest or size.');
   }
-  const sha256 = digest(bytes),
-    identical = sha256 === remoteDigest && bytes.length === asset.data.sizeBytes;
+  const sourceSha256 = asset.data.sourceSha256;
+  if (sourceSha256 !== null && sourceSha256 !== undefined && !/^[a-f0-9]{64}$/.test(sourceSha256)) {
+    fail('invalid_response', 'The published asset has an invalid source digest.');
+  }
+  const sha256 = digest(bytes);
+  const identical =
+    sha256 === sourceSha256 || (sha256 === remoteDigest && bytes.length === asset.data.sizeBytes);
   return {
     scope: input.scope,
     assetId: input.id,
     revision: asset.revision,
     sha256,
     remoteSha256: remoteDigest,
+    ...(sourceSha256 ? { sourceSha256 } : {}),
     identical,
     downloaded,
     recommendation: identical
@@ -151,13 +158,22 @@ const binding = (session) => ({
   profileId: session.profile_id,
   sessionId: session.session_id,
 });
-function sessionView(value, id, size) {
+const normalizedMax = { pageCover: 800000, designVisual: 1500000 };
+function sessionView(value, id, size, purpose) {
   if (
     !value ||
     value.id !== id ||
     typeof value.ownerId !== 'string' ||
     !/^[a-zA-Z0-9_-]{1,128}$/.test(value.ownerId) ||
-    value.size !== size ||
+    (purpose
+      ? !Number.isSafeInteger(value.size) ||
+        value.size < 1 ||
+        value.size >
+          (value.published ? normalizedMax[purpose] : Math.max(size, normalizedMax[purpose]))
+      : value.size !== size) ||
+    (purpose &&
+      value.published &&
+      (typeof value.fileName !== 'string' || !value.fileName.toLowerCase().endsWith('.webp'))) ||
     typeof value.published !== 'boolean'
   ) {
     fail('invalid_response', 'The attachment session did not match the prepared file.');
@@ -202,6 +218,9 @@ export class MediaJournal {
         'Choose the content type matching this file. Design sources use .zip or .html.',
       );
     }
+    if (input.purpose && !['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
+      fail('invalid_arguments', 'Use a PNG, JPEG or WebP file for a page cover or design visual.');
+    }
     if (fileName.length > 200) {
       fail('invalid_arguments', 'Use a filename of at most 200 characters.');
     }
@@ -220,6 +239,7 @@ export class MediaJournal {
           contentType,
           fileName,
           kind: 'memory',
+          ...(input.purpose ? { purpose: input.purpose } : {}),
         },
       }),
     );
@@ -229,6 +249,7 @@ export class MediaJournal {
       fileName,
       size: bytes.length,
       sha256: digest(bytes),
+      ...(input.purpose ? { purpose: input.purpose } : {}),
       prepared: true,
     };
   }
@@ -259,7 +280,9 @@ export class MediaJournal {
         }),
         id,
         bytes.length,
+        value.input.purpose,
       );
+      let finalSession = opened;
       const query = { scope: value.input.scope, ownerId: opened.ownerId, id };
       if (!opened.published) {
         await transport.request('/api/agents/v1/media/content', {
@@ -276,7 +299,9 @@ export class MediaJournal {
           }),
           id,
           bytes.length,
+          value.input.purpose,
         );
+        finalSession = published;
         if (!published.published) {
           fail(
             'media_not_published',
@@ -290,9 +315,15 @@ export class MediaJournal {
         ownerId: opened.ownerId,
         scope: value.input.scope,
         published: true,
-        fileName: value.input.fileName,
-        size: bytes.length,
-        sha256: value.input.sha256,
+        fileName: value.input.purpose ? finalSession.fileName : value.input.fileName,
+        size: finalSession.size,
+        ...(value.input.purpose
+          ? {
+              purpose: value.input.purpose,
+              sourceSha256: value.input.sha256,
+              sourceSize: bytes.length,
+            }
+          : { sha256: value.input.sha256 }),
       };
     }, this.client.transport.signal);
   }

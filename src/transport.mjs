@@ -184,13 +184,17 @@ export class Transport {
       fail('invalid_response', 'The service did not return a WebP preview.');
     }
     const binaryLimit = preview ? 512 * 1024 : feedbackMedia ? 1_000_000 : 15_000_000;
+    const jsonLimit =
+      method === 'GET' && url.pathname === '/api/agents/v1/memory/design-grid'
+        ? 512 * 1024
+        : 262144;
     const chunks = [];
     let size = 0;
     try {
       if (response.body) {
         for await (const chunk of response.body) {
           size += chunk.length;
-          if (size > (binary && response.ok ? binaryLimit : 262144)) {
+          if (size > (binary && response.ok ? binaryLimit : jsonLimit)) {
             fail('invalid_response', 'The API response exceeded the size limit.');
           }
           chunks.push(chunk);

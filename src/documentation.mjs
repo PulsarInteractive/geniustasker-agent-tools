@@ -16,6 +16,7 @@ export const memoryTreeSchema = z
   .object({
     scope,
     parentId: id.optional(),
+    outline: z.literal('design').optional(),
     after: id.optional(),
     ...context,
     ifNoneMatch: digest.optional(),
