@@ -60,6 +60,6 @@ The owner can permanently remove one obsolete and unreferenced variant revision 
 
 ## Reading file usage
 
-The resource inventory returns the largest files first. When a row includes `sources`, each entry identifies a source currently readable by the caller through its kind, ID and title. A missing or empty list is not evidence that the file is unused. The cleanup preview determines whether a file can be reclaimed, and its receipt confirms how much space was freed.
+The resource inventory returns the largest files first. Each row can include up to three readable sources with their kind, ID and title. For an archived ticket attachment, use the returned task title to explain where the file is stored. This takes one listing request, including when the same file has several visible uses. Older responses and resources with restricted sources can omit this list. Use the cleanup preview to determine whether a file can be reclaimed, and the receipt to confirm how much space was freed.
 
 Use the optional `query` field on a space’s storage resources tool to find filenames beginning with that text. Percent and underscore are literal characters. A prefix search returns filename order. Preserve the search when supplying a continuation cursor. An ordinary unfiltered listing starts with the largest files.

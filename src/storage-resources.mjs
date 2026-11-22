@@ -64,6 +64,10 @@ const resourcePage = z.object({
         protectedBytes: bytes,
         issuedAt: bytes,
         reason: z.string().nullable(),
+        sources: z
+          .array(z.object({ kind: key, id: key, title: z.string() }))
+          .max(3)
+          .optional(),
       }),
     )
     .max(25),
