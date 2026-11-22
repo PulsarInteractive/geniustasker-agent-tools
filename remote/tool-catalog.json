@@ -4283,8 +4283,15 @@
           "type": "integer"
         },
         "observation": {
-          "type": "string",
-          "maxLength": 1200
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1200
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "operationId": {
           "type": "string"
