@@ -4236,6 +4236,11 @@
           "enum": ["paired", "unpaired"],
           "maxLength": 128
         },
+        "reviewProgress": {
+          "type": "string",
+          "enum": ["unstarted", "partial"],
+          "maxLength": 16
+        },
         "criterionId": {
           "type": "string",
           "maxLength": 128

@@ -115,7 +115,13 @@ test('component outlines remain readable without disclosing an embedded target',
   assert.deepEqual(result.pages[0].items, [{ id: 'linked', kind: 'component', order: 0 }]);
 });
 test('the design grid reads selected filters only; review receipts retain each conflict and stable operation', async () => {
-  const input = { scope, track: 'mockup', width: 390, verdict: 'unchecked' };
+  const input = {
+    scope,
+    track: 'mockup',
+    width: 390,
+    verdict: 'unchecked',
+    reviewProgress: 'partial',
+  };
   const items = [{ variantId: 'mobile', blockId: 'screen', revision: '7', cells: [] }];
   const grid = {
     scope,
@@ -137,6 +143,9 @@ test('the design grid reads selected filters only; review receipts retain each c
     input,
   );
   assert.equal(result, grid);
+  await assert.rejects(spaceRequest({}, 'design grid', { scope, reviewProgress: 'approved' }), {
+    code: 'invalid_arguments',
+  });
   const receipt = {
     items: [
       { variantId: 'mobile', blockId: 'screen', decisionId: 'new', error: null },
