@@ -5,6 +5,8 @@ import { fail } from './errors.mjs';
 const commands = {
   'guides components': 'tasker_guide_components',
   'design grid': 'tasker_design_grid',
+  'design save-mockup': 'tasker_design_save_mockup',
+  'design save-implementation': 'tasker_design_save_implementation',
   'design target': 'tasker_design_target',
   'design mockups': 'tasker_design_mockups',
   'design implementations': 'tasker_design_implementations',
@@ -198,6 +200,23 @@ export async function spaceRequest(client, command, value) {
           token: await client.accessToken(),
         })
       : await client.get(tool.route, input);
+  if (command === 'design save-mockup' || command === 'design save-implementation') {
+    const track = command === 'design save-mockup' ? 'mockup' : 'implemented';
+    const receipt = z
+      .object({
+        scope: z.literal(input.scope),
+        variantId: z.literal(input.variantId),
+        operationId: z.literal(input.operationId),
+        blockId: z.literal(input.capture.blockId),
+        track: z.literal(track),
+        revision: z.string().regex(/^[1-9][0-9]{0,15}$/),
+      })
+      .strict();
+    if (!receipt.safeParse(result).success) {
+      invalid();
+    }
+    return result;
+  }
   if (command === 'guides components') {
     return validateGuide(input, result);
   }

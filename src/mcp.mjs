@@ -322,7 +322,7 @@ export function createMcpServer(client) {
       schema,
       (input) => spaceRequest(client, command, input),
       tool.write,
-      { destructiveHint: false, idempotentHint: true },
+      { destructiveHint: tool.destructive, idempotentHint: true },
     );
   }
   register(

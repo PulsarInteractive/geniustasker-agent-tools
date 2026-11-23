@@ -206,3 +206,9 @@ Read selected occurrences with `guides components`. Their first four authorized
 thumbnail references follow the current source. Ask for original bytes only
 when the task requires them. Do not copy a target into the document as a
 workaround for restricted access or label a live gallery as a frozen release.
+
+Use `design save-mockup` or `design save-implementation` for an existing
+authorized image asset. Read the target and current revision, reuse the
+variant and block IDs, and keep the operation receipt. Supply known build,
+commit or release channel for an implementation. A save carries no approval.
+Use the same operation ID, timestamp and payload after a connection failure.

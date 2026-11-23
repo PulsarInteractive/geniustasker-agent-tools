@@ -425,3 +425,46 @@ test('a live gallery returns only bounded image identities from the selected des
     await assert.rejects(read(invalid), { code: 'invalid_response' });
   }
 });
+
+test('capture writers bind their receipt to the exact track, block and operation', async () => {
+  const input = {
+    scope,
+    epoch: 'qa-epoch',
+    operationId: decision.operationId,
+    issuedAt: 4000,
+    variantId: 'phone',
+    expectedRevision: null,
+    capture: { pageId: 'screen', blockId: 'hero', assetId: 'asset', title: 'Mobile' },
+  };
+  const receipt = {
+    scope,
+    variantId: 'phone',
+    blockId: 'hero',
+    track: 'implemented',
+    revision: '4',
+    operationId: input.operationId,
+  };
+  const send = client(async (path, opts) => {
+    assert.equal(path, '/api/agents/v1/memory/design/implementations');
+    assert.equal(opts.method, 'POST');
+    assert.deepEqual(opts.json, input);
+    return receipt;
+  });
+  assert.deepEqual(await spaceRequest(send, 'design save-implementation', input), receipt);
+  await assert.rejects(
+    spaceRequest(
+      client(async () => receipt),
+      'design save-mockup',
+      input,
+    ),
+    { code: 'invalid_response' },
+  );
+  await assert.rejects(
+    spaceRequest(
+      client(async () => ({ ...receipt, blockId: 'other' })),
+      'design save-implementation',
+      input,
+    ),
+    { code: 'invalid_response' },
+  );
+});
