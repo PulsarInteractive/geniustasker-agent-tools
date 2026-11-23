@@ -7,6 +7,7 @@ const commands = {
   'design grid': 'tasker_design_grid',
   'design save-mockup': 'tasker_design_save_mockup',
   'design save-implementation': 'tasker_design_save_implementation',
+  'design publish-selection': 'tasker_design_publish_selection',
   'design publish-version': 'tasker_design_publish_version',
   'design targets': 'tasker_design_targets',
   'design target': 'tasker_design_target',
@@ -42,6 +43,7 @@ const linked = z.discriminatedUnion('status', [
       scope: z.string().regex(/^(?:project|memory):[a-zA-Z0-9_-]{1,128}$/),
       targetId: z.string().regex(baseId),
       presentation: z.enum(['link', 'card', 'status', 'checklist', 'gallery', 'table']),
+      selectionPublication: z.literal(true).nullish(),
       tableColumns: z
         .array(z.enum(['status', 'review', 'track', 'revision']))
         .max(3)
@@ -66,6 +68,10 @@ const linked = z.discriminatedUnion('status', [
         .array(
           z
             .object({
+              occurrenceId: z
+                .string()
+                .regex(/^entry-(?:[1-9]|1[0-6])$/)
+                .nullish(),
               variantId: z.string().regex(baseId),
               blockId: z.string().regex(blockId),
               revision: z.string().regex(revision),
@@ -117,7 +123,12 @@ const matches = (pattern, value) => typeof value === 'string' && pattern.test(va
 function validGalleryRevision(input, item) {
   const published = item.designView?.publishedRevision;
   if (!published) {
-    return !input.publishedRevision && !item.publicationLabel;
+    return (
+      !input.publishedRevision &&
+      !item.publicationLabel &&
+      !item.selectionPublication &&
+      !item.images?.some((image) => image.occurrenceId)
+    );
   }
   const images = item.images;
   return (
@@ -127,13 +138,16 @@ function validGalleryRevision(input, item) {
     typeof item.publicationLabel === 'string' &&
     item.publicationLabel.trim().length > 0 &&
     Array.isArray(images) &&
-    unique(images.map((image) => image.blockId)) &&
+    unique(images.map((image) => image.occurrenceId ?? image.blockId)) &&
     images.every(
       (image) =>
-        image.variantId === item.targetId &&
-        image.revision === published &&
-        image.blockId !== input.afterImage &&
-        (!input.focusImage || image.blockId === input.focusImage),
+        (item.selectionPublication
+          ? !!image.occurrenceId
+          : !image.occurrenceId &&
+            image.variantId === item.targetId &&
+            image.revision === published) &&
+        (image.occurrenceId ?? image.blockId) !== input.afterImage &&
+        (!input.focusImage || (image.occurrenceId ?? image.blockId) === input.focusImage),
     )
   );
 }
@@ -464,10 +478,12 @@ export async function spaceRequest(client, command, value) {
   if (command === 'guides components') {
     return validateGuide(input, result);
   }
-  if (command === 'design publish-version') {
+  if (command === 'design publish-version' || command === 'design publish-selection') {
     const receipt = z
       .object({
-        variantId: z.literal(input.variantId),
+        ...(command === 'design publish-version'
+          ? { variantId: z.literal(input.variantId) }
+          : { pageId: z.literal(input.pageId) }),
         publishedRevision: z.literal(input.expectedRevision),
         currentRevision: z.string().regex(revision),
         label: z.literal(input.label.trim()),

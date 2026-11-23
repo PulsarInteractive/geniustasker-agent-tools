@@ -214,6 +214,8 @@ and presentation `gallery`. Point to one variant for a single visual or one
 page for a collection. Set `designView.range` to `selection` or `descendants`.
 Choose a track or a platform only when requested. Use a configured width and
 height together. Omit selectors to show all supported formats and both tracks.
+For a handoff across variants or child pages, use `design publish-selection` with a name, the anchor page revision and 1–16 ordered visual references from the grid. Keep each variant ID, block ID and revision together. Embed the receipt’s page ID and published revision in any Documentation gallery. Use the returned occurrence ID when paging or focusing on a visual. File downloads and playback use the tile’s own variant, revision and block. A stale selection requires a fresh review before publishing. Retry a transport failure with the original operation ID and timestamp. Use live galleries for working collections and named deliveries for a milestone.
+
 For a release handoff, select one variant and put its named publication's exact
 revision in `designView.publishedRevision` with `range: selection`. Changing
 the draft then leaves both the publication and the source ZIP available to
@@ -259,7 +261,7 @@ original files and does not approve a review. Storage cleanup determines which
 unreferenced source bytes can actually be reclaimed.
 
 For motion or sound, save the selected upload with `capture.mediaKind` set to
-`video` (MP4) or `audio` (MP3, AAC, M4A). A clip can be the only deliverable.
+`video` (MP4) or `audio` (MP3, AAC, M4A). A clip can be the only deliverable. For an inline MP4, prepare the original with `purpose: presentationVideo`. Movies may run up to 10 minutes and files may occupy up to 15 MB. Keep a longer movie as an ordinary attachment or use shorter clips for review.
 Use `posterBlockId` to reference a still on the same variant. Keep source ZIPs
 as ordinary attachments. Galleries return the selected block and optional
 poster; open the detail to play the original on request. Record whether a

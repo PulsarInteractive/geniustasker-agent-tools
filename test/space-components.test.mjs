@@ -718,6 +718,20 @@ test('published galleries bind media and continuation to a single retained revis
       input,
     );
   assert.equal((await read(gallery)).items[0].images[0].blockId, 'impact');
+  const edition = {
+    ...gallery,
+    selectionPublication: true,
+    images: [
+      { ...image, occurrenceId: 'entry-1', variantId: 'phone', revision: '7' },
+      { ...image, occurrenceId: 'entry-2', variantId: 'tablet', revision: '11' },
+    ],
+  };
+  assert.equal((await read(edition)).items[0].images[1].revision, '11');
+  await assert.rejects(read({ ...edition, images: [edition.images[0], edition.images[0]] }), {
+    code: 'invalid_response',
+  });
+  await assert.rejects(read({ ...edition, images: [image] }), { code: 'invalid_response' });
+
   for (const corrupt of [
     { ...gallery, publicationLabel: null },
     { ...gallery, revision: '13' },

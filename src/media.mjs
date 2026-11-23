@@ -30,7 +30,7 @@ export const mediaPrepareSchema = z
     scope: mediaScope,
     file: z.string().min(1).max(4096),
     contentType: z.enum(types).optional(),
-    purpose: z.enum(['pageCover', 'designVisual']).optional(),
+    purpose: z.enum(['pageCover', 'designVisual', 'presentationVideo']).optional(),
     epoch: z.string().min(1).max(128),
   })
   .strict();
@@ -171,13 +171,13 @@ function sessionView(value, id, size, purpose) {
     value.id !== id ||
     typeof value.ownerId !== 'string' ||
     !/^[a-zA-Z0-9_-]{1,128}$/.test(value.ownerId) ||
-    (purpose
+    (Object.hasOwn(normalizedMax, purpose)
       ? !Number.isSafeInteger(value.size) ||
         value.size < 1 ||
         value.size >
           (value.published ? normalizedMax[purpose] : Math.max(size, normalizedMax[purpose]))
       : value.size !== size) ||
-    (purpose &&
+    (Object.hasOwn(normalizedMax, purpose) &&
       value.published &&
       (typeof value.fileName !== 'string' || !value.fileName.toLowerCase().endsWith('.webp'))) ||
     typeof value.published !== 'boolean'
@@ -230,7 +230,13 @@ export class MediaJournal {
         'Choose the content type matching the filename of the selected file.',
       );
     }
-    if (input.purpose && !['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
+    if (input.purpose === 'presentationVideo' && contentType !== 'video/mp4') {
+      fail('invalid_arguments', 'Choose an MP4 file for video playback.');
+    }
+    if (
+      Object.hasOwn(normalizedMax, input.purpose) &&
+      !['image/png', 'image/jpeg', 'image/webp'].includes(contentType)
+    ) {
       fail('invalid_arguments', 'Use a PNG, JPEG or WebP file for a page cover or design visual.');
     }
     if (fileName.length > 200) {
@@ -327,9 +333,11 @@ export class MediaJournal {
         ownerId: opened.ownerId,
         scope: value.input.scope,
         published: true,
-        fileName: value.input.purpose ? finalSession.fileName : value.input.fileName,
+        fileName: Object.hasOwn(normalizedMax, value.input.purpose)
+          ? finalSession.fileName
+          : value.input.fileName,
         size: finalSession.size,
-        ...(value.input.purpose
+        ...(Object.hasOwn(normalizedMax, value.input.purpose)
           ? {
               purpose: value.input.purpose,
               sourceSha256: value.input.sha256,

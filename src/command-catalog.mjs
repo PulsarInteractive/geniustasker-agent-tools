@@ -394,6 +394,15 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.publishDesignSelection": {
+      "action": "publishDesignSelection",
+      "fields": [
+        "label",
+        "items"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.restore": {
       "action": "restoreMemoryVersion",
       "fields": [
