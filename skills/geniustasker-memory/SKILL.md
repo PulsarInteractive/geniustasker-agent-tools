@@ -223,6 +223,17 @@ as `afterImage`. Stop at `hasMoreImages: false`. A frozen link requires
 current access to the target plus history and media permissions. Report a
 missing grant if the publication cannot be opened.
 
+To embed a backlog, choose the project's existing shared task filter as the target
+of a `task` component with presentation `table`. It follows the filter's active
+tickets. For a Design review table, point a `design` component at the screen,
+variant or branch and select the configured track, format, verdict or criterion
+needed for the question. Each row opens its task or exact visual. Zero configured
+criteria means the visual has no criteria to check. Only report approval if there
+are criteria and all have passed. Read up to four rows per occurrence; when
+`hasMoreRows` is true, resolve that one occurrence to get `nextRowCursor`, then
+pass it as `rowCursor` with the same source page and occurrence. A changed view
+requires a fresh first window. Store the selection rather than copying its rows.
+
 Read live occurrences with `guides components`. Their first four authorized
 thumbnail references follow the current source. Ask for original bytes only
 when the task requires them. Do not copy a target into the document as a

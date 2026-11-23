@@ -87,6 +87,55 @@ test('one selected component batch respects grant placeholders and the byte and 
   }
   assert.equal(spaceCommands.get('guides components').tool.write, false);
 });
+test('live task and review tables validate their projected rows and single-occurrence continuation', async () => {
+  const task = {
+    ...available,
+    presentation: 'table',
+    rows: [{ id: 'issue', title: 'Record stems', revision: '1', taskStatus: 'New' }],
+    hasMoreRows: true,
+  };
+  const design = {
+    ...task,
+    blockId: 'linked',
+    kind: 'design',
+    scope: 'memory:art',
+    targetId: 'print',
+    rows: [
+      {
+        id: 'proof',
+        blockId: 'front',
+        track: 'mockup',
+        title: 'Print proof',
+        revision: '4',
+        criteria: 3,
+        approved: 1,
+        rejected: 1,
+      },
+    ],
+    hasMoreRows: false,
+  };
+  const send = (q, items) =>
+    spaceRequest(
+      client(async () => ({ ...response, items })),
+      'guides components',
+      q,
+    );
+  assert.equal((await send(query, [task, design])).items.length, 2);
+  const one = { ...query, blockIds: ['work'] };
+  await send(one, [{ ...task, nextRowCursor: 'window' }]);
+  await send({ ...one, rowCursor: 'window' }, [{ ...task, hasMoreRows: false, rows: [] }]);
+  for (const value of [
+    { ...task, nextRowCursor: 'window', rows: design.rows },
+    { ...design, blockId: 'work', rows: [{ ...design.rows[0], approved: 3 }] },
+    { ...task, hasMoreRows: false, rows: Array(5).fill(task.rows[0]) },
+    { ...task, nextRowCursor: 'window', images: [] },
+    { ...task },
+  ]) {
+    await assert.rejects(send(one, [value]), { code: 'invalid_response' });
+  }
+  await assert.rejects(send({ ...query, rowCursor: 'window' }, []), { code: 'invalid_arguments' });
+});
+
 test('linked Guide cards carry their derived inline preview and keep inaccessible cards opaque', async () => {
   const plain = {
     blockId: 'work',

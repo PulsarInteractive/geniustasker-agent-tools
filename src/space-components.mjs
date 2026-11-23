@@ -38,10 +38,12 @@ const linked = z.discriminatedUnion('status', [
       kind: z.enum(['guide', 'design', 'skill', 'task']),
       scope: z.string().regex(/^(?:project|memory):[a-zA-Z0-9_-]{1,128}$/),
       targetId: z.string().regex(baseId),
-      presentation: z.enum(['link', 'card', 'status', 'checklist', 'gallery']),
+      presentation: z.enum(['link', 'card', 'status', 'checklist', 'gallery', 'table']),
       designView: z
         .object({
           range: z.enum(['selection', 'descendants']),
+          verdict: z.enum(['approved', 'rejected', 'unchecked']).nullish(),
+          criterionId: z.string().min(1).max(160).nullish(),
           publishedRevision: z.string().regex(revision).nullish(),
           track: z.enum(['mockup', 'implemented']).nullish(),
           platform: z.string().max(60).nullish(),
@@ -66,6 +68,26 @@ const linked = z.discriminatedUnion('status', [
         )
         .max(4)
         .nullish(),
+      rows: z
+        .array(
+          z
+            .object({
+              id: z.string().regex(baseId),
+              title: z.string().max(160),
+              revision: z.string().regex(revision),
+              blockId: z.string().regex(blockId).nullish(),
+              taskStatus: z.string().max(60).nullish(),
+              track: z.enum(['mockup', 'implemented']).nullish(),
+              approved: z.number().int().min(0).max(64).nullish(),
+              rejected: z.number().int().min(0).max(64).nullish(),
+              criteria: z.number().int().min(0).max(64).nullish(),
+            })
+            .strict(),
+        )
+        .max(4)
+        .nullish(),
+      nextRowCursor: z.string().min(1).max(8192).nullish(),
+      hasMoreRows: z.boolean().nullish(),
       hasMoreImages: z.boolean().nullish(),
       publicationLabel: z.string().max(80).nullish(),
       title: z.string(),
@@ -106,6 +128,65 @@ function validGalleryRevision(input, item) {
   );
 }
 
+function validPresentation(input, item) {
+  const tableFields = [item.rows, item.hasMoreRows, item.nextRowCursor];
+  const galleryFields = [item.images, item.hasMoreImages, item.publicationLabel];
+  const absent = (fields) => fields.every((field) => field === null || field === undefined);
+  if (item.presentation === 'table') {
+    if (
+      !absent(galleryFields) ||
+      item.designView?.publishedRevision ||
+      input.publishedRevision ||
+      !Array.isArray(item.rows) ||
+      typeof item.hasMoreRows !== 'boolean'
+    ) {
+      return false;
+    }
+    if (
+      item.nextRowCursor &&
+      (!item.hasMoreRows || input.blockIds.length !== 1 || item.nextRowCursor === input.rowCursor)
+    ) {
+      return false;
+    }
+    if (item.hasMoreRows && input.blockIds.length === 1 && !item.nextRowCursor) {
+      return false;
+    }
+    if (item.kind === 'task') {
+      return (
+        !item.designView &&
+        item.scope.startsWith('project:') &&
+        unique(item.rows.map((row) => row.id)) &&
+        item.rows.every(
+          (row) =>
+            typeof row.taskStatus === 'string' &&
+            absent([row.track, row.blockId, row.approved, row.rejected, row.criteria]),
+        )
+      );
+    }
+    return (
+      item.kind === 'design' &&
+      item.scope.startsWith('memory:') &&
+      unique(item.rows.map((row) => JSON.stringify([row.id, row.blockId]))) &&
+      item.rows.every(
+        (row) =>
+          row.blockId &&
+          row.track &&
+          (row.taskStatus === null || row.taskStatus === undefined) &&
+          Number.isInteger(row.approved) &&
+          Number.isInteger(row.rejected) &&
+          Number.isInteger(row.criteria) &&
+          row.approved + row.rejected <= row.criteria,
+      )
+    );
+  }
+  if (input.rowCursor || !absent(tableFields)) {
+    return false;
+  }
+  return item.presentation === 'gallery'
+    ? item.kind === 'design' && validGalleryRevision(input, item)
+    : !input.publishedRevision && absent([...galleryFields, item.designView]);
+}
+
 function validateGuide(input, result) {
   if (
     result?.scope !== input.scope ||
@@ -126,12 +207,7 @@ function validateGuide(input, result) {
       (item) =>
         linked.safeParse(item).success &&
         selected.delete(item.blockId) &&
-        (item.status !== 'available' ||
-          (item.presentation === 'gallery'
-            ? item.kind === 'design' && validGalleryRevision(input, item)
-            : [item.images, item.hasMoreImages, item.designView, item.publicationLabel].every(
-                (field) => field === null || field === undefined,
-              ))),
+        (item.status !== 'available' || validPresentation(input, item)),
     )
   ) {
     invalid();
@@ -205,6 +281,8 @@ export async function spaceRequest(client, command, value) {
       !input.blockIds.every((id) => matches(blockId, id)) ||
       ((input.afterImage || input.focusImage) && !input.publishedRevision) ||
       (input.focusImage && input.afterImage) ||
+      (typeof input.rowCursor === 'string' &&
+        (!input.rowCursor || input.blockIds.length !== 1 || input.publishedRevision)) ||
       (input.publishedRevision && input.blockIds.length !== 1))
   ) {
     fail(
