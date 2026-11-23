@@ -4351,5 +4351,123 @@
     "method": "POST",
     "write": true,
     "destructive": false
+  },
+  {
+    "name": "tasker_design_target",
+    "title": "Read Design delivery expectations",
+    "route": "memory/design/target",
+    "scopes": ["memory:read"],
+    "description": "Read independent mockup and implementation expectations plus visible evidence for one tracked Design page, including an empty target. Unknown reflects restricted access. A visible example is not approval.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136
+        },
+        "pageId": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "required": ["scope", "pageId"],
+      "additionalProperties": false
+    },
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_design_mockups",
+    "title": "Find Design mockups",
+    "route": "memory/design/mockups",
+    "scopes": ["memory:read"],
+    "description": "Read authorized mockup image references for one filtered page of results. Filter by screen, platform, resolution or verdict. Open only the selected image.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136
+        },
+        "pageId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "platform": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["unchecked", "approved", "rejected"],
+          "maxLength": 32
+        },
+        "cursor": {
+          "type": "string",
+          "maxLength": 250
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "write": false,
+    "destructive": false
+  },
+  {
+    "name": "tasker_design_implementations",
+    "title": "Find implemented Design screens",
+    "route": "memory/design/implementations",
+    "scopes": ["memory:read"],
+    "description": "Read authorized implementation captures by screen, platform, resolution or verdict. A capture can exist without any mockup. Open only the selected image.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136
+        },
+        "pageId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "platform": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["unchecked", "approved", "rejected"],
+          "maxLength": 32
+        },
+        "cursor": {
+          "type": "string",
+          "maxLength": 250
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "write": false,
+    "destructive": false
   }
 ]

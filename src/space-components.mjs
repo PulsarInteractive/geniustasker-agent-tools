@@ -5,6 +5,9 @@ import { fail } from './errors.mjs';
 const commands = {
   'guides components': 'tasker_guide_components',
   'design grid': 'tasker_design_grid',
+  'design target': 'tasker_design_target',
+  'design mockups': 'tasker_design_mockups',
+  'design implementations': 'tasker_design_implementations',
   'design review': 'tasker_design_grid_decisions',
 };
 export const spaceCommands = new Map(
@@ -162,6 +165,42 @@ export async function spaceRequest(client, command, value) {
       : await client.get(tool.route, input);
   if (command === 'guides components') {
     return validateGuide(input, result);
+  }
+  if (command === 'design target') {
+    if (
+      result?.scope !== input.scope ||
+      result.pageId !== input.pageId ||
+      !matches(revision, result.revision)
+    ) {
+      invalid();
+    }
+    for (const track of ['mockup', 'implemented']) {
+      const evidence = result[track];
+      if (
+        !['required', 'deferred', 'not-applicable'].includes(evidence?.expected) ||
+        evidence.expected !== result.expectation?.[track] ||
+        !['available', 'missing', 'unknown'].includes(evidence.presence)
+      ) {
+        invalid();
+      }
+      if (
+        evidence.presence === 'available'
+          ? !matches(baseId, evidence.example?.variantId) ||
+            !matches(revision, evidence.example?.revision)
+          : evidence.example !== null
+      ) {
+        invalid();
+      }
+    }
+    return result;
+  }
+  if (command === 'design mockups' || command === 'design implementations') {
+    validateGrid({ ...input, includeTotals: false }, result);
+    const track = command === 'design mockups' ? 'mockup' : 'implemented';
+    if (result.items.some((item) => item.track !== track)) {
+      invalid();
+    }
+    return result;
   }
   if (command === 'design grid') {
     return validateGrid(input, result);

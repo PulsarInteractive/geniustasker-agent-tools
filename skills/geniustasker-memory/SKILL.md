@@ -189,3 +189,10 @@ the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
 
 A Guide displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.
+
+For a Design page with delivery expectations, read `design target` before
+proposing work. Each track has a requirement and separately observed evidence.
+Report `unknown` as limited visibility. Use `design mockups` or
+`design implementations` with the selected screen and configured resolution.
+An example is evidence of a visible file. Check the exact revisions and review
+decisions separately before saying the implementation was approved.

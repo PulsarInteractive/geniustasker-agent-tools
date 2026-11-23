@@ -350,3 +350,40 @@ test('each scoped resource listing advertises the bounded filename prefix', () =
     assert.equal(t.inputSchema.properties.query.minLength, 1);
   }
 });
+
+test('delivery tools preserve the visible track and distinguish unknown from missing', async () => {
+  const input = { scope, pageId: 'phone' };
+  const evidence = { expected: 'required', presence: 'unknown', example: null };
+  const target = {
+    ...input,
+    revision: '8',
+    expectation: { mockup: 'required', implemented: 'required' },
+    mockup: evidence,
+    implemented: evidence,
+  };
+  const get = async (path, selector) => {
+    assert.equal(path, 'memory/design/target');
+    assert.deepEqual(selector, input);
+    return target;
+  };
+  assert.deepEqual(await spaceRequest({ get }, 'design target', input), target);
+  await assert.rejects(
+    spaceRequest(
+      {
+        get: async () => ({
+          ...target,
+          implemented: { ...evidence, example: { variantId: 'private', revision: '4' } },
+        }),
+      },
+      'design target',
+      input,
+    ),
+  );
+  const page = {
+    scope,
+    nextCursor: null,
+    items: [{ variantId: 'v', revision: '3', blockId: 'image', track: 'mockup', cells: [] }],
+  };
+  assert.deepEqual(await spaceRequest({ get: async () => page }, 'design mockups', input), page);
+  await assert.rejects(spaceRequest({ get: async () => page }, 'design implementations', input));
+});
