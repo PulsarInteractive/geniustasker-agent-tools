@@ -8,6 +8,7 @@ import { spaceCommands, spaceRequest } from '../src/space-components.mjs';
 import { readMemoryPages } from '../src/memory-read-pages.mjs';
 import { compareMedia, MediaJournal } from '../src/media.mjs';
 import { readFile } from 'node:fs/promises';
+import { fixture } from './helpers.mjs';
 import { Transport } from '../src/transport.mjs';
 import tools from '../remote/tool-catalog.json' with { type: 'json' };
 
@@ -44,6 +45,131 @@ const decision = {
   ],
 };
 
+test('all public space GET tools reach their exact transport path through the installed delegated client', async (t) => {
+  const routes = [...spaceCommands.values()]
+    .map((v) => v.tool)
+    .filter((tool) => (tool.method ?? 'GET') === 'GET');
+  assert.ok(routes.some((tool) => tool.route === 'memory/design/mockups'));
+  const visited = [];
+  const f = await fixture(t, async (url) => {
+    visited.push(url.pathname);
+    return Response.json({ items: [] });
+  });
+  for (const tool of routes) {
+    await f.client.get(tool.route, { scope });
+  }
+  assert.deepEqual(
+    visited,
+    routes.map((tool) => '/api/agents/v1/' + tool.route),
+  );
+  await assert.rejects(f.client.get('memory/design/reviews', { scope }), {
+    code: 'invalid_arguments',
+  });
+});
+test('design changes validate the whole window before advancing across inaccessible media', async () => {
+  const page = {
+    scope,
+    collection: 'pageIndex',
+    epoch: 'epoch',
+    checkpoint: '19',
+    items: [],
+    omittedIds: [],
+    nextCursor: 'next',
+    hasMore: true,
+    pollAfterSeconds: 30,
+  };
+  assert.deepEqual(
+    await spaceRequest({ get: async () => page }, 'design changes', { scope }),
+    page,
+  );
+  await assert.rejects(
+    spaceRequest(
+      {
+        get: async () => ({
+          ...page,
+          items: [
+            {
+              kind: 'remove',
+              id: 'private',
+              revision: '2',
+              data: { kind: 'page', title: 'hidden' },
+            },
+          ],
+        }),
+      },
+      'design changes',
+      { scope, cursor: 'before' },
+    ),
+    { code: 'invalid_response' },
+  );
+});
+test('conformity receipts keep exact source, implementation, verdict and operation', async () => {
+  const review = {
+    target: { variantId: 'shared', revision: '3' },
+    evidence: { variantId: 'phone', revision: '9' },
+    verdict: 'approved',
+  };
+  const input = { scope, epoch: 'e', operationId: decision.operationId, issuedAt: 4000, review };
+  const result = {
+    scope,
+    operationId: input.operationId,
+    decisionId: input.operationId,
+    revision: '12',
+    review,
+  };
+  assert.deepEqual(
+    await spaceRequest(
+      client(async () => result),
+      'design compare-review',
+      input,
+    ),
+    result,
+  );
+  const other = {
+    ...result,
+    review: { ...review, evidence: { ...review.evidence, revision: '10' } },
+  };
+  await assert.rejects(
+    spaceRequest(
+      client(async () => other),
+      'design compare-review',
+      input,
+    ),
+    { code: 'invalid_response' },
+  );
+  const comparisons = {
+    scope,
+    epoch: 'e',
+    checkpoint: '12',
+    nextCursor: null,
+    items: [
+      {
+        id: 'decision',
+        revision: '12',
+        kind: 'design-review',
+        title: 'Print approval',
+        summary: 'Verified',
+        origin: review.target,
+        evidence: review.evidence,
+        verdict: review.verdict,
+      },
+    ],
+  };
+  assert.deepEqual(
+    await spaceRequest({ get: async () => comparisons }, 'design comparisons', {
+      scope,
+      variantId: 'shared',
+    }),
+    comparisons,
+  );
+  await assert.rejects(
+    spaceRequest({ get: async () => comparisons }, 'design comparisons', {
+      scope,
+      variantId: 'other',
+    }),
+    { code: 'invalid_response' },
+  );
+});
 test('one selected component batch respects grant placeholders and the byte and block boundaries', async () => {
   let calls = 0;
   const c = client(async (path, opts) => {

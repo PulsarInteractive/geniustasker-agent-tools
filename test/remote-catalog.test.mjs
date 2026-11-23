@@ -26,6 +26,7 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
           : ![
               'tasker_attachment_add',
               'tasker_design_grid_decisions',
+              'tasker_design_conformity',
               'tasker_design_publish_version',
             ].includes(tool.name) && !tool.name.endsWith('_cleanup_preview'),
       );

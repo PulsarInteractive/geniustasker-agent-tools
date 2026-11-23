@@ -12,6 +12,9 @@ const commands = {
   'design target': 'tasker_design_target',
   'design mockups': 'tasker_design_mockups',
   'design implementations': 'tasker_design_implementations',
+  'design changes': 'tasker_design_changes',
+  'design comparisons': 'tasker_design_comparisons',
+  'design compare-review': 'tasker_design_conformity',
   'design review': 'tasker_design_grid_decisions',
 };
 export const spaceCommands = new Map(
@@ -312,6 +315,107 @@ export async function spaceRequest(client, command, value) {
           token: await client.accessToken(),
         })
       : await client.get(tool.route, input);
+  if (command === 'design changes') {
+    const item = z
+      .object({
+        id: z.string().regex(baseId),
+        revision: z.string().regex(revision),
+        kind: z.enum(['remove', 'upsert']),
+        data: z
+          .object({
+            title: z.string().max(160),
+            kind: z.string().max(60),
+            track: z.enum(['mockup', 'implemented']).optional(),
+          })
+          .strict()
+          .nullable(),
+      })
+      .strict();
+    const page = z
+      .object({
+        scope: z.literal(input.scope),
+        epoch: z.string().min(1),
+        collection: z.literal('pageIndex'),
+        checkpoint: z.string().regex(revision),
+        items: z.array(item).max(16),
+        omittedIds: z.array(z.never()).max(0),
+        nextCursor: z.string().min(1).max(256),
+        hasMore: z.boolean(),
+        pollAfterSeconds: z.number().int().positive(),
+      })
+      .strict();
+    if (
+      !page.safeParse(result).success ||
+      result.items.some((row) => (row.kind === 'remove') !== (row.data === null))
+    ) {
+      invalid();
+    }
+    return result;
+  }
+  if (command === 'design comparisons' || command === 'design compare-review') {
+    const pointer = z
+      .object({ variantId: z.string().regex(baseId), revision: z.string().regex(revision) })
+      .strict();
+    const verdict = z.enum(['requested', 'changes-requested', 'approved']);
+    if (command === 'design comparisons') {
+      const entry = z
+        .object({
+          id: z.string().regex(baseId),
+          revision: z.string().regex(revision),
+          title: z.string(),
+          summary: z.string(),
+          kind: z.literal('design-review'),
+          origin: pointer.extend({ variantId: z.literal(input.variantId) }),
+          evidence: pointer.nullish(),
+          verdict,
+        })
+        .strict();
+      if (
+        !z
+          .object({
+            scope: z.literal(input.scope),
+            epoch: z.string(),
+            checkpoint: z.string().regex(revision),
+            items: z.array(entry).max(16),
+            nextCursor: z.string().min(1).max(220).nullable(),
+          })
+          .strict()
+          .safeParse(result).success ||
+        !unique(result.items.map((v) => v.id)) ||
+        (result.nextCursor && result.nextCursor === input.cursor)
+      ) {
+        invalid();
+      }
+    } else {
+      const exact = (ref) =>
+        z
+          .object({ variantId: z.literal(ref.variantId), revision: z.literal(ref.revision) })
+          .strict();
+      if (
+        !z
+          .object({
+            scope: z.literal(input.scope),
+            operationId: z.literal(input.operationId),
+            decisionId: z.literal(input.operationId),
+            revision: z.string().regex(revision),
+            review: z
+              .object({
+                target: exact(input.review.target),
+                verdict: z.literal(input.review.verdict),
+                evidence: input.review.evidence
+                  ? exact(input.review.evidence)
+                  : z.null().optional(),
+              })
+              .strict(),
+          })
+          .strict()
+          .safeParse(result).success
+      ) {
+        invalid();
+      }
+    }
+    return result;
+  }
   if (command === 'design save-mockup' || command === 'design save-implementation') {
     const track = command === 'design save-mockup' ? 'mockup' : 'implemented';
     const receipt = z
@@ -391,6 +495,7 @@ export async function spaceRequest(client, command, value) {
     if (
       !queue.safeParse(result).success ||
       !unique(result.items.map((row) => row.pageId)) ||
+      (input.pageId && result.items.some((row) => row.pageId !== input.pageId)) ||
       (result.nextCursor !== null && result.nextCursor === input.cursor)
     ) {
       invalid();

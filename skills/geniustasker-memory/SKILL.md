@@ -259,3 +259,15 @@ Use `posterBlockId` to reference a still on the same variant. Keep source ZIPs
 as ordinary attachments. Galleries return the selected block and optional
 poster; open the detail to play the original on request. Record whether a
 decision came from playback, an image sequence or a still.
+
+For a release question, read `design targets` for the declared release channel,
+page and track. An implementation from another channel does not fill a missing
+delivery. A shared mockup explicitly marked `sharedAcrossPlatforms` can support
+separate comparisons against iOS and Android at the same format and context.
+Read `design comparisons` for the selected reference. Check the exact mockup
+and implementation revisions against the current files before reporting a
+decision. Use `design compare-review` only for the requested pair and with
+reviewer authority. Give each independent platform its own decision. An image
+criterion and a comparison verdict answer different questions.
+
+To track a large Design library, mark the present with `design changes` before listing it. Follow the returned cursor after the inventory. Apply visible changes by increasing revision and keep the cursor only after processing the whole window. A reset requires discarding old headers and previews before a fresh inventory.
