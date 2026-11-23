@@ -256,7 +256,11 @@ choose among multiple matches. Preserve an unmatched section and its own
 review state. Use `beforeBlockId` only for an intentional move. Reusing a
 published reference or changing a landmark requires no asset upload.
 Documentation galleries can follow a sequence or show one cover per series.
-A named publication retains its own order and revisions.
+A named publication retains its own order and revisions. To compare two
+published occurrences, resolve each through the authorized Documentation
+component with its own focusImage and the same publication revision. Use each
+returned source revision and landmark. If one is unavailable, show the
+available side and report the missing access.
 
 Use `design save-mockup` or `design save-implementation` for an existing
 authorized image asset. Read the target and current revision, reuse the
