@@ -717,6 +717,7 @@ test('published galleries bind media and continuation to a single retained revis
     blockId: 'impact',
     revision: '12',
     title: 'Impact',
+    landmarks: [{ key: 'contact', label: 'Contact', x: 100, y: 200, width: 5000, height: 1000 }],
     track: 'mockup',
   };
   const gallery = {

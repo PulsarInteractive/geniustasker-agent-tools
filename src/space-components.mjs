@@ -69,6 +69,7 @@ const linked = z.discriminatedUnion('status', [
         .array(
           z
             .object({
+              landmarks: z.custom((value) => validLandmarks(value)).nullish(),
               seriesCount: z.number().int().min(1).max(64).nullish(),
               occurrenceId: z
                 .string()
@@ -268,7 +269,6 @@ function validateGuide(input, result) {
 }
 
 function validCapturePosition(item) {
-  const marks = item.landmarks ?? [];
   return (
     Number.isInteger(item.frameOrder) &&
     item.frameOrder >= 0 &&
@@ -276,6 +276,12 @@ function validCapturePosition(item) {
     Number.isInteger(item.seriesCount) &&
     item.seriesCount > 0 &&
     item.seriesCount <= 64 &&
+    validLandmarks(item.landmarks ?? [])
+  );
+}
+
+function validLandmarks(marks) {
+  return (
     Array.isArray(marks) &&
     marks.length <= 12 &&
     unique(marks.map((mark) => mark?.key)) &&
