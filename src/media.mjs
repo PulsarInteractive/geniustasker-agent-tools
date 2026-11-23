@@ -20,6 +20,10 @@ const types = [
   'application/zip',
   'text/html',
   'text/plain',
+  'video/mp4',
+  'audio/mpeg',
+  'audio/aac',
+  'audio/mp4',
 ];
 export const mediaPrepareSchema = z
   .object({
@@ -204,20 +208,26 @@ export class MediaJournal {
       id = randomUUID(),
       store = this.store(id);
     const fileName = basename(path);
-    const sourceType = /\.zip$/i.test(fileName)
-      ? 'application/zip'
-      : /\.html?$/i.test(fileName)
-        ? 'text/html'
-        : undefined;
+    const extension = fileName.split('.').pop().toLowerCase();
+    const formats = new Map([
+      ['zip', 'application/zip'],
+      ['html', 'text/html'],
+      ['htm', 'text/html'],
+      ['mp4', 'video/mp4'],
+      ['m4v', 'video/mp4'],
+      ['mp3', 'audio/mpeg'],
+      ['aac', 'audio/aac'],
+      ['m4a', 'audio/mp4'],
+    ]);
+    const sourceType = formats.get(extension);
     const contentType = input.contentType ?? sourceType;
     if (
       !contentType ||
-      ((sourceType || ['application/zip', 'text/html'].includes(contentType)) &&
-        contentType !== sourceType)
+      ((sourceType || [...formats.values()].includes(contentType)) && contentType !== sourceType)
     ) {
       fail(
         'invalid_arguments',
-        'Choose the content type matching this file. Design sources use .zip or .html.',
+        'Choose the content type matching the filename of the selected file.',
       );
     }
     if (input.purpose && !['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
