@@ -6,6 +6,8 @@ import * as z from 'zod/v4';
 import { CredentialStore } from './store.mjs';
 import { operationIdSchema } from './commands.mjs';
 import { AgentError, fail } from './errors.mjs';
+import { memoryImageSchema } from './memory-image.mjs';
+import { readMemoryImagePixels } from './memory-image-pixels.mjs';
 
 const mediaScope = z.string().regex(/^memory:[a-zA-Z0-9_-]{1,128}$/);
 const types = [
@@ -18,12 +20,17 @@ const types = [
   'application/zip',
   'text/html',
   'text/plain',
+  'video/mp4',
+  'audio/mpeg',
+  'audio/aac',
+  'audio/mp4',
 ];
 export const mediaPrepareSchema = z
   .object({
     scope: mediaScope,
     file: z.string().min(1).max(4096),
     contentType: z.enum(types).optional(),
+    purpose: z.enum(['pageCover', 'designVisual', 'presentationVideo']).optional(),
     epoch: z.string().min(1).max(128),
   })
   .strict();
@@ -130,14 +137,20 @@ export async function compareMedia(client, value) {
   ) {
     fail('invalid_response', 'The resource has an invalid verified digest or size.');
   }
-  const sha256 = digest(bytes),
-    identical = sha256 === remoteDigest && bytes.length === asset.data.sizeBytes;
+  const sourceSha256 = asset.data.sourceSha256;
+  if (sourceSha256 !== null && sourceSha256 !== undefined && !/^[a-f0-9]{64}$/.test(sourceSha256)) {
+    fail('invalid_response', 'The published asset has an invalid source digest.');
+  }
+  const sha256 = digest(bytes);
+  const identical =
+    sha256 === sourceSha256 || (sha256 === remoteDigest && bytes.length === asset.data.sizeBytes);
   return {
     scope: input.scope,
     assetId: input.id,
     revision: asset.revision,
     sha256,
     remoteSha256: remoteDigest,
+    ...(sourceSha256 ? { sourceSha256 } : {}),
     identical,
     downloaded,
     recommendation: identical
@@ -151,13 +164,22 @@ const binding = (session) => ({
   profileId: session.profile_id,
   sessionId: session.session_id,
 });
-function sessionView(value, id, size) {
+const normalizedMax = { pageCover: 800000, designVisual: 1500000 };
+function sessionView(value, id, size, purpose) {
   if (
     !value ||
     value.id !== id ||
     typeof value.ownerId !== 'string' ||
     !/^[a-zA-Z0-9_-]{1,128}$/.test(value.ownerId) ||
-    value.size !== size ||
+    (Object.hasOwn(normalizedMax, purpose)
+      ? !Number.isSafeInteger(value.size) ||
+        value.size < 1 ||
+        value.size >
+          (value.published ? normalizedMax[purpose] : Math.max(size, normalizedMax[purpose]))
+      : value.size !== size) ||
+    (Object.hasOwn(normalizedMax, purpose) &&
+      value.published &&
+      (typeof value.fileName !== 'string' || !value.fileName.toLowerCase().endsWith('.webp'))) ||
     typeof value.published !== 'boolean'
   ) {
     fail('invalid_response', 'The attachment session did not match the prepared file.');
@@ -186,21 +208,36 @@ export class MediaJournal {
       id = randomUUID(),
       store = this.store(id);
     const fileName = basename(path);
-    const sourceType = /\.zip$/i.test(fileName)
-      ? 'application/zip'
-      : /\.html?$/i.test(fileName)
-        ? 'text/html'
-        : undefined;
+    const extension = fileName.split('.').pop().toLowerCase();
+    const formats = new Map([
+      ['zip', 'application/zip'],
+      ['html', 'text/html'],
+      ['htm', 'text/html'],
+      ['mp4', 'video/mp4'],
+      ['m4v', 'video/mp4'],
+      ['mp3', 'audio/mpeg'],
+      ['aac', 'audio/aac'],
+      ['m4a', 'audio/mp4'],
+    ]);
+    const sourceType = formats.get(extension);
     const contentType = input.contentType ?? sourceType;
     if (
       !contentType ||
-      ((sourceType || ['application/zip', 'text/html'].includes(contentType)) &&
-        contentType !== sourceType)
+      ((sourceType || [...formats.values()].includes(contentType)) && contentType !== sourceType)
     ) {
       fail(
         'invalid_arguments',
-        'Choose the content type matching this file. Design sources use .zip or .html.',
+        'Choose the content type matching the filename of the selected file.',
       );
+    }
+    if (input.purpose === 'presentationVideo' && contentType !== 'video/mp4') {
+      fail('invalid_arguments', 'Choose an MP4 file for video playback.');
+    }
+    if (
+      Object.hasOwn(normalizedMax, input.purpose) &&
+      !['image/png', 'image/jpeg', 'image/webp'].includes(contentType)
+    ) {
+      fail('invalid_arguments', 'Use a PNG, JPEG or WebP file for a page cover or design visual.');
     }
     if (fileName.length > 200) {
       fail('invalid_arguments', 'Use a filename of at most 200 characters.');
@@ -220,6 +257,7 @@ export class MediaJournal {
           contentType,
           fileName,
           kind: 'memory',
+          ...(input.purpose ? { purpose: input.purpose } : {}),
         },
       }),
     );
@@ -229,6 +267,7 @@ export class MediaJournal {
       fileName,
       size: bytes.length,
       sha256: digest(bytes),
+      ...(input.purpose ? { purpose: input.purpose } : {}),
       prepared: true,
     };
   }
@@ -259,7 +298,9 @@ export class MediaJournal {
         }),
         id,
         bytes.length,
+        value.input.purpose,
       );
+      let finalSession = opened;
       const query = { scope: value.input.scope, ownerId: opened.ownerId, id };
       if (!opened.published) {
         await transport.request('/api/agents/v1/media/content', {
@@ -276,7 +317,9 @@ export class MediaJournal {
           }),
           id,
           bytes.length,
+          value.input.purpose,
         );
+        finalSession = published;
         if (!published.published) {
           fail(
             'media_not_published',
@@ -290,9 +333,17 @@ export class MediaJournal {
         ownerId: opened.ownerId,
         scope: value.input.scope,
         published: true,
-        fileName: value.input.fileName,
-        size: bytes.length,
-        sha256: value.input.sha256,
+        fileName: Object.hasOwn(normalizedMax, value.input.purpose)
+          ? finalSession.fileName
+          : value.input.fileName,
+        size: finalSession.size,
+        ...(Object.hasOwn(normalizedMax, value.input.purpose)
+          ? {
+              purpose: value.input.purpose,
+              sourceSha256: value.input.sha256,
+              sourceSize: bytes.length,
+            }
+          : { sha256: value.input.sha256 }),
       };
     }, this.client.transport.signal);
   }
@@ -313,6 +364,23 @@ export async function downloadMedia(client, value) {
     binary: true,
     token: await client.accessToken(),
   });
+  return saveMediaFile(file, bytes);
+}
+
+/** Bind a local preview to the same page, block and revision selection as MCP. */
+export async function downloadPageImage(client, file, value) {
+  if (typeof file !== 'string' || file.length < 1 || file.length > 4096) {
+    fail('invalid_arguments', 'Choose a new file for the selected WebP image.');
+  }
+  const selection = memoryImageSchema.safeParse(value);
+  if (!selection.success) {
+    fail('invalid_arguments', 'Select one authorized page, image block and revision.');
+  }
+  const { bytes, metadata } = await readMemoryImagePixels(client, selection.data);
+  return { ...metadata, ...(await saveMediaFile(file, bytes)) };
+}
+
+async function saveMediaFile(file, bytes) {
   const path = resolve(file);
   const handle = await open(path, 'wx', 0o600);
   try {

@@ -53,7 +53,53 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     requests.push(request.url);
     response.setHeader('Content-Type', 'application/json');
     const url = new URL(request.url, 'http://local');
-    if (url.pathname.endsWith('/knowledge')) {
+    if (url.pathname.endsWith('/memory/tree')) {
+      assert.equal(request.method, 'GET');
+      assert.equal(url.searchParams.get('outline'), 'home');
+      response.end(
+        JSON.stringify({
+          scope: 'memory:one',
+          epoch: 'e',
+          checkpoint: '7',
+          accessRevision: '3',
+          parentId: null,
+          title: 'Studio',
+          parent: null,
+          version: 'a'.repeat(64),
+          etag: 'a'.repeat(64),
+          notModified: false,
+          items: [],
+          totalChildren: 0,
+          nextAfter: null,
+          home: {
+            kind: 'skills',
+            description: 'Print procedures',
+            destinations: ['pages', 'skills', 'settings'],
+          },
+        }),
+      );
+    } else if (url.pathname.endsWith('/memory/guide-components')) {
+      assert.equal(request.method, 'POST');
+      response.end(
+        JSON.stringify({
+          scope: 'memory:one',
+          pageId: 'guide',
+          revision: '2',
+          items: [{ blockId: 'policy', status: 'unavailable' }],
+        }),
+      );
+    } else if (url.pathname.endsWith('/memory/design-grid')) {
+      response.end(
+        JSON.stringify({
+          scope: 'memory:one',
+          epoch: 'e',
+          checkpoint: '5',
+          nextCursor: null,
+          items: [],
+          counts: { media: 0, unchecked: 0, approved: 0, rejected: 0 },
+        }),
+      );
+    } else if (url.pathname.endsWith('/knowledge')) {
       const mode = url.searchParams.get('mode');
       response.end(
         JSON.stringify({
@@ -161,6 +207,9 @@ test('official MCP client discovers strict tools and reads pages over real stdio
   const names = new Set(listing.tools.map((tool) => tool.name));
   assert.equal(names.size, listing.tools.length);
   for (const name of [
+    'tasker_design_grid',
+    'tasker_guide_components',
+    'tasker_design_grid_decisions',
     'tasker_storage_files',
     'tasker_storage_tickets',
     'tasker_storage_selection',
@@ -174,6 +223,28 @@ test('official MCP client discovers strict tools and reads pages over real stdio
     assert.ok(names.has(name), name);
   }
   assert.ok(listing.tools.some((tool) => tool.name === 'tasker_workflow'));
+  const opening = await client.callTool({
+    name: 'tasker_memory_tree',
+    arguments: { scope: 'memory:one', outline: 'home' },
+  });
+  assert.deepEqual(opening.structuredContent.data.home.destinations, [
+    'pages',
+    'skills',
+    'settings',
+  ]);
+  const components = await client.callTool({
+    name: 'tasker_guide_components',
+    arguments: { scope: 'memory:one', pageId: 'guide', blockIds: ['policy'] },
+  });
+  assert.deepEqual(components.structuredContent.data.items, [
+    { blockId: 'policy', status: 'unavailable' },
+  ]);
+  const grid = await client.callTool({
+    name: 'tasker_design_grid',
+    arguments: { scope: 'memory:one' },
+  });
+  assert.equal(grid.structuredContent.data.counts.media, 0);
+
   const search = await client.callTool({
     name: 'tasker_search',
     arguments: { scope: 'memory:one', query: 'owl' },

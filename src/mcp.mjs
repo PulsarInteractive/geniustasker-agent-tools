@@ -1,3 +1,4 @@
+import { spaceCommands, spaceRequest } from './space-components.mjs';
 import {
   readProjectDocumentation,
   documentationTool,
@@ -46,6 +47,7 @@ import {
   designDiscussionSchema,
   memoryCatalogTool,
   memoryCatalogSchema,
+  readMemoryCatalog,
   readMemoryImage,
 } from './memory-image.mjs';
 import { workflow, workflowSchema } from './workflows.mjs';
@@ -269,7 +271,7 @@ export function createMcpServer(client) {
   );
   register(
     'tasker_memory_tree',
-    'Browse a Guides page and its readable children, with branch versions. Use this before fetching Markdown; compare subtreeVersion to skip unchanged branches. A continuation needs epoch and checkpoint. Check documentationSync in capabilities first.',
+    remoteTools.find((tool) => tool.name === 'tasker_memory_tree').description,
     memoryTreeSchema,
     (input) => readMemoryTree(client, input),
   );
@@ -311,6 +313,16 @@ export function createMcpServer(client) {
         idempotentHint: tool.idempotent,
         openWorldHint: false,
       },
+    );
+  }
+  for (const [command, { tool, schema }] of spaceCommands) {
+    register(
+      tool.name,
+      tool.description,
+      schema,
+      (input) => spaceRequest(client, command, input),
+      tool.write,
+      { destructiveHint: tool.destructive, idempotentHint: true },
     );
   }
   register(
@@ -360,7 +372,7 @@ export function createMcpServer(client) {
     (input) => compareMedia(client, input),
   );
   register(memoryCatalogTool.name, memoryCatalogTool.description, memoryCatalogSchema, (input) =>
-    client.get('memory/catalog', input),
+    readMemoryCatalog(client, input),
   );
   register(
     memoryImageTool.name,
@@ -377,7 +389,7 @@ export function createMcpServer(client) {
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
-    'Prepare one explicitly selected local image or attachment for Memory. Design also accepts downloadable ZIP and HTML source files up to 15,000,000 bytes. No upload yet; retain operationId.',
+    'Prepare a selected local file in Guides or Design. A Guide card uses the first accessible inline image of its linked page. Publish the selected image as an ordinary image asset, then insert it in a body block. Use pageCover for a Design page cover or designVisual for Design gallery images. Omit purpose for an original attachment such as ZIP or HTML. Retain operationId for upload.',
     mediaPrepareSchema,
     (input) => media.prepare(input),
     false,

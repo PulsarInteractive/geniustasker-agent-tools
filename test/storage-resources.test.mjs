@@ -12,6 +12,7 @@ import { scopedStorageRequest } from '../src/storage-resources.mjs';
 const operationId = '00000000-0000-4000-8000-000000000002',
   assetId = 'stored-original';
 const scope = 'project:fixture';
+const taskSource = { kind: 'task', id: 'ticket-one', title: 'Prepare the print proofs' };
 function receipt(state = 'preview') {
   const done = state === 'complete';
   return {
@@ -71,6 +72,7 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
             protectedBytes: 0,
             issuedAt: 1,
             reason: null,
+            sources: [{ ...taskSource, notes: 'Unrelated account data' }],
           },
         ],
         coverage: 'complete',
@@ -123,6 +125,7 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
   };
   const list = await cli(['storage', 'resources'], { scope, type: 'video', limit: 1 });
   assert.equal(list.items[0].reclaimableBytes, 430);
+  assert.deepEqual(list.items[0].sources, [taskSource]);
   const discussion = await cli(['memory', 'design-discussion'], {
     scope: 'memory:design',
     variantId: 'screen',
@@ -150,6 +153,8 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
   );
   assert.ok(!tools.some((t) => t.name === 'tasker_account_storage_resources'));
   const call = async (name, data) => client.callTool({ name, arguments: data });
+  const files = await call('tasker_project_storage_resources', { scope, type: 'video', limit: 1 });
+  assert.deepEqual(files.structuredContent.data.items[0].sources, [taskSource]);
   const draft = await call('tasker_project_cleanup_preview', {
     scope,
     assetIds: [assetId, 'shared'],

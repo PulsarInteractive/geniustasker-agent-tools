@@ -130,3 +130,9 @@ describes when it may edit, offer a draft or leave the result in its ticket.
 For comparing notes, use `tasker_memory_read_pages` with specific authorized
 page and block IDs. The `memory-reading`, `memory-history` and
 `memory-templates` workflows apply directly in hosted ChatGPT.
+
+## Guide cards, Design reviews and selected files
+
+For a question such as “Which steps remain on this release page?”, read its Guide outline and pass the selected component IDs to `tasker_guide_components`. The tool checks access to each live destination in the connected account. For “Montre-moi la maquette mobile et sa revue”, narrow `tasker_design_grid` to the appropriate space and viewport. Open only the selected media at its saved revision using `tasker_memory_view_image`. For a requested review use the `design-image-review` workflow.
+
+If the host advertises `tasker_space_prepare_host_file` and `tasker_space_upload_host_file`, select a file in the conversation, choose its space and prepare it. Transfer the same file with the returned metadata. For a Guide, publish the selected image and insert it at the requested reading position. A card linking to that Guide automatically uses its first accessible inline image. Text-only Guides have text-only cards. Design accepts `designVisual` for a gallery image or `pageCover` for an explicit Design page cover, with server-side WebP compression. To keep a ZIP, HTML source or image as an original attachment, omit the purpose. Use the returned asset ID in a separately authorized page edit. A host without file transfer can use already published assets or the installed CLI.

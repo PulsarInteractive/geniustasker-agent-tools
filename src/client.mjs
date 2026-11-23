@@ -1,4 +1,5 @@
 import { retryAt, requireRetryReady } from './recovery.mjs';
+import { spaceCommands } from './space-components.mjs';
 import { fail } from './errors.mjs';
 import { createHash } from 'node:crypto';
 import { ConditionalReadCache } from './read-cache.mjs';
@@ -201,6 +202,9 @@ export class AgentClient {
         'storage/resources',
         'storage/cleanup/status',
         'memory/design-discussion',
+        ...Array.from(spaceCommands.values(), ({ tool }) => tool)
+          .filter((tool) => (tool.method ?? 'GET') === 'GET' && !tool.write)
+          .map((tool) => tool.route),
         'tasks/archive/detail',
         'tasks/archive/comments',
         'memories',

@@ -139,6 +139,10 @@ test('Design ZIP and HTML sources prepare immutable files without opening or exe
       'application/zip',
       Buffer.concat([Buffer.from('504b0506', 'hex'), Buffer.alloc(18)]),
     ],
+    ['run.mp4', 'video/mp4', Buffer.from('000000186674797069736f6d', 'hex')],
+    ['voice.m4a', 'audio/mp4', Buffer.from('00000018667479704d344120', 'hex')],
+    ['mix.mp3', 'audio/mpeg', Buffer.concat([Buffer.from('ID3'), Buffer.alloc(12)])],
+    ['excerpt.aac', 'audio/aac', Buffer.from('fff15080017ffc', 'hex')],
     ['work.html', 'text/html', '<!doctype html><title>QA source</title>'],
   ]) {
     const file = join(directory, name);

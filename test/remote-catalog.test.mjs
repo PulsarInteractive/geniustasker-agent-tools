@@ -23,7 +23,13 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
         tool.destructive,
         tool.name.startsWith('tasker_feedback_')
           ? tool.name.endsWith('_media_remove')
-          : tool.name !== 'tasker_attachment_add' && !tool.name.endsWith('_cleanup_preview'),
+          : ![
+              'tasker_attachment_add',
+              'tasker_design_grid_decisions',
+              'tasker_design_conformity',
+              'tasker_design_publish_selection',
+              'tasker_design_publish_version',
+            ].includes(tool.name) && !tool.name.endsWith('_cleanup_preview'),
       );
     }
     assert.ok(!tool.route || /^[a-z]+(?:[-/][a-z]+)*$/.test(tool.route));

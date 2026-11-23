@@ -229,7 +229,9 @@ export default {
       "fields": [
         "logoAssetId",
         "contentRoles",
+        "designResolutions",
         "designFilters",
+        "designReviewSettings",
         "title",
         "productKey",
         "summary",
@@ -342,7 +344,11 @@ export default {
         "agentInstructions",
         "guide",
         "design",
+        "designExpectation",
         "designReview",
+        "designCriteria",
+        "headerAssetId",
+        "headerAlt",
         "designThread",
         "blocks",
         "tags",
@@ -380,6 +386,23 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.publishDesign": {
+      "action": "publishDesignRevision",
+      "fields": [
+        "label"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
+    "memory.page.publishDesignSelection": {
+      "action": "publishDesignSelection",
+      "fields": [
+        "label",
+        "items"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.restore": {
       "action": "restoreMemoryVersion",
       "fields": [
@@ -399,9 +422,14 @@ export default {
         "agentInstructions",
         "guide",
         "design",
+        "designExpectation",
         "designReview",
+        "designCriteria",
+        "headerAssetId",
+        "headerAlt",
         "designThread",
         "blocks",
+        "componentRemovalIds",
         "tags",
         "provenance",
         "sourceId",
@@ -421,7 +449,9 @@ export default {
       "fields": [
         "logoAssetId",
         "contentRoles",
+        "designResolutions",
         "designFilters",
+        "designReviewSettings",
         "title",
         "productKey",
         "summary",
@@ -809,7 +839,8 @@ export default {
     "sprint.complete": {
       "action": "complete",
       "fields": [
-        "carryToSprint"
+        "carryToSprint",
+        "previewRevision"
       ],
       "module": "Project/ProjectSprint",
       "permission": "tasks:write"
