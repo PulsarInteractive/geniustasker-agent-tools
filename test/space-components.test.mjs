@@ -506,3 +506,49 @@ test('capture writers bind their receipt to the exact track, block and operation
     { code: 'invalid_response' },
   );
 });
+
+test('published galleries bind media and continuation to a single retained revision', async () => {
+  const input = {
+    scope,
+    pageId: 'guide',
+    blockIds: ['release'],
+    publishedRevision: '12',
+    afterImage: 'start',
+  };
+  const image = {
+    variantId: 'run',
+    blockId: 'impact',
+    revision: '12',
+    title: 'Impact',
+    track: 'mockup',
+  };
+  const gallery = {
+    blockId: 'release',
+    status: 'available',
+    kind: 'design',
+    scope,
+    targetId: 'run',
+    presentation: 'gallery',
+    revision: '12',
+    title: 'Run',
+    designView: { range: 'selection', publishedRevision: '12' },
+    publicationLabel: 'Beta',
+    images: [image],
+    hasMoreImages: false,
+  };
+  const read = (item) =>
+    spaceRequest(
+      client(async () => ({ scope, pageId: 'guide', revision: '5', items: [item] })),
+      'guides components',
+      input,
+    );
+  assert.equal((await read(gallery)).items[0].images[0].blockId, 'impact');
+  for (const corrupt of [
+    { ...gallery, publicationLabel: null },
+    { ...gallery, revision: '13' },
+    { ...gallery, images: [{ ...image, revision: '13' }] },
+    { ...gallery, images: [{ ...image, variantId: 'another' }] },
+  ]) {
+    await assert.rejects(read(corrupt), { code: 'invalid_response' });
+  }
+});

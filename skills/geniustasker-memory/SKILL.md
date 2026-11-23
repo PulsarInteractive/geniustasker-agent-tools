@@ -214,7 +214,16 @@ and presentation `gallery`. Point to one variant for a single visual or one
 page for a collection. Set `designView.range` to `selection` or `descendants`.
 Choose a track or a platform only when requested. Use a configured width and
 height together. Omit selectors to show all supported formats and both tracks.
-Read selected occurrences with `guides components`. Their first four authorized
+For a release handoff, select one variant and put its named publication's exact
+revision in `designView.publishedRevision` with `range: selection`. Changing
+the draft then leaves both the publication and the source ZIP available to
+authorized readers. For the next window, call `guides components` with only
+that occurrence, the same `publishedRevision` and its last image's `blockId`
+as `afterImage`. Stop at `hasMoreImages: false`. A frozen link requires
+current access to the target plus history and media permissions. Report a
+missing grant if the publication cannot be opened.
+
+Read live occurrences with `guides components`. Their first four authorized
 thumbnail references follow the current source. Ask for original bytes only
 when the task requires them. Do not copy a target into the document as a
 workaround for restricted access or label a live gallery as a frozen release.

@@ -42,6 +42,7 @@ const linked = z.discriminatedUnion('status', [
       designView: z
         .object({
           range: z.enum(['selection', 'descendants']),
+          publishedRevision: z.string().regex(revision).nullish(),
           track: z.enum(['mockup', 'implemented']).nullish(),
           platform: z.string().max(60).nullish(),
           width: z.number().int().min(1).max(32768).nullish(),
@@ -66,6 +67,7 @@ const linked = z.discriminatedUnion('status', [
         .max(4)
         .nullish(),
       hasMoreImages: z.boolean().nullish(),
+      publicationLabel: z.string().max(80).nullish(),
       title: z.string(),
       targetStamp: z.string().nullish(),
       revision: z.string().regex(revision),
@@ -80,6 +82,30 @@ const linked = z.discriminatedUnion('status', [
 ]);
 
 const matches = (pattern, value) => typeof value === 'string' && pattern.test(value);
+function validGalleryRevision(input, item) {
+  const published = item.designView?.publishedRevision;
+  if (!published) {
+    return !input.publishedRevision && !item.publicationLabel;
+  }
+  const images = item.images;
+  return (
+    item.designView.range === 'selection' &&
+    (!input.publishedRevision || input.publishedRevision === published) &&
+    item.revision === published &&
+    typeof item.publicationLabel === 'string' &&
+    item.publicationLabel.trim().length > 0 &&
+    Array.isArray(images) &&
+    unique(images.map((image) => image.blockId)) &&
+    images.every(
+      (image) =>
+        image.variantId === item.targetId &&
+        image.revision === published &&
+        image.blockId !== input.afterImage &&
+        (!input.focusImage || image.blockId === input.focusImage),
+    )
+  );
+}
+
 function validateGuide(input, result) {
   if (
     result?.scope !== input.scope ||
@@ -102,8 +128,8 @@ function validateGuide(input, result) {
         selected.delete(item.blockId) &&
         (item.status !== 'available' ||
           (item.presentation === 'gallery'
-            ? item.kind === 'design'
-            : [item.images, item.hasMoreImages, item.designView].every(
+            ? item.kind === 'design' && validGalleryRevision(input, item)
+            : [item.images, item.hasMoreImages, item.designView, item.publicationLabel].every(
                 (field) => field === null || field === undefined,
               ))),
     )
@@ -175,7 +201,11 @@ export async function spaceRequest(client, command, value) {
   const input = parsed.data;
   if (
     command === 'guides components' &&
-    (!unique(input.blockIds) || !input.blockIds.every((id) => matches(blockId, id)))
+    (!unique(input.blockIds) ||
+      !input.blockIds.every((id) => matches(blockId, id)) ||
+      ((input.afterImage || input.focusImage) && !input.publishedRevision) ||
+      (input.focusImage && input.afterImage) ||
+      (input.publishedRevision && input.blockIds.length !== 1))
   ) {
     fail(
       'invalid_arguments',
