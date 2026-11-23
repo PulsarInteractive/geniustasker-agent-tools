@@ -131,6 +131,9 @@ export class Transport {
         redirect: 'error',
         signal,
         headers: {
+          ...(url.pathname === '/api/agents/v1/memory/tree' && method === 'GET'
+            ? { 'x-tasker-tree-order': 'editorial' }
+            : {}),
           ...(partSha256 ? { 'x-part-sha256': partSha256 } : {}),
           Accept: binary ? 'application/octet-stream' : 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -576,6 +576,27 @@ test('directory swap recovery restores the previous snapshot instead of publishi
   assert.ok((await manifest(directory)).sources[0].pages.one);
 });
 
+test('editorial order accepts opaque IDs and rejects a repeated boundary', async () => {
+  const f = clientFixture();
+  f.page('a');
+  f.page('z');
+  const root = await readMemoryTree(f.client, { scope: 'memory:one' });
+  const source = { get: async () => ({ ...root, items: [...root.items].reverse() }) };
+  assert.deepEqual(
+    (await readMemoryTree(source, { scope: root.scope })).items.map((p) => p.id),
+    ['z', 'a'],
+  );
+  await assert.rejects(
+    readMemoryTree(source, {
+      scope: root.scope,
+      epoch: root.epoch,
+      checkpoint: root.checkpoint,
+      after: 'z',
+    }),
+    { code: 'invalid_response' },
+  );
+});
+
 test('API wrappers reject crossed contexts, invalid paths and inconsistent conditional replies', async () => {
   const f = clientFixture();
   f.page('one');
