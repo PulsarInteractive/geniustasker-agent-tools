@@ -387,3 +387,41 @@ test('delivery tools preserve the visible track and distinguish unknown from mis
   assert.deepEqual(await spaceRequest({ get: async () => page }, 'design mockups', input), page);
   await assert.rejects(spaceRequest({ get: async () => page }, 'design implementations', input));
 });
+
+test('a live gallery returns only bounded image identities from the selected design', async () => {
+  const image = {
+    variantId: 'phone',
+    blockId: 'art',
+    title: 'Read',
+    track: 'mockup',
+    revision: '10',
+  };
+  const gallery = {
+    blockId: query.blockIds[0],
+    status: 'available',
+    scope: 'memory:art',
+    kind: 'design',
+    targetId: 'manual',
+    presentation: 'gallery',
+    title: 'Artwork',
+    revision: '8',
+    designView: { range: 'descendants', width: 390, height: 844 },
+    images: [image],
+    hasMoreImages: false,
+  };
+  const read = (extra) =>
+    spaceRequest(
+      client(async () => ({ ...response, items: [{ ...gallery, ...extra }, response.items[1]] })),
+      'guides components',
+      query,
+    );
+  assert.deepEqual((await read({})).items[0].images, [image]);
+  for (const invalid of [
+    { images: Array(5).fill(image) },
+    { kind: 'task' },
+    { presentation: 'card' },
+    { images: [{ ...image, url: 'secret' }] },
+  ]) {
+    await assert.rejects(read(invalid), { code: 'invalid_response' });
+  }
+});

@@ -34,7 +34,32 @@ const linked = z.discriminatedUnion('status', [
       kind: z.enum(['guide', 'design', 'skill', 'task']),
       scope: z.string().regex(/^(?:project|memory):[a-zA-Z0-9_-]{1,128}$/),
       targetId: z.string().regex(baseId),
-      presentation: z.enum(['link', 'card', 'status', 'checklist']),
+      presentation: z.enum(['link', 'card', 'status', 'checklist', 'gallery']),
+      designView: z
+        .object({
+          range: z.enum(['selection', 'descendants']),
+          track: z.enum(['mockup', 'implemented']).nullish(),
+          platform: z.string().max(60).nullish(),
+          width: z.number().int().min(1).max(32768).nullish(),
+          height: z.number().int().min(1).max(32768).nullish(),
+        })
+        .strict()
+        .nullish(),
+      images: z
+        .array(
+          z
+            .object({
+              variantId: z.string().regex(baseId),
+              blockId: z.string().regex(blockId),
+              revision: z.string().regex(revision),
+              title: z.string().max(100),
+              track: z.enum(['mockup', 'implemented']),
+            })
+            .strict(),
+        )
+        .max(4)
+        .nullish(),
+      hasMoreImages: z.boolean().nullish(),
       title: z.string(),
       targetStamp: z.string().nullish(),
       revision: z.string().regex(revision),
@@ -65,7 +90,17 @@ function validateGuide(input, result) {
   }
   const selected = new Set(input.blockIds);
   if (
-    !result.items.every((item) => linked.safeParse(item).success && selected.delete(item.blockId))
+    !result.items.every(
+      (item) =>
+        linked.safeParse(item).success &&
+        selected.delete(item.blockId) &&
+        (item.status !== 'available' ||
+          (item.presentation === 'gallery'
+            ? item.kind === 'design'
+            : [item.images, item.hasMoreImages, item.designView].every(
+                (field) => field === null || field === undefined,
+              ))),
+    )
   ) {
     invalid();
   }

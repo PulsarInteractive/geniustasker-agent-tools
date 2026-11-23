@@ -196,3 +196,13 @@ Report `unknown` as limited visibility. Use `design mockups` or
 `design implementations` with the selected screen and configured resolution.
 An example is evidence of a visible file. Check the exact revisions and review
 decisions separately before saying the implementation was approved.
+
+Embed an existing Design in Documentation with a component of kind `design`
+and presentation `gallery`. Point to one variant for a single visual or one
+page for a collection. Set `designView.range` to `selection` or `descendants`.
+Choose a track or a platform only when requested. Use a configured width and
+height together. Omit selectors to show all supported formats and both tracks.
+Read selected occurrences with `guides components`. Their first four authorized
+thumbnail references follow the current source. Ask for original bytes only
+when the task requires them. Do not copy a target into the document as a
+workaround for restricted access or label a live gallery as a frozen release.
