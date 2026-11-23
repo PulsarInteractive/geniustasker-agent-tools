@@ -118,9 +118,7 @@ export async function readMemoryTree(client, value) {
       (result.etag !== query.ifNoneMatch || result.items.length || result.nextAfter !== null)) ||
     (!result.notModified && query.parentId && result.parent?.id !== query.parentId) ||
     (result.nextAfter && result.nextAfter !== result.items.at(-1)?.id) ||
-    result.items.some(
-      (item, index) => item.id <= (index ? result.items[index - 1].id : (query.after ?? '')),
-    )
+    result.items.some((item) => item.id === query.after)
   ) {
     fail('invalid_response', 'The tree response has an inconsistent parent, cursor or validator.');
   }
