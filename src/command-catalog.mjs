@@ -386,6 +386,14 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.publishDesign": {
+      "action": "publishDesignRevision",
+      "fields": [
+        "label"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.restore": {
       "action": "restoreMemoryVersion",
       "fields": [

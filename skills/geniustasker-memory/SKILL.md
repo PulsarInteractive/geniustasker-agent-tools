@@ -212,3 +212,11 @@ authorized image asset. Read the target and current revision, reuse the
 variant and block IDs, and keep the operation receipt. Supply known build,
 commit or release channel for an implementation. A save carries no approval.
 Use the same operation ID, timestamp and payload after a connection failure.
+
+Subsequent capture saves on the same current block replace its open draft
+history entry. A cited or named revision remains protected. When a user wants a
+stable delivery reference, use `design publish-version` with a short name and
+the exact source revision; store the returned published revision. Read its
+historical image with the history and media grants. Publishing does not copy
+original files and does not approve a review. Storage cleanup determines which
+unreferenced source bytes can actually be reclaimed.

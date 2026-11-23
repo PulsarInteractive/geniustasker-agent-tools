@@ -7,6 +7,7 @@ const commands = {
   'design grid': 'tasker_design_grid',
   'design save-mockup': 'tasker_design_save_mockup',
   'design save-implementation': 'tasker_design_save_implementation',
+  'design publish-version': 'tasker_design_publish_version',
   'design target': 'tasker_design_target',
   'design mockups': 'tasker_design_mockups',
   'design implementations': 'tasker_design_implementations',
@@ -219,6 +220,21 @@ export async function spaceRequest(client, command, value) {
   }
   if (command === 'guides components') {
     return validateGuide(input, result);
+  }
+  if (command === 'design publish-version') {
+    const receipt = z
+      .object({
+        variantId: z.literal(input.variantId),
+        publishedRevision: z.literal(input.expectedRevision),
+        currentRevision: z.string().regex(revision),
+        label: z.literal(input.label.trim()),
+        operationId: z.literal(input.operationId),
+      })
+      .strict();
+    if (!receipt.safeParse(result).success) {
+      invalid();
+    }
+    return result;
   }
   if (command === 'design target') {
     if (

@@ -974,6 +974,7 @@
             "memory.page.create",
             "memory.page.delete",
             "memory.page.proposeRevision",
+            "memory.page.publishDesign",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -1084,6 +1085,7 @@
             "memory.page.create",
             "memory.page.delete",
             "memory.page.proposeRevision",
+            "memory.page.publishDesign",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -1234,6 +1236,7 @@
             "memory.page.create",
             "memory.page.delete",
             "memory.page.proposeRevision",
+            "memory.page.publishDesign",
             "memory.page.restore",
             "memory.page.update",
             "memory.update",
@@ -1575,6 +1578,7 @@
             "memory.page.create",
             "memory.page.delete",
             "memory.page.proposeRevision",
+            "memory.page.publishDesign",
             "memory.page.restore",
             "memory.page.update",
             "memory.update"
@@ -4799,5 +4803,58 @@
     "method": "POST",
     "write": true,
     "destructive": true
+  },
+  {
+    "name": "tasker_design_publish_version",
+    "title": "Freeze one named Design revision",
+    "route": "memory/design/publications",
+    "scopes": ["memory:write"],
+    "description": "Freeze the displayed revision of one selected Design variant under a short name. Existing original files are referenced, and ordinary cleanup preserves the frozen version. Keep the stable operation ID and time for retries. Subsequent drafts can change independently.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "epoch",
+        "expectedRevision",
+        "issuedAt",
+        "label",
+        "operationId",
+        "scope",
+        "variantId"
+      ],
+      "properties": {
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedRevision": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,15}$"
+        },
+        "issuedAt": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$"
+        },
+        "variantId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "method": "POST",
+    "write": true,
+    "destructive": false
   }
 ]
