@@ -4175,13 +4175,16 @@
     "title": "Browse images and review criteria",
     "route": "memory/design-grid",
     "scopes": ["memory:read"],
-    "description": "Browse one page of individual images with applicable criteria and current verdicts. Omit format and track to include all formats and both tracks. Filter by group, page, explicit pairing, viewport, platform, criterion or verdict. Continue with the same filters and cursor. Use the image tool only for selected images.",
+    "description": "Browse one page of individual images with applicable criteria and current verdicts. Set includeTotals to false when browsing images or embedding a gallery. Counts and pageOverview are then omitted. Request exact totals only when answering a coverage question. Omit format and track to include all formats and both tracks. Filter by group, page, explicit pairing, viewport, platform, criterion or verdict. Continue with the same filters and cursor. Use the image tool only for selected images.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "scope": {
           "type": "string",
           "maxLength": 136
+        },
+        "includeTotals": {
+          "type": "boolean"
         },
         "groupId": {
           "type": "string",

@@ -80,9 +80,10 @@ function validateGrid(input, result) {
     result?.scope !== input.scope ||
     !Array.isArray(result.items) ||
     result.items.length > 16 ||
-    !['media', 'approved', 'unchecked', 'rejected'].every(
-      (k) => Number.isSafeInteger(result.counts?.[k]) && result.counts[k] >= 0,
-    ) ||
+    ((input.includeTotals !== false || result.counts !== undefined) &&
+      !['media', 'approved', 'unchecked', 'rejected'].every(
+        (k) => Number.isSafeInteger(result.counts?.[k]) && result.counts[k] >= 0,
+      )) ||
     (result.nextCursor !== null &&
       (typeof result.nextCursor !== 'string' ||
         !result.nextCursor.length ||

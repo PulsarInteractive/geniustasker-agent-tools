@@ -183,6 +183,21 @@ test('the design grid reads selected filters only; review receipts retain each c
     input,
   );
   assert.equal(result, grid);
+  const window = { ...grid };
+  delete window.counts;
+  const listClient = { get: async () => window };
+  assert.equal(
+    await spaceRequest(listClient, 'design grid', { ...input, includeTotals: false }),
+    window,
+  );
+  await assert.rejects(spaceRequest(listClient, 'design grid', input));
+  assert.equal(
+    await spaceRequest({ get: async () => grid }, 'design grid', {
+      ...input,
+      includeTotals: false,
+    }),
+    grid,
+  );
   await assert.rejects(spaceRequest({}, 'design grid', { scope, reviewProgress: 'approved' }), {
     code: 'invalid_arguments',
   });
