@@ -56,6 +56,8 @@ const linked = z.discriminatedUnion('status', [
               blockId: z.string().regex(blockId),
               revision: z.string().regex(revision),
               title: z.string().max(100),
+              mediaKind: z.enum(['image', 'audio', 'video']).nullish(),
+              posterBlockId: z.string().regex(blockId).nullish(),
               track: z.enum(['mockup', 'implemented']),
             })
             .strict(),

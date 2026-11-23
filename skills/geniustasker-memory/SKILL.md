@@ -220,3 +220,10 @@ the exact source revision; store the returned published revision. Read its
 historical image with the history and media grants. Publishing does not copy
 original files and does not approve a review. Storage cleanup determines which
 unreferenced source bytes can actually be reclaimed.
+
+For motion or sound, save the selected upload with `capture.mediaKind` set to
+`video` (MP4) or `audio` (MP3, AAC, M4A). A clip can be the only deliverable.
+Use `posterBlockId` to reference a still on the same variant. Keep source ZIPs
+as ordinary attachments. Galleries return the selected block and optional
+poster; open the detail to play the original on request. Record whether a
+decision came from playback, an image sequence or a still.

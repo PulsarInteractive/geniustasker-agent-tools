@@ -4179,7 +4179,7 @@
     "title": "Browse images and review criteria",
     "route": "memory/design-grid",
     "scopes": ["memory:read"],
-    "description": "Browse one page of individual images with applicable criteria and current verdicts. Set includeTotals to false when browsing images or embedding a gallery. Counts and pageOverview are then omitted. Request exact totals only when answering a coverage question. Omit format and track to include all formats and both tracks. Filter by group, page, explicit pairing, viewport, platform, criterion or verdict. Continue with the same filters and cursor. Use the image tool only for selected images.",
+    "description": "Browse one page of individual media with applicable criteria and current verdicts. Set includeTotals to false when browsing images or embedding a gallery. Counts and pageOverview are then omitted. Request exact totals only when answering a coverage question. Omit format and track to include all formats and both tracks. Filter by group, page, explicit pairing, viewport, platform, criterion or verdict. Continue with the same filters and cursor. Use the image tool only for selected images.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -4385,7 +4385,7 @@
     "title": "Find Design mockups",
     "route": "memory/design/mockups",
     "scopes": ["memory:read"],
-    "description": "Read authorized mockup image references for one filtered page of results. Filter by screen, platform, resolution or verdict. Open only the selected image.",
+    "description": "Read authorized mockup image references for one filtered page of results. Filter by screen, platform, resolution or verdict. Request only the selected media.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -4432,7 +4432,7 @@
     "title": "Find implemented Design screens",
     "route": "memory/design/implementations",
     "scopes": ["memory:read"],
-    "description": "Read authorized implementation captures by screen, platform, resolution or verdict. A capture can exist without any mockup. Open only the selected image.",
+    "description": "Read authorized implementation captures by screen, platform, resolution or verdict. A capture can exist without any mockup. Request only the selected media.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -4476,10 +4476,10 @@
   },
   {
     "name": "tasker_design_save_mockup",
-    "title": "Save a mockup image",
+    "title": "Save a mockup capture",
     "route": "memory/design/mockups",
     "scopes": ["memory:write"],
-    "description": "Save one authorized, already uploaded image block on the mockup track. Provide the parent Design page, variant and block identity, its current revision (null for a new variant), and a stable operation ID and timestamp. A new variant needs a title. Omitted fields and other blocks are preserved. Retry the identical operation after timeout.",
+    "description": "Save one authorized, already uploaded image, MP4 or audio block on the mockup track. Provide the parent Design page, variant and block identity, its current revision (null for a new variant), and a stable operation ID and timestamp. A new variant needs a title. Omitted fields and other blocks are preserved. Retry the identical operation after timeout.",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -4549,6 +4549,17 @@
                 }
               ]
             },
+            "mediaKind": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["image", "audio", "video"]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
             "pageId": {
               "type": "string",
               "pattern": "^[a-zA-Z0-9_-]{1,128}$"
@@ -4558,6 +4569,17 @@
                 {
                   "type": "string",
                   "maxLength": 60
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "posterBlockId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$"
                 },
                 {
                   "type": "null"
@@ -4641,10 +4663,10 @@
   },
   {
     "name": "tasker_design_save_implementation",
-    "title": "Save an implementation image",
+    "title": "Save an implementation capture",
     "route": "memory/design/implementations",
     "scopes": ["memory:write"],
-    "description": "Save one authorized image of an implementation. Include known build, commit or release channel. Use the existing variant and block ID to replace the current capture. Keep its expected revision and operation ID for retries. Saving a capture does not approve a comparison.",
+    "description": "Save one image, MP4 or audio capture of an implementation. Include known build, commit or release channel. Use the existing variant and block ID to replace the current capture. Keep its expected revision and operation ID for retries. Saving a capture does not approve a comparison.",
     "inputSchema": {
       "type": "object",
       "required": [
@@ -4714,6 +4736,17 @@
                 }
               ]
             },
+            "mediaKind": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["image", "audio", "video"]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
             "pageId": {
               "type": "string",
               "pattern": "^[a-zA-Z0-9_-]{1,128}$"
@@ -4723,6 +4756,17 @@
                 {
                   "type": "string",
                   "maxLength": 60
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "posterBlockId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$"
                 },
                 {
                   "type": "null"
