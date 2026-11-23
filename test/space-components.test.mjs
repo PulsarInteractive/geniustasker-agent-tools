@@ -373,6 +373,7 @@ test('the design grid reads selected filters only; review receipts retain each c
   for (const invalid of [
     [items[0]],
     [cover, { ...cover, blockId: 'next' }],
+    [{ ...cover, landmarks: [{ label: 'Summary' }] }],
     [{ ...cover, landmarks: [{ key: 'summary', label: 'Summary', width: 50 }] }],
   ]) {
     await assert.rejects(

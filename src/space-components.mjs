@@ -282,6 +282,7 @@ function validCapturePosition(item) {
     marks.every((mark) => {
       if (
         !mark ||
+        typeof mark.key !== 'string' ||
         !/^[a-z0-9][a-z0-9_-]{0,47}$/.test(mark.key) ||
         typeof mark.label !== 'string' ||
         !mark.label.trim() ||
