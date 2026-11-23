@@ -54,6 +54,7 @@ const linked = z.discriminatedUnion('status', [
       designView: z
         .object({
           range: z.enum(['selection', 'descendants']),
+          grouping: z.enum(['series', 'sequence']).nullish(),
           verdict: z.enum(['approved', 'rejected', 'unchecked']).nullish(),
           criterionId: z.string().min(1).max(160).nullish(),
           publishedRevision: z.string().regex(revision).nullish(),
@@ -68,6 +69,7 @@ const linked = z.discriminatedUnion('status', [
         .array(
           z
             .object({
+              seriesCount: z.number().int().min(1).max(64).nullish(),
               occurrenceId: z
                 .string()
                 .regex(/^entry-(?:[1-9]|1[0-6])$/)
@@ -265,6 +267,43 @@ function validateGuide(input, result) {
   };
 }
 
+function validCapturePosition(item) {
+  const marks = item.landmarks ?? [];
+  return (
+    Number.isInteger(item.frameOrder) &&
+    item.frameOrder >= 0 &&
+    item.frameOrder < 64 &&
+    Number.isInteger(item.seriesCount) &&
+    item.seriesCount > 0 &&
+    item.seriesCount <= 64 &&
+    Array.isArray(marks) &&
+    marks.length <= 12 &&
+    unique(marks.map((mark) => mark?.key)) &&
+    marks.every((mark) => {
+      if (
+        !mark ||
+        !/^[a-z0-9][a-z0-9_-]{0,47}$/.test(mark.key) ||
+        typeof mark.label !== 'string' ||
+        !mark.label.trim() ||
+        mark.label.length > 100
+      ) {
+        return false;
+      }
+      const { x, y, width, height } = mark;
+      return (
+        [x, y, width, height].every((v) => v === null || v === undefined) ||
+        ([x, y, width, height].every(Number.isInteger) &&
+          x >= 0 &&
+          y >= 0 &&
+          width > 0 &&
+          height > 0 &&
+          x + width <= 10000 &&
+          y + height <= 10000)
+      );
+    })
+  );
+}
+
 function validateGrid(input, result) {
   if (
     result?.scope !== input.scope ||
@@ -281,12 +320,14 @@ function validateGrid(input, result) {
     !result.items.every(
       (item) =>
         matches(baseId, item?.variantId) &&
+        (!input.presentation || validCapturePosition(item)) &&
         matches(blockId, item?.blockId) &&
         matches(revision, item?.revision) &&
         Array.isArray(item.cells) &&
         item.cells.length <= 64,
     ) ||
-    !unique(result.items.map(imageKey))
+    !unique(result.items.map(imageKey)) ||
+    (input.presentation === 'series' && !unique(result.items.map((item) => item.variantId)))
   ) {
     invalid();
   }

@@ -4238,6 +4238,10 @@
 				"includeTotals": {
 					"type": "boolean"
 				},
+				"presentation": {
+					"type": "string",
+					"maxLength": 16
+				},
 				"groupId": {
 					"type": "string",
 					"maxLength": 128
@@ -4548,6 +4552,17 @@
 							"type": "string",
 							"pattern": "^[a-zA-Z0-9_-]{1,128}$"
 						},
+						"beforeBlockId": {
+							"anyOf": [
+								{
+									"type": "string",
+									"pattern": "^[a-zA-Z0-9_-]{1,80}$"
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
 						"blockId": {
 							"type": "string",
 							"pattern": "^[a-zA-Z0-9_-]{1,80}$"
@@ -4591,6 +4606,81 @@
 									"type": "integer",
 									"minimum": 1,
 									"maximum": 32768
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
+						"landmarks": {
+							"anyOf": [
+								{
+									"type": "array",
+									"maxItems": 12,
+									"items": {
+										"type": "object",
+										"required": ["key", "label"],
+										"properties": {
+											"height": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 1,
+														"maximum": 10000
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"key": {
+												"type": "string",
+												"pattern": "^[a-z0-9][a-z0-9_-]{0,47}$"
+											},
+											"label": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100
+											},
+											"width": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 1,
+														"maximum": 10000
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"x": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9999
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"y": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9999
+													},
+													{
+														"type": "null"
+													}
+												]
+											}
+										},
+										"additionalProperties": false
+									}
 								},
 								{
 									"type": "null"
@@ -4745,6 +4835,17 @@
 							"type": "string",
 							"pattern": "^[a-zA-Z0-9_-]{1,128}$"
 						},
+						"beforeBlockId": {
+							"anyOf": [
+								{
+									"type": "string",
+									"pattern": "^[a-zA-Z0-9_-]{1,80}$"
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
 						"blockId": {
 							"type": "string",
 							"pattern": "^[a-zA-Z0-9_-]{1,80}$"
@@ -4788,6 +4889,81 @@
 									"type": "integer",
 									"minimum": 1,
 									"maximum": 32768
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
+						"landmarks": {
+							"anyOf": [
+								{
+									"type": "array",
+									"maxItems": 12,
+									"items": {
+										"type": "object",
+										"required": ["key", "label"],
+										"properties": {
+											"height": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 1,
+														"maximum": 10000
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"key": {
+												"type": "string",
+												"pattern": "^[a-z0-9][a-z0-9_-]{0,47}$"
+											},
+											"label": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100
+											},
+											"width": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 1,
+														"maximum": 10000
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"x": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9999
+													},
+													{
+														"type": "null"
+													}
+												]
+											},
+											"y": {
+												"anyOf": [
+													{
+														"type": "integer",
+														"minimum": 0,
+														"maximum": 9999
+													},
+													{
+														"type": "null"
+													}
+												]
+											}
+										},
+										"additionalProperties": false
+									}
 								},
 								{
 									"type": "null"

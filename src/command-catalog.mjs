@@ -839,7 +839,8 @@ export default {
     "sprint.complete": {
       "action": "complete",
       "fields": [
-        "carryToSprint"
+        "carryToSprint",
+        "previewRevision"
       ],
       "module": "Project/ProjectSprint",
       "permission": "tasks:write"

@@ -246,6 +246,18 @@ thumbnail references follow the current source. Ask for original bytes only
 when the task requires them. Do not copy a target into the document as a
 workaround for restricted access or label a live gallery as a frozen release.
 
+For a page captured at several scroll positions, request `presentation: series`
+to find a representative cover per variant. In the chosen variant request
+`presentation: sequence`, omit totals and follow the cursor. A phone viewport
+can have a long image or several captures. Keep the author's order and stable
+block IDs. A shared landmark key identifies a matching section even when one
+track contains two captures and the other contains three. Let the reviewer
+choose among multiple matches. Preserve an unmatched section and its own
+review state. Use `beforeBlockId` only for an intentional move. Reusing a
+published reference or changing a landmark requires no asset upload.
+Documentation galleries can follow a sequence or show one cover per series.
+A named publication retains its own order and revisions.
+
 Use `design save-mockup` or `design save-implementation` for an existing
 authorized image asset. Read the target and current revision, reuse the
 variant and block IDs, and keep the operation receipt. Supply known build,

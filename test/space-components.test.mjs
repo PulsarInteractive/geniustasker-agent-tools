@@ -358,6 +358,27 @@ test('the design grid reads selected filters only; review receipts retain each c
     input,
   );
   assert.equal(result, grid);
+  const cover = {
+    ...items[0],
+    frameOrder: 0,
+    seriesCount: 3,
+    landmarks: [{ key: 'summary', label: 'Summary' }],
+  };
+  const browse = { scope, presentation: 'series', includeTotals: false };
+  assert.equal(
+    (await spaceRequest({ get: async () => ({ ...grid, items: [cover] }) }, 'design grid', browse))
+      .items[0].seriesCount,
+    3,
+  );
+  for (const invalid of [
+    [items[0]],
+    [cover, { ...cover, blockId: 'next' }],
+    [{ ...cover, landmarks: [{ key: 'summary', label: 'Summary', width: 50 }] }],
+  ]) {
+    await assert.rejects(
+      spaceRequest({ get: async () => ({ ...grid, items: invalid }) }, 'design grid', browse),
+    );
+  }
   const window = { ...grid };
   delete window.counts;
   const listClient = { get: async () => window };
