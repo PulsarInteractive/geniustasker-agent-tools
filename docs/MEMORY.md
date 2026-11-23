@@ -176,3 +176,5 @@ reviewer’s inbox untouched. Preserve the original reference across retries.
 If the excerpt changed, reread the section and check whether the change is still
 needed. Missing delegation or an unavailable proposal command leaves the draft
 with the human reviewer.
+
+Wiki branch entries follow the reading order set by their author. Treat page IDs and continuation cursors as opaque. Older installations continue to receive their original ID ordering.
