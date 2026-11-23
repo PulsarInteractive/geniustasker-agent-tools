@@ -233,6 +233,11 @@ are criteria and all have passed. Read up to four rows per occurrence; when
 `hasMoreRows` is true, resolve that one occurrence to get `nextRowCursor`, then
 pass it as `rowCursor` with the same source page and occurrence. A changed view
 requires a fresh first window. Store the selection rather than copying its rows.
+The title is always visible. For a table, optionally save `tableColumns` in the
+reader's preferred order. Task tables accept `status` and `revision`. Design
+tables accept `track`, `review` and `revision`. An empty list shows titles only.
+Choose `tableOrder` from Rank, Priority, DueDate or Newest for tasks and catalog
+or reverseCatalog for Design. These orders apply across all response windows.
 
 Read live occurrences with `guides components`. Their first four authorized
 thumbnail references follow the current source. Ask for original bytes only
@@ -269,5 +274,9 @@ and implementation revisions against the current files before reporting a
 decision. Use `design compare-review` only for the requested pair and with
 reviewer authority. Give each independent platform its own decision. An image
 criterion and a comparison verdict answer different questions.
+
+When reading comparisons, `currentEvidence: false` means the recorded verdict is
+historical. Open the current versions before deciding again. Do not infer a
+fresh approval when an older server omits this field.
 
 To track a large Design library, mark the present with `design changes` before listing it. Follow the returned cursor after the inventory. Apply visible changes by increasing revision and keep the cursor only after processing the whole window. A reset requires discarding old headers and previews before a fresh inventory.

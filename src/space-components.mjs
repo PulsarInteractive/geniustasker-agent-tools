@@ -42,6 +42,13 @@ const linked = z.discriminatedUnion('status', [
       scope: z.string().regex(/^(?:project|memory):[a-zA-Z0-9_-]{1,128}$/),
       targetId: z.string().regex(baseId),
       presentation: z.enum(['link', 'card', 'status', 'checklist', 'gallery', 'table']),
+      tableColumns: z
+        .array(z.enum(['status', 'review', 'track', 'revision']))
+        .max(3)
+        .nullish(),
+      tableOrder: z
+        .enum(['Rank', 'Priority', 'DueDate', 'Newest', 'catalog', 'reverseCatalog'])
+        .nullish(),
       designView: z
         .object({
           range: z.enum(['selection', 'descendants']),
@@ -132,10 +139,30 @@ function validGalleryRevision(input, item) {
 }
 
 function validPresentation(input, item) {
-  const tableFields = [item.rows, item.hasMoreRows, item.nextRowCursor];
+  const tableFields = [
+    item.rows,
+    item.hasMoreRows,
+    item.nextRowCursor,
+    item.tableColumns,
+    item.tableOrder,
+  ];
   const galleryFields = [item.images, item.hasMoreImages, item.publicationLabel];
   const absent = (fields) => fields.every((field) => field === null || field === undefined);
   if (item.presentation === 'table') {
+    const columns = item.tableColumns ?? [];
+    const task = item.kind === 'task';
+    if (
+      !unique(columns) ||
+      columns.some(
+        (c) => !(task ? ['status', 'revision'] : ['track', 'review', 'revision']).includes(c),
+      ) ||
+      (item.tableOrder &&
+        !(
+          task ? ['Rank', 'Priority', 'DueDate', 'Newest'] : ['catalog', 'reverseCatalog']
+        ).includes(item.tableOrder))
+    ) {
+      return false;
+    }
     if (
       !absent(galleryFields) ||
       item.designView?.publishedRevision ||
@@ -367,6 +394,7 @@ export async function spaceRequest(client, command, value) {
           kind: z.literal('design-review'),
           origin: pointer.extend({ variantId: z.literal(input.variantId) }),
           evidence: pointer.nullish(),
+          currentEvidence: z.boolean().nullish(),
           verdict,
         })
         .strict();
