@@ -388,6 +388,44 @@ test('delivery tools preserve the visible track and distinguish unknown from mis
   await assert.rejects(spaceRequest({ get: async () => page }, 'design implementations', input));
 });
 
+test('delivery backlog supports empty continuations and validates the requested evidence', async () => {
+  const input = { scope, track: 'implemented', presence: 'unknown' };
+  const nextCursor = 'c'.repeat(64) + '.page';
+  const page = {
+    scope,
+    track: 'implemented',
+    epoch: 'epoch',
+    checkpoint: '12',
+    items: [],
+    nextCursor,
+  };
+  const get = async (path, selector) => {
+    assert.equal(path, 'memory/design/targets');
+    assert.deepEqual(selector, input);
+    return page;
+  };
+  assert.deepEqual(await spaceRequest({ get }, 'design targets', input), page);
+  const row = {
+    pageId: 'track',
+    title: 'Music',
+    revision: '2',
+    evidence: { presence: 'unknown', expected: 'required', example: null },
+  };
+  const issue = (result, query = input) =>
+    spaceRequest({ get: async () => result }, 'design targets', query);
+  assert.equal((await issue({ ...page, items: [row] })).items[0].pageId, 'track');
+  await assert.rejects(
+    issue({
+      ...page,
+      items: [
+        { ...row, evidence: { ...row.evidence, example: { variantId: 'hidden', revision: '1' } } },
+      ],
+    }),
+  );
+  await assert.rejects(issue({ ...page, items: [row, row] }));
+  await assert.rejects(issue(page, { ...input, cursor: nextCursor }));
+});
+
 test('a live gallery returns only bounded image identities from the selected design', async () => {
   const image = {
     variantId: 'phone',

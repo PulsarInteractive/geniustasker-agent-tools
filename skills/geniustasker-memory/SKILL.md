@@ -190,6 +190,12 @@ action with a sequence of child deletions.
 
 A Guide displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.
 
+Use `design targets` to find declared deliverables across a Design space, including
+screens awaiting their first upload. Choose mockups or implementations, then the
+expected track, declared format and visible evidence you need. Follow the
+continuation even when a filtered window is empty. A restricted reader may see
+`unknown`; report that uncertainty and never infer absence or approval.
+
 For a Design page with delivery expectations, read `design target` before
 proposing work. Each track has a requirement and separately observed evidence.
 Report `unknown` as limited visibility. Use `design mockups` or

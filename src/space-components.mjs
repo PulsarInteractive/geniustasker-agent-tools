@@ -8,6 +8,7 @@ const commands = {
   'design save-mockup': 'tasker_design_save_mockup',
   'design save-implementation': 'tasker_design_save_implementation',
   'design publish-version': 'tasker_design_publish_version',
+  'design targets': 'tasker_design_targets',
   'design target': 'tasker_design_target',
   'design mockups': 'tasker_design_mockups',
   'design implementations': 'tasker_design_implementations',
@@ -234,6 +235,56 @@ export async function spaceRequest(client, command, value) {
       })
       .strict();
     if (!receipt.safeParse(result).success) {
+      invalid();
+    }
+    return result;
+  }
+  if (command === 'design targets') {
+    const pointer = z
+      .object({ variantId: z.string().regex(baseId), revision: z.string().regex(revision) })
+      .strict();
+    const evidence = z
+      .object({
+        expected: z.enum(['required', 'deferred', 'not-applicable']),
+        presence: z.enum(['available', 'missing', 'unknown']),
+        example: pointer.nullable(),
+      })
+      .strict()
+      .refine(
+        (v) =>
+          (v.presence === 'available') === (v.example !== null) &&
+          (!input.presence || v.presence === input.presence) &&
+          (!input.expected || v.expected === input.expected),
+      );
+    const queue = z
+      .object({
+        scope: z.literal(input.scope),
+        track: z.literal(input.track),
+        epoch: z.string().min(1).max(128),
+        checkpoint: z.string().regex(revision),
+        items: z
+          .array(
+            z
+              .object({
+                pageId: z.string().regex(baseId),
+                title: z.string(),
+                revision: z.string().regex(revision),
+                evidence,
+              })
+              .strict(),
+          )
+          .max(12),
+        nextCursor: z
+          .string()
+          .regex(/^[a-f0-9]{64}\.[a-zA-Z0-9_-]{1,128}$/)
+          .nullable(),
+      })
+      .strict();
+    if (
+      !queue.safeParse(result).success ||
+      !unique(result.items.map((row) => row.pageId)) ||
+      (result.nextCursor !== null && result.nextCursor === input.cursor)
+    ) {
       invalid();
     }
     return result;

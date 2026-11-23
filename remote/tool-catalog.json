@@ -4900,5 +4900,55 @@
     "method": "POST",
     "write": true,
     "destructive": false
+  },
+  {
+    "name": "tasker_design_targets",
+    "title": "Find Design deliverables",
+    "route": "memory/design/targets",
+    "scopes": ["memory:read"],
+    "description": "List up to 12 visible delivery targets, including pages without files. Choose a track and optionally filter by expectation, presence, platform and resolution. Continue with the same filters even after an empty page with a cursor. Restricted readers see unknown when they cannot establish absence.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "maxLength": 136
+        },
+        "track": {
+          "type": "string",
+          "enum": ["mockup", "implemented"]
+        },
+        "expected": {
+          "type": "string",
+          "enum": ["required", "deferred", "not-applicable"]
+        },
+        "presence": {
+          "type": "string",
+          "enum": ["available", "missing", "unknown"]
+        },
+        "platform": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "cursor": {
+          "type": "string",
+          "maxLength": 250
+        }
+      },
+      "required": ["scope", "track"],
+      "additionalProperties": false
+    },
+    "write": false,
+    "destructive": false
   }
 ]
