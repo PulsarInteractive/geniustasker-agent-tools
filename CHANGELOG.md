@@ -2,6 +2,7 @@
 
 ## 0.1.0-beta.21
 
+- Inspect the original image referenced by a selected ticket, including a file still used in its description after detachment. Reuse the connected project's task and storage read permissions.
 - Read an image from a current Documentation page or Design capture with one bounded request. Selecting an earlier publication requires history access.
 - Use ordered Design captures, review criteria and private drafts in the same CLI and MCP distribution.
 
