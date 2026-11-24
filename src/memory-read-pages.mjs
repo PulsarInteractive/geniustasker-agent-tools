@@ -23,7 +23,15 @@ const sectionResult = z.object({
     .array(
       z.object({
         id: z.string().regex(/^[a-zA-Z0-9_-]{1,80}$/),
-        kind: z.enum(['markdown', 'image', 'attachment', 'code', 'callout', 'mermaid']),
+        kind: z.enum([
+          'markdown',
+          'image',
+          'attachment',
+          'code',
+          'callout',
+          'mermaid',
+          'component',
+        ]),
         order: z.number().int(),
         text: z.string().optional(),
         offset: z.number().int().nonnegative().optional(),

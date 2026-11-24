@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import guides from '../remote/workflows.json' with { type: 'json' };
+
 import tools from '../remote/tool-catalog.json' with { type: 'json' };
 import { workflow } from '../src/workflows.mjs';
 import { withFeedbackDiscovery } from '../src/presentation.mjs';
@@ -12,6 +13,27 @@ import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { commandHelp } from '../src/commands.mjs';
+
+test('host-discovered workflows teach ticket parentage and identify the quota on a refused first write', () => {
+  for (const topic of ['first-mission', 'projects', 'planning', 'project-work']) {
+    const steps = workflow({ topic }).steps.join(' ');
+    for (const term of ['Epic', 'Ticket', 'Subtask', 'immediate parent']) {
+      assert.ok(steps.includes(term), topic + ' is missing ' + term);
+    }
+  }
+  for (const topic of ['storage', 'storage-cleanup']) {
+    const steps = workflow({ topic }).steps.join(' ');
+    assert.match(steps, /account_data/);
+    assert.match(steps, /media_storage/);
+  }
+  const cleanup = workflow({ topic: 'storage-cleanup' }).steps.join(' ');
+  assert.match(cleanup, /documentContent/);
+  assert.match(cleanup, /index_incomplete/);
+  assert.match(
+    workflow({ topic: 'guide-components' }).steps.join(' '),
+    /text cards.*tasker_memory_view_image/,
+  );
+});
 
 test('workflow discovery is exhaustive, bounded, and rejects unknown topics', async () => {
   const tool = tools.find((t) => t.name.endsWith('_workflow'));
@@ -40,6 +62,27 @@ test('workflow discovery is exhaustive, bounded, and rejects unknown topics', as
   ]) {
     assert.throws(() => workflow(input));
   }
+});
+
+test('the base Memory guide covers safe imports and clients with a limited topic list', () => {
+  const instructions = workflow({ topic: 'memory' }).steps.join(' ');
+  assert.match(instructions, /UUID v4.*both id and epoch/);
+  assert.match(instructions, /checkpoint, epoch and continuation/);
+  assert.match(instructions, /existing note in its language and style/);
+});
+
+test('Documentation pages and published Skills have distinct workflows while the previous procedure topic retains its meaning', () => {
+  const reference = workflow({ topic: 'memory' });
+  const skill = workflow({ topic: 'space-skills' });
+  const prior = workflow({ topic: 'space-guides' });
+  assert.deepEqual({ ...prior, topic: 'space-skills' }, skill);
+  assert.match(reference.steps.join(' '), /parentId/);
+  assert.match(reference.examples.fr, /dans Documentation/);
+  assert.match(skill.examples.fr, /skill publiée/);
+  assert.match(skill.steps.join(' '), /Skills space \(kind playbooks\).*status=published/);
+  const projectWork = workflow({ topic: 'project-work' }).summary;
+  assert.match(projectWork, /Documentation.*library.*Skills.*playbooks/);
+  assert.doesNotMatch(projectWork, /\bGuides\b/);
 });
 
 test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {
@@ -103,6 +146,7 @@ test('project guidance is served intact by real local MCP without credentials or
   });
   await client.connect(transport);
   const instructions = client.getInstructions();
+  assert.ok(instructions.includes(workflow({ topic: 'project-work' }).summary));
   assert.match(instructions, /InProgress means current identifiable execution/);
   assert.match(instructions, /silence or lease expiry does not prove interruption/);
   assert.match(instructions, /run\.claim can leave a task New.*run\.patch.*read the task back/);
@@ -120,7 +164,7 @@ test('project guidance is served intact by real local MCP without credentials or
     ),
     false,
   );
-  for (const topic of ['projects', 'planning', 'protocols', 'runs', 'checklist']) {
+  for (const topic of ['projects', 'planning', 'protocols', 'runs', 'checklist', 'project-work']) {
     const result = await client.callTool({
       name: 'tasker_workflow',
       arguments: { topic },
@@ -129,6 +173,15 @@ test('project guidance is served intact by real local MCP without credentials or
     const texts = result.content.filter((item) => item.type === 'text');
     assert.equal(texts.length, 1);
     assert.deepEqual(JSON.parse(texts[0].text), workflow({ topic }));
+    if (topic === 'project-work') {
+      const { steps, examples } = result.structuredContent.data;
+      assert.match(steps.join(' '), /incomplete result cannot establish absence/i);
+      assert.match(steps.join(' '), /another ticket’s actual output is required/);
+      assert.match(steps.join(' '), /operationId, receipt and returned identifiers/);
+      assert.ok(examples.some(({ action }) => action.includes('No ticket or status change')));
+      assert.ok(examples.some(({ action }) => action.includes('Reuse the matching open ticket')));
+      assert.ok(examples.some(({ action }) => action.includes('pending Design link')));
+    }
     if (topic === 'runs') {
       const start = result.structuredContent.data.steps.find((step) =>
         step.includes('Working run while the task stays New'),

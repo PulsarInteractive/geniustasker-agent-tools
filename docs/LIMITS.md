@@ -54,9 +54,9 @@ before preparing a new operation.
 ## Keep reads focused
 
 - List one page of spaces or resources at a time and follow its cursor as needed.
-- Use Memory search and its page index before downloading document bodies.
+- Use Documentation search and its page index before downloading document bodies.
 - Explore a bounded Graph neighborhood instead of loading every node.
 - Reuse checkpoints for change reads; honor `restart_read` when the service asks.
 - Local cache hits revalidate access. Revoked permissions never become an offline grant.
 
-See [CLI reference](CLI.md) for commands and [Memory & Graph](MEMORY.md) for examples.
+See [CLI reference](CLI.md) for commands and [Documentation & Graph](MEMORY.md) for examples.

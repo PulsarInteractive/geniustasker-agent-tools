@@ -243,6 +243,36 @@ export default {
     },
     "additionalProperties": false
   },
+  "memory.design.pruneRevision": {
+    "type": "object",
+    "required": [
+      "confirmed",
+      "currentRevision",
+      "revision",
+      "variantId"
+    ],
+    "properties": {
+      "variantId": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+      },
+      "revision": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,15}$"
+      },
+      "currentRevision": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,15}$"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "enum": [
+          true
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
   "metric.correct": {
     "type": "object",
     "required": [
@@ -1651,6 +1681,85 @@ export default {
       "title"
     ],
     "properties": {
+      "contentReferences": {
+        "anyOf": [
+          {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "pageId",
+                "scope"
+              ],
+              "properties": {
+                "atMs": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "blockId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criterionId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^(global|page):[a-z0-9_-]{1,48}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kind": {
+                  "type": "string",
+                  "pattern": "^(guide|design|skill)$"
+                },
+                "pageId": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]{0,15}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "type": "string",
+                  "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
       "title": {
         "type": "string",
         "description": "Task title, 3 through 200 characters after server trimming. Required on creation.",
@@ -1948,6 +2057,85 @@ export default {
   "task.update": {
     "type": "object",
     "properties": {
+      "contentReferences": {
+        "anyOf": [
+          {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "pageId",
+                "scope"
+              ],
+              "properties": {
+                "atMs": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 86400000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "blockId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criterionId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^(global|page):[a-z0-9_-]{1,48}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "kind": {
+                  "type": "string",
+                  "pattern": "^(guide|design|skill)$"
+                },
+                "pageId": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[1-9][0-9]{0,15}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "type": "string",
+                  "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
       "title": {
         "type": "string",
         "description": "Replacement task title, 3 through 200 characters after server trimming. Omission preserves the saved title; null is not a valid title.",

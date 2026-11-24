@@ -28,21 +28,23 @@ alone does not change the environment.
 
 ## Run your first mission
 
+For a concrete request such as “Fix the offline launch bug in this project,” the connected agent tracks the result in the matching ticket. It creates one if needed and authorized, then verifies the saved outcome. Questions such as “Why did we choose this approach?” stay read-only. Use `geniustasker workflow show --topic project-work --json` for the tracking rules.
+
 Ask your connected agent: “Show my GeniusTasker account, the project and what you can do there. Help me pick one ticket. Wait for my choice before starting.” In the CLI, `geniustasker workflow show --topic first-mission --json` opens the same guide. [Follow one ticket through verification](docs/FIRST_MISSION.md).
 
 ## What you can do
 
-| Area                | Features                                                       |
-| ------------------- | -------------------------------------------------------------- |
-| Projects & tasks    | Browse work, update tickets, record progress and read comments |
-| Agent collaboration | Ask for decisions, track replies and keep useful handoffs      |
-| Memory              | Search documents and read the pages you need                   |
-| Graph               | Explore connected ideas and resolve links to Memory content    |
-| Files               | Upload approved attachments and download selected files        |
-| Permissions         | Choose scopes, restrict agent profiles and revoke connections  |
+| Area                | Features                                                           |
+| ------------------- | ------------------------------------------------------------------ |
+| Projects & tasks    | Browse work, update tickets, record progress and read comments     |
+| Agent collaboration | Ask for decisions, track replies and keep useful handoffs          |
+| Documentation       | Search documents and read the pages you need                       |
+| Graph               | Explore connected ideas and resolve links to Documentation content |
+| Files               | Upload approved attachments and download selected files            |
+| Permissions         | Choose scopes, restrict agent profiles and revoke connections      |
 
 Availability follows your account, the permissions you approve and the service's
-current capabilities. [Memory & Graph guide](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md).
+current capabilities. [Documentation & Graph guide](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md).
 
 In a terminal, the CLI checks for a newer release at most once per UTC day and
 installed version. It never installs automatically. Use `geniustasker update check
@@ -59,7 +61,7 @@ For a stdio MCP host, use this after signing in:
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.20", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.21", "mcp", "--context", "work"]
     }
   }
 }
@@ -76,7 +78,7 @@ explains the available local integration and hosted integration status.
 | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
 | [CLI reference](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/CLI.md)                           | Commands, browser login, remote terminals and troubleshooting |
 | [Usage limits](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/LIMITS.md)                         | Plan limits, shared account quotas and safe retries           |
-| [Memory & Graph](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md)                       | Documents, links, attachments and access changes              |
+| [Documentation & Graph](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/MEMORY.md)                | Documents, links, attachments and access changes              |
 | [Repository documentation](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/docs/DOCUMENTATION_SYNC.md) | Source selection, Markdown snapshots and freshness            |
 | [Security](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/SECURITY.md)                                | Credential handling and reporting a vulnerability             |
 | [Contributing](https://github.com/PulsarInteractive/geniustasker-agent-tools/blob/main/CONTRIBUTING.md)                        | Local development, tests and contribution guidelines          |

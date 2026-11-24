@@ -45,36 +45,48 @@ export class CredentialStore {
   }
   async read() {
     await this.prepare();
-    let handle;
-    try {
-      handle = await open(this.path, constants.O_RDONLY | constants.O_NOFOLLOW);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        return null;
-      }
-      fail('unsafe_credential_store', 'The credential file could not be opened safely.');
-    }
-    try {
-      const stat = await handle.stat();
-      if (
-        !stat.isFile() ||
-        stat.nlink !== 1 ||
-        stat.size > this.maxBytes ||
-        (process.platform !== 'win32' && stat.mode & 0o077) ||
-        (process.getuid && stat.uid !== process.getuid())
-      ) {
-        fail('unsafe_credential_store', 'The credential file must be private and owned by you.');
+    for (let attempt = 0; ; attempt++) {
+      let handle;
+      try {
+        handle = await open(this.path, constants.O_RDONLY | constants.O_NOFOLLOW);
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          return null;
+        }
+        fail('unsafe_credential_store', 'The credential file could not be opened safely.');
       }
       try {
-        return JSON.parse(await handle.readFile('utf8'));
-      } catch {
-        fail('invalid_credential_store', 'The credential file is damaged.', {
-          remediation:
-            'Revoke the session in Account → Agents, then remove this context and log in again.',
-        });
+        const stat = await handle.stat();
+        // Another process may have atomically replaced this path after open().
+        // Discard the unlinked descriptor and validate the current file afresh.
+        if (stat.nlink === 0) {
+          if (attempt === 2) {
+            fail('credential_store_busy', 'The local record is changing. Retry its read.', {
+              retryable: true,
+            });
+          }
+          continue;
+        }
+        if (
+          !stat.isFile() ||
+          stat.nlink !== 1 ||
+          stat.size > this.maxBytes ||
+          (process.platform !== 'win32' && stat.mode & 0o077) ||
+          (process.getuid && stat.uid !== process.getuid())
+        ) {
+          fail('unsafe_credential_store', 'The credential file must be private and owned by you.');
+        }
+        try {
+          return JSON.parse(await handle.readFile('utf8'));
+        } catch {
+          fail('invalid_credential_store', 'The credential file is damaged.', {
+            remediation:
+              'Revoke the session in Account → Agents, then remove this context and log in again.',
+          });
+        }
+      } finally {
+        await handle.close();
       }
-    } finally {
-      await handle.close();
     }
   }
   async write(data) {

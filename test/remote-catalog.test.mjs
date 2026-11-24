@@ -23,7 +23,13 @@ test('remote catalogue has bounded explicit schemas and honest write annotations
         tool.destructive,
         tool.name.startsWith('tasker_feedback_')
           ? tool.name.endsWith('_media_remove')
-          : tool.name !== 'tasker_attachment_add',
+          : ![
+              'tasker_attachment_add',
+              'tasker_design_grid_decisions',
+              'tasker_design_conformity',
+              'tasker_design_publish_selection',
+              'tasker_design_publish_version',
+            ].includes(tool.name) && !tool.name.endsWith('_cleanup_preview'),
       );
     }
     assert.ok(!tool.route || /^[a-z]+(?:[-/][a-z]+)*$/.test(tool.route));
@@ -47,11 +53,19 @@ test('every command can request its exact permission without unrelated write gra
   for (const [kind, command] of Object.entries(catalog.commands)) {
     const tool = tools.find(
       (candidate) =>
+        candidate.route === 'commands' &&
         candidate.name.includes('_edit_') &&
         candidate.inputSchema.properties.kind.enum.includes(kind),
     );
     assert.ok(tool, kind);
-    assert.deepEqual(tool.scopes, [command.permission], kind);
+    const prune = kind === 'memory.design.pruneRevision';
+    assert.deepEqual(
+      tool.scopes,
+      prune
+        ? ['storage:clean', 'history:read', 'memory:read', 'storage:read', 'memory:write']
+        : [command.permission],
+      kind,
+    );
     assert.equal(tool.route, 'commands');
     for (const accepted of tool.inputSchema.properties.kind.enum) {
       assert.equal(catalog.commands[accepted].permission, command.permission);
@@ -67,7 +81,19 @@ test('every command can request its exact permission without unrelated write gra
       expectedRevision: null,
       data: {},
     };
+    if (prune) {
+      assert.equal(validate(input), false);
+      Object.assign(input, {
+        scope: 'memory:design',
+        id: 'design',
+        expectedRevision: '8',
+        data: { variantId: 'mobile', revision: '4', currentRevision: '7', confirmed: true },
+      });
+    }
     assert.equal(validate(input), true, kind);
+    if (prune) {
+      assert.equal(validate({ ...input, data: { ...input.data, confirmed: false } }), false);
+    }
     const other = Object.keys(catalog.commands).find(
       (name) => catalog.commands[name].permission !== command.permission,
     );

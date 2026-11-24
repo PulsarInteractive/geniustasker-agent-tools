@@ -16,6 +16,7 @@ export const memoryTreeSchema = z
   .object({
     scope,
     parentId: id.optional(),
+    outline: z.enum(['home', 'design']).optional(),
     after: id.optional(),
     ...context,
     ifNoneMatch: digest.optional(),
@@ -23,6 +24,9 @@ export const memoryTreeSchema = z
   .strict()
   .refine((value) => !value.after || !!(value.epoch && value.checkpoint), {
     message: 'Continuation needs epoch and checkpoint.',
+  })
+  .refine((value) => value.outline !== 'home' || value.parentId === undefined, {
+    message: 'Open a space home at its root. Use the page ID to open a branch.',
   });
 export const memoryMarkdownSchema = z
   .object({
@@ -54,6 +58,13 @@ const treeResult = z.object({
   parentId: id.nullable(),
   title: z.string().max(160),
   parent: entry.nullable(),
+  home: z
+    .object({
+      kind: z.enum(['guide', 'design', 'skills']),
+      description: z.string(),
+      destinations: z.array(z.string().min(1).max(80)).max(32),
+    })
+    .optional(),
   version: digest,
   etag: digest,
   notModified: z.boolean(),
@@ -71,6 +82,8 @@ const markdownResult = z.object({
   updated: z.string().nullable(),
   creator: z.string().nullable(),
   lastEditor: z.string().nullable(),
+  spaceInstructions: z.string().nullish(),
+  agentInstructions: z.string().nullish(),
   markdown: z.string(),
   assetIds: z.array(id).max(64),
 });
@@ -92,7 +105,7 @@ function checkContext(query, result) {
 }
 
 /** One bounded tree request. The server rechecks the grant and page roles even
- * with a validator. Folder digests describe readable descendants only. */
+ * with a validator. Branch digests describe readable descendants only. */
 export async function readMemoryTree(client, value) {
   const query = parsed(memoryTreeSchema, value);
   const result = parsed(treeResult, await client.get('memory/tree', query), 'invalid_response');

@@ -8,6 +8,10 @@ external model tokens.
 Run `geniustasker workflow show --help` to list the guide topics included in your installation.
 For example, `geniustasker workflow show --topic checklist --json` explains how to track steps within a ticket.
 
+## Open Documentation, Design and Skills
+
+Use `memory tree --scope memory:SPACE --outline home` to open a space, then `memory tree --scope memory:SPACE --parent PAGE` to expand a Documentation page. For a Design branch add `--outline design`. `memory catalog --file filters.json` with `status: "published"` finds published Skills. `design grid --file filters.json` reads Design images and reviews by format. Use `memory view-image --help` to save the exact current or historical image. See the [space and image selectors](MEMORY.md#open-a-space-and-choose-its-content).
+
 ## Custom metric definitions
 
 For custom measurement definitions, use `metrics list --scope project:ID --json`
@@ -131,7 +135,7 @@ launching stdio servers with this entry (adjust environment/context as needed):
   "mcpServers": {
     "geniustasker": {
       "command": "npx",
-      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.20", "mcp", "--context", "work"]
+      "args": ["-y", "@pulsarinteractive/geniustasker@0.1.0-beta.21", "mcp", "--context", "work"]
     }
   }
 }
@@ -483,7 +487,7 @@ geniustasker resources list --scope memory:ID --collection pageIndex --json
 geniustasker resources list --scope memory:ID --collection pages --path brand/identity --json
 ```
 
-Memory pages contain Markdown blocks with stable IDs, a path, tags and optional
+Documentation pages contain Markdown blocks with stable IDs, a path, tags and optional
 source provenance. Preserve IDs when editing; do not relabel a proposal as a
 verified fact. `pages --id ID` also reads one page. A targeted read has no change
 cursor; obtain one from a complete collection inventory when watching updates.
@@ -669,3 +673,14 @@ historical access when needed.
 ## Ticket files and storage
 
 For project diagnostics, distinct permissions, resumable file uploads and per-item receipts, follow the [ticket attachment workflow](STORAGE.md).
+
+### Linked Documentation components and Design review
+
+```sh
+geniustasker guides components --file selected-components.json
+geniustasker design grid --file gallery-filters.json
+geniustasker design review --file selected-image-decisions.json
+geniustasker media prepare --scope memory:studio --epoch EPOCH --file illustration.png --content-type image/png
+```
+
+The first two commands read one bounded selection. The review command records one requested criterion on particular image blocks and returns each outcome. The media command prepares a local file. Upload it with the returned operation ID, then place the image asset in the selected page’s body. Open the linked Documentation page to see its inline images. Design also supports `designVisual` for a gallery image and `pageCover` for an explicit Design page cover. See the [Documentation and Design selections](MEMORY.md#live-components-in-guides).

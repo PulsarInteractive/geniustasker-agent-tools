@@ -60,7 +60,10 @@ CLI, local MCP and hosted ChatGPT use the verified account’s current subscript
 
 - “Use GeniusTasker to show my current project tasks, then propose priorities.”
 - “Move this task to next week after showing me the exact change.”
-- “Find the release notes in Memory and the related Graph references.”
+- “Find the release notes in Documentation and the related Graph references.”
+- « Cherche les critères de livraison dans Documentation et donne-moi la page où ils sont définis. »
+- “Find the published skill for preparing a release in Skills and cite its revision.”
+- « Dans Skills, retrouve la procédure de livraison publiée et vérifie que ses prérequis sont réunis. »
 
 ## Scope and troubleshooting
 
@@ -86,7 +89,7 @@ A custom connection is separate from an OpenAI directory listing. See [official 
 A new conversation may be needed after the tool catalogue changes. A CLI login
 is a separate connection and does not update ChatGPT’s permissions.
 
-## Guides available to the assistant
+## Workflows available to the assistant
 
 The connector includes a `tasker_workflow` tool. Ask it for the relevant guide
 before an unfamiliar operation. These are reviewed instructions served directly
@@ -122,8 +125,14 @@ uses dedicated tools outside the list of project or training commands.
 4. Ask to prepare a report. Review its contents and selected attachments, then approve sending. The returned receipt identifies the submission.
 
 When a verified feature changes, ask the connector to check the linked project's
-editorial policy and its existing Memory. The `memory-editorial` workflow
+editorial policy and its existing Documentation space. The `memory-editorial` workflow
 describes when it may edit, offer a draft or leave the result in its ticket.
 For comparing notes, use `tasker_memory_read_pages` with specific authorized
 page and block IDs. The `memory-reading`, `memory-history` and
 `memory-templates` workflows apply directly in hosted ChatGPT.
+
+## Linked page cards, Design reviews and selected files
+
+For a question such as “Which steps remain on this release page?”, read its page outline and pass the selected component IDs to `tasker_guide_components`. The tool checks access to each live destination in the connected account. For “Montre-moi la maquette mobile et sa revue”, narrow `tasker_design_grid` to the appropriate space and viewport. Open only the selected media at its saved revision using `tasker_memory_view_image`. For a requested review use the `design-image-review` workflow.
+
+If the host advertises `tasker_space_prepare_host_file` and `tasker_space_upload_host_file`, select a file in the conversation, choose its space and prepare it. Transfer the same file with the returned metadata. For a Documentation page, publish the selected image and insert it at the requested reading position. Readers open linked Documentation pages from text cards. To inspect an illustration, read the destination’s outline and pass its page, block and revision to `tasker_memory_view_image`. Design accepts `designVisual` for a gallery image or `pageCover` for an explicit Design page cover, with server-side WebP compression. To keep a ZIP, HTML source or image as an original attachment, omit the purpose. Use the returned asset ID in a separately authorized page edit. A host without file transfer can use already published assets or the installed CLI.

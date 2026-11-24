@@ -7,6 +7,15 @@ export const ORIGINS = Object.freeze({
   development: 'https://dev-api-geniustasker.pulsarinteractive.cloud',
 });
 export const CLIENT_ID = 'geniustasker-cli';
+const storageQuotas = new Set([
+  'account_data',
+  'media_storage',
+  'project_count',
+  'project_members',
+  'space_count',
+  'monitors',
+  'messages',
+]);
 /** Resolve an approved API origin; loopback is available only by explicit opt-in. */
 export function originOf(value = ORIGINS.production, allowLocal = false) {
   let url;
@@ -83,6 +92,12 @@ export class Transport {
         }
       }
     }
+    const historyPreview =
+      ['/api/agents/v1/memory/image-version', '/api/agents/v1/memory/image'].includes(
+        url.pathname,
+      ) &&
+      method === 'GET' &&
+      bytes === undefined;
     const ticketPart =
       /^\/api\/agents\/v1\/attachment-uploads\/parts\/(?:[1-9]|1[0-9]|2[0-4])$/.test(url.pathname);
     const ticketUpload = ticketPart || url.pathname === '/api/agents/v1/attachment-uploads/content';
@@ -102,7 +117,10 @@ export class Transport {
       );
     if (
       (bytes !== undefined || binary) &&
-      ((!ticketUpload && !feedbackMedia && url.pathname !== '/api/agents/v1/media/content') ||
+      ((!ticketUpload &&
+        !feedbackMedia &&
+        !historyPreview &&
+        url.pathname !== '/api/agents/v1/media/content') ||
         (feedbackMedia &&
           (url.search || (bytes !== undefined ? method !== 'PUT' : method !== 'GET'))) ||
         (bytes !== undefined &&
@@ -166,13 +184,31 @@ export class Transport {
       await response.body?.cancel().catch(() => {});
       throw challenge;
     }
+    const preview =
+      binary &&
+      response.ok &&
+      (historyPreview ||
+        (url.pathname === '/api/agents/v1/media/content' &&
+          url.searchParams.get('view') === 'preview'));
+    if (
+      preview &&
+      response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase() !== 'image/webp'
+    ) {
+      await response.body?.cancel();
+      fail('invalid_response', 'The service did not return a WebP preview.');
+    }
+    const binaryLimit = preview ? 512 * 1024 : feedbackMedia ? 1_000_000 : 15_000_000;
+    const jsonLimit =
+      method === 'GET' && url.pathname === '/api/agents/v1/memory/design-grid'
+        ? 512 * 1024
+        : 262144;
     const chunks = [];
     let size = 0;
     try {
       if (response.body) {
         for await (const chunk of response.body) {
           size += chunk.length;
-          if (size > (binary && response.ok ? (feedbackMedia ? 1_000_000 : 15_000_000) : 262144)) {
+          if (size > (binary && response.ok ? binaryLimit : jsonLimit)) {
             fail('invalid_response', 'The API response exceeded the size limit.');
           }
           chunks.push(chunk);
@@ -188,7 +224,10 @@ export class Transport {
       });
     }
     if (binary && response.ok) {
-      return Buffer.concat(chunks);
+      const result = Buffer.concat(chunks);
+      return historyPreview
+        ? { bytes: result, selection: response.headers.get('X-Genius-Image-Version') }
+        : result;
     }
     let data;
     try {
@@ -226,6 +265,7 @@ export class Transport {
             ? 'Run auth login again; check the connection in Account → Agents.'
             : 'Check permissions, availability and command help.'),
         ...(identifier(e?.requestId) ? { requestId: e.requestId } : {}),
+        ...(code === 'quota_exceeded' && storageQuotas.has(e?.quota) ? { quota: e.quota } : {}),
         ...(Number.isFinite(retry) && retry >= 0 ? { retryAfterSeconds: retry } : {}),
         ...(Number.isSafeInteger(data?.interval) && data.interval > 0
           ? { interval: data.interval }

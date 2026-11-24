@@ -1,19 +1,19 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "geniustasker",
-  "version": "0.1.0-beta.20",
-  "description": "Track project work and independent product memories with your own agents.",
+  "version": "0.1.0-beta.21",
+  "description": "Work on project tasks, read Documentation, compare Design captures and follow published Skills.",
   "author": {
     "name": "Pulsar Interactive"
   },
   "repository": "https://github.com/PulsarInteractive/geniustasker-agent-tools",
   "license": "MIT",
-  "keywords": ["productivity", "projects", "memory"],
+  "keywords": ["productivity", "projects", "documentation", "design", "skills"],
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "GeniusTasker",
-        "shortDescription": "Projects, progress and memory for your agents",
+        "shortDescription": "Tasks, Documentation, Design and Skills",
         "developerName": "Pulsar Interactive",
         "category": "Productivity",
         "capabilities": ["Read", "Write"],

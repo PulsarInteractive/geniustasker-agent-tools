@@ -227,7 +227,11 @@ export default {
     "memory.create": {
       "create": true,
       "fields": [
+        "logoAssetId",
         "contentRoles",
+        "designResolutions",
+        "designFilters",
+        "designReviewSettings",
         "title",
         "productKey",
         "summary",
@@ -237,6 +241,18 @@ export default {
       ],
       "module": "Memory/$",
       "permission": "memory:write"
+    },
+    "memory.design.pruneRevision": {
+      "action": "pruneDesignRevision",
+      "fields": [
+        "variantId",
+        "revision",
+        "currentRevision",
+        "confirmed"
+      ],
+      "inputSchema": "GeniusTasker.Contracts.AgentDesignRevisionCleanup",
+      "module": "Memory/$",
+      "permission": "storage:clean"
     },
     "memory.edge.create": {
       "create": true,
@@ -325,6 +341,15 @@ export default {
         "title",
         "path",
         "summary",
+        "agentInstructions",
+        "guide",
+        "design",
+        "designExpectation",
+        "designReview",
+        "designCriteria",
+        "headerAssetId",
+        "headerAlt",
+        "designThread",
         "blocks",
         "tags",
         "provenance",
@@ -361,6 +386,23 @@ export default {
       "module": "Memory/MemoryPage",
       "permission": "memory:write"
     },
+    "memory.page.publishDesign": {
+      "action": "publishDesignRevision",
+      "fields": [
+        "label"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
+    "memory.page.publishDesignSelection": {
+      "action": "publishDesignSelection",
+      "fields": [
+        "label",
+        "items"
+      ],
+      "module": "Memory/MemoryPage",
+      "permission": "memory:write"
+    },
     "memory.page.restore": {
       "action": "restoreMemoryVersion",
       "fields": [
@@ -377,7 +419,17 @@ export default {
         "title",
         "path",
         "summary",
+        "agentInstructions",
+        "guide",
+        "design",
+        "designExpectation",
+        "designReview",
+        "designCriteria",
+        "headerAssetId",
+        "headerAlt",
+        "designThread",
         "blocks",
+        "componentRemovalIds",
         "tags",
         "provenance",
         "sourceId",
@@ -395,7 +447,11 @@ export default {
     },
     "memory.update": {
       "fields": [
+        "logoAssetId",
         "contentRoles",
+        "designResolutions",
+        "designFilters",
+        "designReviewSettings",
         "title",
         "productKey",
         "summary",
@@ -783,7 +839,8 @@ export default {
     "sprint.complete": {
       "action": "complete",
       "fields": [
-        "carryToSprint"
+        "carryToSprint",
+        "previewRevision"
       ],
       "module": "Project/ProjectSprint",
       "permission": "tasks:write"
@@ -856,6 +913,7 @@ export default {
     "task.create": {
       "create": true,
       "fields": [
+        "contentReferences",
         "title",
         "description",
         "importance",
@@ -936,6 +994,7 @@ export default {
     },
     "task.update": {
       "fields": [
+        "contentReferences",
         "title",
         "description",
         "importance",
@@ -1019,6 +1078,7 @@ export default {
     "permissions": [
       "tasks:delete",
       "storage:read",
+      "storage:clean",
       "attachments:add",
       "attachments:replace",
       "attachments:remove",

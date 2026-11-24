@@ -9,6 +9,7 @@ Inspect identity and capabilities, then read `tasker_workflow` with
 `topic: planning` for the current transport and product instructions.
 
 Read the project configuration, relevant tasks and existing sprint/workflow IDs.
+For a plan with several deliverables, discover the project's enabled ticket hierarchy. First match existing tickets to the plan. Create the Epic, then the child Tickets, then the Subtasks of each Ticket where the work has independent acceptance criteria. Use the server ID of the immediate parent at each level. Read each created record back and retain its ticket number and parent. If work stops partway, resume with the first missing child. Check the [storage workflow](../geniustasker-media/SKILL.md#when-a-write-exceeds-a-quota) when creating a first ticket fails for capacity.
 On every authorized task creation or taking charge, check `estimateDays` and
 supply a scope-based estimate when possible. Preserve human choices; if effort
 is unknown, keep null, explain the missing assumption and reassess after
@@ -87,7 +88,7 @@ status, schedule, reward or execution claim. Resolve timezone before an end time
 never silently replace a larger group or apply an instruction to a collaborator.
 
 At project start and after verifying a durable feature or decision, check the
-linked Memory and documentation preference. Read the [Memory skill](../geniustasker-memory/SKILL.md)
+linked documentation space and the project’s documentation preference. Read the [Documentation and Skills instructions](../geniustasker-memory/SKILL.md)
 and workflow `memory-editorial` to decide whether to update an existing note,
 propose a first note, or leave the information in the task.
 
@@ -95,5 +96,14 @@ propose a first note, or leave the information in the task.
 
 Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
-the app for deleting a project or an entire Memory. Never approximate that
+the app for deleting a project or an entire content space. Never approximate that
 action with a sequence of child deletions.
+
+## Closing a sprint
+
+Report estimates in working days and count unestimated tickets separately.
+Story points have their own total. Preview the carry destination and count
+completed children that will follow an unfinished parent. Keep completed work
+that stays in the old sprint visible in the summary. Use the confirmed snapshot
+revision when the deployment offers it. On conflict, refresh the preview before
+issuing a new operation. Retry a lost response with the original operation ID.

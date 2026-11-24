@@ -73,16 +73,16 @@ For a blocked task or an authorized manual lock, read
 [task locks and current availability](TASK_LOCKS.md). Locked is an effective
 availability state, independent of canonical progress and a known pause.
 
-| Operation          | Commands                                                       | Required access                                                                            |
-| ------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| New project        | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |
-| Project settings   | `project.update`, `project.features`                           | `projects:write`, native project administration                                            |
-| Agent instructions | `project.configureInstructions`                                | `projects:write`, actual project owner, agent contributions already enabled                |
-| Sprint lifecycle   | `sprint.create/update/start/complete/delete`                   | `tasks:write`, native sprint management                                                    |
-| Workflow stages    | `workflow.create/update/delete`                                | `tasks:write`, native project administration                                               |
-| Recurring tasks    | `schedule.create/update/delete`                                | `tasks:write`, native schedule rights                                                      |
-| Project documents  | `document.create/update/delete`, `folder.create/update/delete` | `tasks:write`, native content rights                                                       |
-| Memory folders     | `memory.page.create/update/delete` with `directory: true`      | `memory:write`, Memory content rights                                                      |
+| Operation             | Commands                                                       | Required access                                                                            |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| New project           | `project.create`                                               | `projects:write`, all-resources consent including future projects, available account quota |
+| Project settings      | `project.update`, `project.features`                           | `projects:write`, native project administration                                            |
+| Agent instructions    | `project.configureInstructions`                                | `projects:write`, actual project owner, agent contributions already enabled                |
+| Sprint lifecycle      | `sprint.create/update/start/complete/delete`                   | `tasks:write`, native sprint management                                                    |
+| Workflow stages       | `workflow.create/update/delete`                                | `tasks:write`, native project administration                                               |
+| Recurring tasks       | `schedule.create/update/delete`                                | `tasks:write`, native schedule rights                                                      |
+| Project documents     | `document.create/update/delete`, `folder.create/update/delete` | `tasks:write`, native content rights                                                       |
+| Documentation folders | `memory.page.create/update/delete` with `directory: true`      | `memory:write`, Documentation content rights                                               |
 
 Existing credentials retain their original permissions. Reconnect and approve
 `projects:write` to use project administration. A grant restricted to selected
@@ -160,7 +160,7 @@ the user. Do not write scheduler state (`disabled`, `nextCheck`, `lastCreation`)
 Deleting a recurrence preserves previously generated tasks.
 
 Project folders use `name` and `parent`; project documents use `title`, `content`
-and `folder`. They are separate from Memory pages. Memory folders use the
+and `folder`. They are separate from Documentation pages. Documentation folders use the
 existing page command with `directory: true`, `path` and `parentId`; documents
 keep stable page and block IDs. Folder cycles are rejected by the server.
 
@@ -216,4 +216,4 @@ status, importance, XP or agent execution claims. Reassignment, deletion and
 access changes make affected instructions stale. They belong only to the
 connected owner; another collaborator's instructions are not exposed.
 
-A project or an entire Memory can be removed only through the owner interface. Agents can edit or delete a single authorized Memory page with its current revision. Never emulate removal of a whole space by processing its children.
+A project or an entire space can be removed only through the owner interface. Agents can edit or delete a single authorized Documentation page with its current revision. Never emulate removal of a whole space by processing its children.

@@ -1,4 +1,4 @@
 interface:
-  display_name: 'GeniusTasker Memory'
-  short_description: 'Navigate and maintain independent product knowledge'
-  default_prompt: 'Use $geniustasker-memory to find the relevant product knowledge and update it with verified results.'
+  display_name: 'GeniusTasker Guides and Skills'
+  short_description: 'Find reference pages in Guides and procedures in Skills'
+  default_prompt: 'Use $geniustasker-memory to find project documentation in Guides or the published procedure in Skills.'
