@@ -15,6 +15,8 @@ Read the result of the failed command and retain its operation ID. A project's o
 
 Before pruning history, verify the exact page and edition, its current revision, publication label and references. Use only the cleanup operations advertised for that kind of page and the existing delegated `history:read` and `storage:clean` permissions. If a cleanup or capacity adjustment succeeds, reread the failed operation's target. Preserve its original operation ID for an uncertain reply.
 
+To recover stored document bytes in a Documentation or Design space, inspect the inputs of `tasker_memory_storage_resources`. When it offers `documentContent`, pass the selected scope and that category. Follow the cursor. An `index_incomplete` result means the service is still checking references. Request another bounded listing before selecting any files. Preview eligible IDs with `tasker_memory_cleanup_preview`. After the owner approves the selection, use `tasker_memory_cleanup_apply` and read `tasker_memory_cleanup_status` with the same operation ID. The receipt reports file bytes. Recheck the structured-data budget separately when that was the limit on the failed write.
+
 For a published Documentation illustration or Design capture, find its page and block ID, then call `tasker_memory_view_image`. Read the returned image content. Supply `revision` to verify the current page or `atRevision` to select an earlier publication. Historical reads require `history:read` as well as `memory:read` and `media:read`.
 
 Discover `mediaUploadAvailable`, the current scope and the necessary media

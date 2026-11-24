@@ -53,6 +53,10 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
     const body = options.body ? JSON.parse(options.body) : Object.fromEntries(u.searchParams);
     calls.push([path, body]);
     if (path === 'storage/resources') {
+      if (body.category === 'documentContent') {
+        assert.equal(body.scope, 'memory:wiki');
+        return Response.json({ scope: body.scope, items: [], coverage: 'complete', nextCursor: null });
+      }
       assert.equal(body.limit, '1');
       assert.equal(body.type, 'video');
       return Response.json({
@@ -153,6 +157,10 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
   );
   assert.ok(!tools.some((t) => t.name === 'tasker_account_storage_resources'));
   const call = async (name, data) => client.callTool({ name, arguments: data });
+  const textQuery = { scope: 'memory:wiki', category: 'documentContent' };
+  const wikiFiles = await call('tasker_memory_storage_resources', textQuery);
+  assert.equal(wikiFiles.structuredContent.data.scope, textQuery.scope);
+  assert.deepEqual((await cli(['storage', 'resources'], textQuery)).items, []);
   const files = await call('tasker_project_storage_resources', { scope, type: 'video', limit: 1 });
   assert.deepEqual(files.structuredContent.data.items[0].sources, [taskSource]);
   const draft = await call('tasker_project_cleanup_preview', {
