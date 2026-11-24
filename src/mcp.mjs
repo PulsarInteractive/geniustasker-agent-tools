@@ -32,6 +32,7 @@ import {
 import remoteTools from '../remote/tool-catalog.json' with { type: 'json' };
 import { agentPresentation, withFeedbackDiscovery } from './presentation.mjs';
 import { editorialTools, reviewProjectMemory, previewMemoryTemplate } from './memory-editorial.mjs';
+import { pageDraftTools, pageDraftRequest } from './page-drafts.mjs';
 import { memoryHistoryTools, memoryHistoryRequest } from './memory-history.mjs';
 import {
   memoryReadPagesSchema,
@@ -300,6 +301,15 @@ export function createMcpServer(client) {
   }
   for (const [key, { tool, schema }] of archiveTools) {
     register(tool.name, tool.description, schema, (input) => readArchive(client, key, input));
+  }
+  for (const [key, { tool, schema }] of pageDraftTools) {
+    register(
+      tool.name,
+      tool.description,
+      schema,
+      (input) => pageDraftRequest(client, key, input),
+      tool.write,
+    );
   }
   for (const [key, { tool, schema }] of memoryHistoryTools) {
     register(

@@ -658,6 +658,121 @@
     "route": "memory/read-pages"
   },
   {
+    "name": "tasker_memory_drafts",
+    "title": "List my unpublished pages",
+    "description": "List one window of private working copies belonging to the connected account. Continue with nextAfter in the same space.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "after": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        }
+      },
+      "required": ["scope"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "memory/page-drafts",
+    "write": false
+  },
+  {
+    "name": "tasker_memory_draft",
+    "title": "Read my page draft",
+    "description": "Read the private working copy, its base and current draft revision. On a new page use one stable pageId. Other contributors see only the published page.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "pageId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        }
+      },
+      "required": ["scope", "pageId"],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read"],
+    "route": "memory/page-draft",
+    "write": false
+  },
+  {
+    "name": "tasker_memory_edit_draft",
+    "title": "Save, publish or discard one page draft",
+    "description": "Save replaces this account’s working content. Publish exactly the validated page when ready. Retain the full command including operationId for retries. Discard only at the author’s request. Preserve unrelated fields from the current draft.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "pattern": "^memory:[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 135
+        },
+        "pageId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$",
+          "maxLength": 128
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "type": "string",
+          "enum": ["save", "publish", "discard"]
+        },
+        "baseRevision": {
+          "type": ["string", "null"],
+          "pattern": "^(0|[1-9][0-9]{0,15})$"
+        },
+        "draftRevision": {
+          "type": ["string", "null"],
+          "pattern": "^(0|[1-9][0-9]{0,15})$"
+        },
+        "content": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "scope",
+        "pageId",
+        "operationId",
+        "epoch",
+        "issuedAt",
+        "action",
+        "baseRevision",
+        "draftRevision"
+      ],
+      "additionalProperties": false
+    },
+    "scopes": ["memory:read", "memory:write"],
+    "route": "memory/page-draft",
+    "destructive": true,
+    "write": true
+  },
+  {
     "name": "tasker_memory_history",
     "title": "Read Memory note history",
     "description": "Read one bounded page of retained revisions for a currently accessible note. Continue using nextBeforeRevision in the same Memory and note. See workflow memory-history.",
