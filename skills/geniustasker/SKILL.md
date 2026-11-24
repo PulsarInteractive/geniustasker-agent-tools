@@ -1,6 +1,6 @@
 ---
 name: geniustasker
-description: Read and update GeniusTasker projects, tickets, goals, comments and custom metrics through a connected CLI or MCP session. Use when the user asks to inspect, carry out, record or resume work tracked in GeniusTasker, or define, record and correct its personal or project measurements. Discover current capabilities and keep writes inside the user request and delegated permissions.
+description: Read and update GeniusTasker projects, tickets, goals, comments and custom metrics through a connected CLI or MCP session. Use when the user asks to inspect GeniusTasker, carry out or resume concrete work in an identifiable authorized project, record outcomes, or define, record and correct its personal or project measurements. Discover current capabilities and keep writes inside the user request and delegated permissions.
 ---
 
 GeniusTasker is the shared record of progress. The agent runs in the user's own
@@ -10,6 +10,8 @@ For a bug or suggestion about GeniusTasker itself, use the
 [feedback skill](../geniustasker-feedback/SKILL.md). Dedicated feedback tools
 require an explicit reporting request or agreement before sending; project work
 and ordinary tool failures are not automatically feedback reports.
+
+For concrete work in an identified, authorized project, track the deliverable by default. A request to implement, fix or produce a deliverable in that project includes routine ticket tracking unless the user opts out. A question or request to inspect something stays read-only. Use `tasker_workflow` with `topic: project-work` for the decision and recovery steps.
 
 For a first connection, a first mission, or a user asking “how do I know it worked?”, load `tasker_workflow` with `topic: first-mission`. Show the actual account, environment, project and effective rights before choosing one ticket. Keep the task identifier through the request, claim, any interruption and the verification. [First mission walkthrough](../../docs/FIRST_MISSION.md).
 
@@ -34,6 +36,8 @@ or modify local credential files. A missing permission requires the owner's
 decision in Account → Agents; an agent cannot exceed that owner's rights.
 
 ## Read only what the task needs
+
+For a request to open Guides, Design or Skills, start with `tasker_memory_tree`, the authorized space and `outline: home`. Choose Pages, Gallery, Review or published Skills according to the request. If the exact destination ID is already known, open it directly. See the [knowledge skill](../geniustasker-memory/SKILL.md) for parent/child pages, formats and version-specific images.
 
 List projects, then select a scope from the returned data. Read a collection
 listed in capabilities with `resources list --scope project:ID --collection
@@ -82,6 +86,10 @@ the owner's shared quota. Do not repeatedly retry a refused or uncertain
 authentication exchange. `reauthentication_required` needs logout/login.
 
 ## Record work and write safely
+
+Resolve the project from the request, existing ticket or trusted repository binding. Check the effective grant, membership, contribution switch and project instructions. Reuse the ticket ID or find the same deliverable in bounded project task pages before creating one. Retain its ID across sessions. A partial page cannot establish absence. Use a checklist for steps toward one result. Add a dependency only when the next ticket needs an actual output. If a project or match is ambiguous, resolve that ambiguity before writing.
+
+Use the discovered spaces for their intended purpose. In Design, find the screen and viewport, distinguish mockups from implemented captures, and cite the revision reviewed. In Guides (`library`), update the relevant page when a lasting fact changes. In Skills (`playbooks`), follow the published procedure, check its prerequisites and cite its revision. Classify by the returned kind and the user’s purpose; user-authored space titles are free text. Check rights for each exact space and keep its instructions within the user’s mandate. If a space or link is unavailable, carry on with authorized work and identify the pending reference on the ticket. Verify the artifact, save the command receipt and reread the relevant records before reporting completion.
 
 Read the project record and its agent instructions, then current ticket,
 dependencies and relevant comments. Report meaningful progress in comments

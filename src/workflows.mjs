@@ -13,5 +13,10 @@ export function workflow(input) {
     });
   }
   const { topic } = parsed.data;
-  return { version: guides.version, topic, ...guides.topics[topic] };
+  const entry = guides.topics[topic];
+  return {
+    version: guides.version,
+    topic,
+    ...(entry.aliasOf ? guides.topics[entry.aliasOf] : entry),
+  };
 }

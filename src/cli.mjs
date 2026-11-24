@@ -1,3 +1,4 @@
+import { spaceCommands, spaceRequest } from './space-components.mjs';
 import { withFeedbackDiscovery } from './presentation.mjs';
 import {
   readFeedbackCapabilities,
@@ -21,6 +22,13 @@ import {
   previewMemoryTemplate,
 } from './memory-editorial.mjs';
 import { memoryHistoryRequest } from './memory-history.mjs';
+import { readMemoryCatalog, designDiscussionSchema } from './memory-image.mjs';
+import {
+  scopedStorageTools,
+  scopedStorageCommands,
+  scopedStorageToolFor,
+  clientStorageRequest,
+} from './storage-resources.mjs';
 import { readMemoryPages } from './memory-read-pages.mjs';
 import { workflow, workflowTopics } from './workflows.mjs';
 import { readFile } from 'node:fs/promises';
@@ -43,7 +51,13 @@ import { previewProtocol } from './protocols.mjs';
 import { readIntents, previewIntent } from './intents.mjs';
 import { reportRunEvent } from './run-events.mjs';
 import { readResources, readMetrics } from './resources.mjs';
-import { MediaJournal, mediaAction, downloadMedia, compareMedia } from './media.mjs';
+import {
+  MediaJournal,
+  mediaAction,
+  downloadMedia,
+  downloadPageImage,
+  compareMedia,
+} from './media.mjs';
 import { fail, safeError, exitCode } from './errors.mjs';
 import { checkUpdate, installUpdate, maybeNotifyUpdate } from './update.mjs';
 import { acquireRuntime } from './update-runtime.mjs';
@@ -161,7 +175,7 @@ export const commands = {
   },
   'media prepare': {
     summary: 'Prepare a local private attachment; retain its operation ID.',
-    options: ['scope', 'file', 'content-type', 'epoch'],
+    options: ['scope', 'file', 'content-type', 'epoch', 'purpose'],
   },
   'media upload': {
     summary: 'Upload or safely retry the prepared operation.',
@@ -172,8 +186,9 @@ export const commands = {
     options: ['scope', 'owner', 'id', 'action'],
   },
   'media download': {
-    summary: 'Download an authorized attachment to a new local file.',
-    options: ['scope', 'owner', 'id', 'file'],
+    summary:
+      'Download an authorized original to a new file or choose --view preview for a bounded static image.',
+    options: ['scope', 'owner', 'id', 'file', 'view'],
   },
   'docs sync': {
     summary: 'Refresh selected Memory/Graph sources in a managed local documentation directory.',
@@ -187,9 +202,38 @@ export const commands = {
     summary: 'Remove a sync lock only when its process on this host has stopped.',
     options: ['directory'],
   },
+  ...Object.fromEntries(
+    Object.entries(scopedStorageCommands).map(([command, suffix]) => [
+      command,
+      {
+        summary: scopedStorageTools.get('tasker_project_' + suffix).tool.description,
+        options: ['file'],
+      },
+    ]),
+  ),
+  ...Object.fromEntries(
+    [...spaceCommands].map(([command, { tool }]) => [
+      command,
+      { summary: tool.description, options: ['file'] },
+    ]),
+  ),
+  'memory design-discussion': {
+    summary: 'Read a page of threads or replies for a design variant.',
+    options: ['file'],
+  },
+  'memory catalog': {
+    summary: 'Find skills or design variants using a bounded catalog query.',
+    options: ['file'],
+  },
+  'memory view-image': {
+    summary:
+      'Save the selected image block to a new WebP file. Choose --revision for the current page or --at-revision for a retained Design version.',
+    options: ['scope', 'page', 'block', 'revision', 'at-revision', 'file'],
+  },
   'memory tree': {
-    summary: 'Read one folder and descendant versions; unchanged validators avoid page bodies.',
-    options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match'],
+    summary:
+      'Open a space with --outline home; browse a page with --parent or a Design branch with --outline design. Continuations use --after, --epoch and --checkpoint.',
+    options: ['scope', 'parent', 'after', 'epoch', 'checkpoint', 'if-none-match', 'outline'],
   },
   ...Object.fromEntries(
     [...ticketStorageTools].map(([command, { tool }]) => [
@@ -653,6 +697,30 @@ export async function main(
       data = await (command === 'docs status' ? documentationStatus : unlockDocumentation)({
         directory: options.directory,
       });
+    } else if (Object.hasOwn(scopedStorageCommands, command)) {
+      const input = await readCommandFile(options.file);
+      data = await clientStorageRequest(client, scopedStorageToolFor(command, input), input);
+    } else if (spaceCommands.has(command)) {
+      data = await spaceRequest(client, command, await readCommandFile(options.file));
+    } else if (command === 'memory design-discussion') {
+      const input = designDiscussionSchema.safeParse(await readCommandFile(options.file));
+      if (!input.success) {
+        fail(
+          'invalid_arguments',
+          'Choose a design variant and its supported discussion selectors.',
+        );
+      }
+      data = await client.get('memory/design-discussion', input.data);
+    } else if (command === 'memory view-image') {
+      data = await downloadPageImage(client, options.file, {
+        scope: options.scope,
+        pageId: options.page,
+        blockId: options.block,
+        ...(options.revision === undefined ? {} : { revision: options.revision }),
+        ...(options['at-revision'] === undefined ? {} : { atRevision: options['at-revision'] }),
+      });
+    } else if (command === 'memory catalog') {
+      data = await readMemoryCatalog(client, await readCommandFile(options.file));
     } else if (command === 'memory tree') {
       data = await readMemoryTree(client, {
         scope: options.scope,
@@ -661,6 +729,7 @@ export async function main(
         epoch: options.epoch,
         checkpoint: options.checkpoint,
         ifNoneMatch: options['if-none-match'],
+        outline: options.outline,
       });
     } else if (command === 'attachment prepare-upload') {
       data = await prepareTicketUpload(client, await readCommandFile(options.file));
@@ -726,6 +795,7 @@ export async function main(
         file: options.file,
         contentType: options['content-type'],
         epoch: options.epoch,
+        purpose: options.purpose,
       });
     } else if (command === 'media upload') {
       data = await new MediaJournal(client).upload(options.operation);
@@ -741,6 +811,7 @@ export async function main(
         scope: options.scope,
         ownerId: options.owner,
         id: options.id,
+        ...(options.view ? { view: options.view } : {}),
         file: options.file,
       });
     } else if (['memory search', 'graph explore', 'memory resolve'].includes(command)) {

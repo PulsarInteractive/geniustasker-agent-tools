@@ -243,6 +243,36 @@ export default {
     },
     "additionalProperties": false
   },
+  "memory.design.pruneRevision": {
+    "type": "object",
+    "required": [
+      "confirmed",
+      "currentRevision",
+      "revision",
+      "variantId"
+    ],
+    "properties": {
+      "variantId": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+      },
+      "revision": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,15}$"
+      },
+      "currentRevision": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,15}$"
+      },
+      "confirmed": {
+        "type": "boolean",
+        "enum": [
+          true
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
   "metric.correct": {
     "type": "object",
     "required": [

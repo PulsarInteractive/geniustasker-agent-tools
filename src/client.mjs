@@ -1,4 +1,5 @@
 import { retryAt, requireRetryReady } from './recovery.mjs';
+import { spaceCommands } from './space-components.mjs';
 import { fail } from './errors.mjs';
 import { createHash } from 'node:crypto';
 import { ConditionalReadCache } from './read-cache.mjs';
@@ -174,6 +175,20 @@ export class AgentClient {
   async accessToken() {
     return (await this.authorizedSession()).access_token;
   }
+  async getHistoricalPreview(query) {
+    return this.transport.request('/api/agents/v1/memory/image-version', {
+      query,
+      binary: true,
+      token: await this.accessToken(),
+    });
+  }
+  async getPreview(query) {
+    return this.transport.request('/api/agents/v1/media/content', {
+      query,
+      binary: true,
+      token: await this.accessToken(),
+    });
+  }
   async get(resource, query) {
     if (
       ![
@@ -181,6 +196,15 @@ export class AgentClient {
         'capabilities',
         'projects',
         'project/documentation',
+        'storage/project',
+        'storage/tickets',
+        'storage/files',
+        'storage/resources',
+        'storage/cleanup/status',
+        'memory/design-discussion',
+        ...Array.from(spaceCommands.values(), ({ tool }) => tool)
+          .filter((tool) => (tool.method ?? 'GET') === 'GET' && !tool.write)
+          .map((tool) => tool.route),
         'tasks/archive/detail',
         'tasks/archive/comments',
         'memories',
@@ -191,6 +215,7 @@ export class AgentClient {
         'knowledge',
         'reference',
         'memory/tree',
+        'memory/catalog',
         'memory/markdown',
         'memory/sections',
         'memory/history',

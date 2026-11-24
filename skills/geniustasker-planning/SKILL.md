@@ -97,3 +97,12 @@ Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
 the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
+
+## Closing a sprint
+
+Report estimates in working days and count unestimated tickets separately.
+Story points have their own total. Preview the carry destination and count
+completed children that will follow an unfinished parent. Keep completed work
+that stays in the old sprint visible in the summary. Use the confirmed snapshot
+revision when the deployment offers it. On conflict, refresh the preview before
+issuing a new operation. Retry a lost response with the original operation ID.

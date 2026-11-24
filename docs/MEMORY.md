@@ -1,4 +1,28 @@
-# Memory and Graph
+# Guides, Skills and Graph
+
+Guides is the space for project documentation. Skills contains reusable procedures, including when to apply them and what they require. These space names appear in both English and French. Existing command names, IDs, permissions and links stay valid.
+
+| App                      | Kind        | Agent workflow                                                              |
+| ------------------------ | ----------- | --------------------------------------------------------------------------- |
+| Guides (formerly Memory) | `library`   | `memory-reading` for reference pages and their children                     |
+| Skills (formerly Guides) | `playbooks` | `space-skills` for published procedures; `space-guides` on older clients    |
+| Design                   | `design`    | `space-design` for visual variants and their files at the selected revision |
+
+Dans l’application, **Guides** rassemble les pages de référence d’un projet. Une page peut contenir ses propres sous-pages. **Skills** regroupe les procédures réutilisables. Pour en suivre une, vérifiez son déclencheur et ses prérequis, puis citez la révision publiée dans le ticket. Les espaces existants gardent leurs titres et leurs instructions personnalisées.
+
+## Open a space and choose its content
+
+`geniustasker memory tree --scope memory:studio --outline home --json` and the MCP tool `tasker_memory_tree` open the same space. One request returns a description, the available destinations and up to 50 root titles. For more root titles, send the same selector with `after: nextAfter`, `epoch` and `checkpoint`. For a specific page, use its stable ID directly. The description and instructions are content supplied by the team. Each operation checks its own permissions.
+
+| Destination | What to open                                                                                                                                                                                                                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pages       | Select a page to read its content, or use its ID as `parentId` to see its children. Omit `outline` for a Guides branch. In Design use `outline: design`. Existing Design groups remain valid parents. In the grid select a screen by `pageId` and a legacy group by `groupId`. A new Design page can contain its own material and child pages directly. |
+| Gallery     | Use `tasker_design_grid` with the space and optional page ID. Start without a track or dimensions to see all accessible formats. To select a named format read the configured `designResolutions` and send its width and height.                                                                                                                        |
+| Review      | Use the same grid filtered to the requested images and checks. To read a particular image’s observations, query its `variantId` alone in that space and match the returned `blockId` and `revision`. A verdict requires the corresponding write and reviewer permissions.                                                                               |
+| Skills      | Use `tasker_memory_catalog` with `status: published`, then open the selected `id` and `revision`. The ordinary page tree can also contain drafts.                                                                                                                                                                                                       |
+| Settings    | This is an application destination. Reading the home grants access to its navigation metadata. Modifying settings requires a separate authorized operation.                                                                                                                                                                                             |
+
+Older services may lack the home outline. Use their existing authorized tree, catalog or gallery to read the selection. After a denial or a grant change, recheck access before using any earlier result.
 
 Delegated access to Memory documents, history, assets and Graph through the CLI,
 local MCP and ChatGPT requires a current Starter or Pro account and explicit
@@ -176,5 +200,31 @@ reviewer’s inbox untouched. Preserve the original reference across retries.
 If the excerpt changed, reread the section and check whether the change is still
 needed. Missing delegation or an unavailable proposal command leaves the draft
 with the human reviewer.
+
+## Live components in Guides
+
+A Guide can refer to another Guide, a Design page, a Skill or a project task. The same destination may appear twice with different presentations. Read the source page outline to find the IDs of the occurrences. A batch selects 1–16 particular block IDs from a single page.
+
+```json
+{
+  "scope": "memory:field-guide",
+  "pageId": "release",
+  "blockIds": ["acceptance", "mobile-visual"]
+}
+```
+
+Pass this file to `geniustasker guides components --file selection.json` or call `tasker_guide_components` with its contents. Each available result contains the selected presentation, destination and revision. The current permissions of the source and destination are checked for this read. An unavailable element contains its block ID and status. Re-read after an access change. A preview returns metadata and fetches no image originals. For a linked Guide card, `headerAssetId` and `headerAlt` identify the first accessible inline image in the destination’s reading order. A text-only page has no card image. To change the first picture, edit the body of the destination with its current revision. Its other cards pick up the new order without an additional upload or separate cover edit.
+
+To author a component, read the current source and select the authorized destination. For an unrelated edit, omit `blocks` or preserve the opaque occurrence from the read response (its ID, `kind: component`, empty text and `componentStamp` whenever supplied). The stamp identifies changes to the occurrence and must be copied without interpreting it. To change that occurrence, explicitly supply its new destination and presentation. Link and card presentations work across destinations. Tasks can also show status or their checklist summary. For a removal, include its occurrence ID in `componentRemovalIds`. Use `tasker_workflow` topic `guide-components` for the full sequence.
+
+## Image reviews in Design
+
+`geniustasker design grid --file filters.json` and `tasker_design_grid` browse the same gallery. Start with only the Design space scope for all formats or choose filters for one group, page, viewport, track, pair, criterion or verdict. For browsing, pass `includeTotals: false` to read the next images without computing a full review summary. Request totals when the user asks for counts or page-wide progress. An image is identified by its variant and block. Keep the filters unchanged on continuation. Use `reviewProgress: "partial"` for images with some checks accepted and others outstanding, or `"unstarted"` for images awaiting their first check. Rejected images have a verdict and are distinct from work in progress. The older `verdict: "unchecked"` filter includes outstanding checks at any stage. To inspect pixels, send the image tool the current `revision` or the retained `atRevision` exactly as selected.
+
+To resolve a named viewport, call `tasker_resources` with the selected space, `collection: "memory"` and its root ID (for `memory:studio`, use `id: "studio"`). Read the returned `data.designResolutions`. Each preset supplies a display label, width and height in pixels. Send its width and height together to filter a grid. With no requested format, omit both dimensions. The first grid response for a space, group or page can include `pageOverview`. Its description and separate mockup and implementation counts describe the entire authorized selection, even when the image list has additional filters. The response’s `counts` describe the filtered result. For the selected image’s full review and observations, read its variant without criterion or verdict filters and match its block ID and revision.
+
+In the CLI, save the reviewed image with `geniustasker memory view-image --scope memory:studio --page variant-id --block block-id --revision 7 --file mobile.webp`. For an older Design revision use `--at-revision 5` with a new file path. The MCP tool `tasker_memory_view_image` returns those pixels inline. Current images require page and media access. Historical images also require history access. A cleaned or inaccessible revision has no visual evidence to show.
+
+An enabled space rubric applies to its track. A screen can add its own criteria. Child screens use their own local criteria. Each cell carries the current decision ID. To record requested evidence, `geniustasker design review --file decision.json` and `tasker_design_grid_decisions` take one criterion, one verdict and 1–16 explicit targets. A target contains `variantId`, `blockId`, `revision` and `expectedDecisionId`. Use `null` when no prior decision exists. Send a stable operation ID and timestamp. Read the individual receipts before reporting completion. The `design-image-review` workflow covers optional observations, explicit pairing, evidence selection and conflicts.
 
 Wiki branch entries follow the reading order set by their author. Treat page IDs and continuation cursors as opaque. Older installations continue to receive their original ID ordering.

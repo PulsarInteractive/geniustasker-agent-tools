@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile, lstat, symlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { CommandJournal, validateCommand, readCommandFile } from '../src/commands.mjs';
+import { CommandJournal, commandHelp, validateCommand, readCommandFile } from '../src/commands.mjs';
 import { credentials } from '../src/client.mjs';
 import { main } from '../src/cli.mjs';
 import { fixture, tokens, origin } from './helpers.mjs';
@@ -281,4 +281,37 @@ test('knowledge fields permit page restrictions and images without membership es
       data: { title: 'Plan', roles: ['MEMORY.ADMIN'] },
     }),
   );
+});
+
+test('a Design history command names an explicitly confirmed earlier revision and the exact root', () => {
+  const command = {
+    operationId: '00000000-0000-4000-8000-000000000100',
+    issuedAt: 1,
+    epoch: 'root',
+    scope: 'memory:design',
+    id: 'design',
+    expectedRevision: '8',
+    kind: 'memory.design.pruneRevision',
+    data: { variantId: 'mobile', revision: '3', currentRevision: '7', confirmed: true },
+  };
+  assert.deepEqual(validateCommand(command), command);
+  assert.deepEqual(commandHelp({ kind: command.kind }).requiredPermissions, [
+    'storage:clean',
+    'history:read',
+    'memory:read',
+    'storage:read',
+    'memory:write',
+  ]);
+  for (const data of [
+    {},
+    { ...command.data, confirmed: false },
+    { ...command.data, revision: '7' },
+    { ...command.data, revision: '8' },
+    { ...command.data, variantId: 'bad/path' },
+  ]) {
+    assert.throws(() => validateCommand({ ...command, data }), { code: 'invalid_arguments' });
+  }
+  assert.throws(() => validateCommand({ ...command, id: 'another-owner' }), {
+    code: 'invalid_arguments',
+  });
 });

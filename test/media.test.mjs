@@ -119,3 +119,42 @@ test('private downloads are explicit, exclusive files; binary transport is bound
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('Design ZIP and HTML sources prepare immutable files without opening or executing them', async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), 'tasker-design-source-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const journal = new MediaJournal({
+    store: { directory, context: 'qa' },
+    authorizedSession: async () => ({
+      origin: 'https://qa.example',
+      connection_id: 'qa',
+      profile_id: 'qa',
+      session_id: 'qa',
+    }),
+    transport: {},
+  });
+  for (const [name, contentType, contents] of [
+    [
+      'work.zip',
+      'application/zip',
+      Buffer.concat([Buffer.from('504b0506', 'hex'), Buffer.alloc(18)]),
+    ],
+    ['run.mp4', 'video/mp4', Buffer.from('000000186674797069736f6d', 'hex')],
+    ['voice.m4a', 'audio/mp4', Buffer.from('00000018667479704d344120', 'hex')],
+    ['mix.mp3', 'audio/mpeg', Buffer.concat([Buffer.from('ID3'), Buffer.alloc(12)])],
+    ['excerpt.aac', 'audio/aac', Buffer.from('fff15080017ffc', 'hex')],
+    ['work.html', 'text/html', '<!doctype html><title>QA source</title>'],
+  ]) {
+    const file = join(directory, name);
+    await writeFile(file, contents);
+    const prepared = await journal.prepare({ scope: 'memory:design', epoch: 'epoch', file });
+    const saved = await journal.store(prepared.operationId).read();
+    assert.equal(saved.input.contentType, contentType);
+    assert.equal(saved.input.size, Buffer.byteLength(contents));
+    assert.equal(saved.input.kind, 'memory');
+    await assert.rejects(
+      journal.prepare({ scope: 'memory:design', epoch: 'epoch', file, contentType: 'text/plain' }),
+      { code: 'invalid_arguments' },
+    );
+  }
+});
