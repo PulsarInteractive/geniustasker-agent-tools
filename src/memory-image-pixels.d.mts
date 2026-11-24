@@ -1,4 +1,5 @@
 export const memoryPreviewBytes: number;
+export function readDimensions(bytes: Uint8Array): { width: number; height: number };
 export type MemoryImageSelector = {
   scope: string;
   pageId: string;

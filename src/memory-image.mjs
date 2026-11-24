@@ -1,9 +1,11 @@
 import * as z from 'zod/v4';
 import tools from '../remote/tool-catalog.json' with { type: 'json' };
 import { fail } from './errors.mjs';
-import { readMemoryImagePixels } from './memory-image-pixels.mjs';
+import { readMemoryImagePixels, readDimensions } from './memory-image-pixels.mjs';
 
 export const memoryImageTool = tools.find((tool) => tool.name === 'tasker_memory_view_image');
+export const ticketImageTool = tools.find((tool) => tool.name === 'tasker_ticket_view_image');
+export const ticketImageSchema = z.fromJSONSchema(ticketImageTool.inputSchema);
 export const memoryCatalogTool = tools.find((tool) => tool.name === 'tasker_memory_catalog');
 export const designDiscussionTool = tools.find(
   (tool) => tool.name === 'tasker_memory_design_discussion',
@@ -55,6 +57,23 @@ export async function readMemoryImage(client, input) {
     fail('invalid_arguments', 'Select one image block on a page you can read.');
   }
   const { bytes, metadata } = await readMemoryImagePixels(client, parsed.data);
+  return imageResult(bytes, metadata);
+}
+
+export async function readTicketImage(client, input) {
+  const selected = ticketImageSchema.safeParse(input);
+  if (!selected.success) {
+    fail(
+      'invalid_arguments',
+      'Select a project, ticket and image from its description or attachments.',
+    );
+  }
+  const { scope, taskId, assetId } = selected.data;
+  const bytes = await client.getPreview({ scope, taskId, id: assetId, view: 'preview' });
+  return imageResult(bytes, { scope, taskId, assetId, ...readDimensions(bytes) });
+}
+
+function imageResult(bytes, metadata) {
   let binary = '';
   for (let offset = 0; offset < bytes.length; offset += 8192) {
     binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));

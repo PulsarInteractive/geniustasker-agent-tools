@@ -55,7 +55,12 @@ test('CLI and MCP review a scoped selection, require confirmation, reread the op
     if (path === 'storage/resources') {
       if (body.category === 'documentContent') {
         assert.equal(body.scope, 'memory:wiki');
-        return Response.json({ scope: body.scope, items: [], coverage: 'complete', nextCursor: null });
+        return Response.json({
+          scope: body.scope,
+          items: [],
+          coverage: 'complete',
+          nextCursor: null,
+        });
       }
       assert.equal(body.limit, '1');
       assert.equal(body.type, 'video');

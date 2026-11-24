@@ -4,6 +4,10 @@ export interface MemoryMcpImage {
   data: string;
   metadata: Record<string, unknown>;
 }
+export function readTicketImage(
+  client: { getPreview(query: Record<string, string>): Promise<Uint8Array> },
+  input: unknown,
+): Promise<MemoryMcpImage>;
 export function readMemoryCatalog(
   client: {
     get(route: string, query: Record<string, string | number | boolean>): Promise<unknown>;

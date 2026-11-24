@@ -5,6 +5,8 @@ description: Manage GeniusTasker ticket originals and space files. Use for file 
 
 # Files and images
 
+To inspect an image in a ticket, call `tasker_ticket_view_image` with the project scope, the ticket ID and the asset ID from the attachment or the end of its GeniusTasker image link. Read the image in the tool result. This uses the existing `tasks:read` and `storage:read` permissions. An image can also be cited in a ticket description after its original attachment is detached.
+
 ## When a write exceeds a quota
 
 Read the result of the failed command and retain its operation ID. A project's owner funds writes by collaborators. A project with zero tickets can therefore encounter an account-wide limit. Compare the account's total used and reserved capacity with its plan using the available owner diagnostics.

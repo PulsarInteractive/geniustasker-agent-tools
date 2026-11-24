@@ -4,7 +4,7 @@ export const memoryPreviewBytes = 512 * 1024;
 const invalid = () =>
   fail('invalid_response', 'The service returned an invalid image preview.', { status: 502 });
 
-function readDimensions(bytes) {
+export function readDimensions(bytes) {
   if (!(bytes instanceof Uint8Array) || bytes.length < 24 || bytes.length > memoryPreviewBytes) {
     invalid();
   }

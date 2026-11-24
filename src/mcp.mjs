@@ -44,6 +44,9 @@ import {
 import {
   memoryImageTool,
   memoryImageSchema,
+  ticketImageTool,
+  ticketImageSchema,
+  readTicketImage,
   designDiscussionTool,
   designDiscussionSchema,
   memoryCatalogTool,
@@ -390,18 +393,23 @@ export function createMcpServer(client) {
   register(memoryCatalogTool.name, memoryCatalogTool.description, memoryCatalogSchema, (input) =>
     readMemoryCatalog(client, input),
   );
-  register(
-    memoryImageTool.name,
-    memoryImageTool.description,
-    memoryImageSchema,
-    (input) => readMemoryImage(client, input),
-    false,
-    {},
-    ({ type, mimeType, data, metadata }) => ({
-      content: [{ type, mimeType, data }],
-      structuredContent: { formatVersion: 1, data: metadata },
-    }),
-  );
+  for (const [tool, schema, read] of [
+    [memoryImageTool, memoryImageSchema, readMemoryImage],
+    [ticketImageTool, ticketImageSchema, readTicketImage],
+  ]) {
+    register(
+      tool.name,
+      tool.description,
+      schema,
+      (input) => read(client, input),
+      false,
+      {},
+      ({ type, mimeType, data, metadata }) => ({
+        content: [{ type, mimeType, data }],
+        structuredContent: { formatVersion: 1, data: metadata },
+      }),
+    );
+  }
   const media = new MediaJournal(client);
   register(
     'tasker_media_prepare',
