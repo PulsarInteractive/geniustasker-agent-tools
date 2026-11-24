@@ -17,6 +17,10 @@ For a first connection, a first mission, or a user asking “how do I know it wo
 
 ## Connect and discover
 
+When a user names a project, list projects through every returned `nextAfter` until you find the exact title and type. A task project and a Documentation space can share a title. Select the task project to create tickets and the Documentation space to read its wiki. Preserve the named CLI context and deployment on each call. An empty first page or an active CLI session in a different environment does not establish access.
+
+When the service refuses a write, inspect the error category and the operation receipt before asking the owner to reconnect. A storage refusal requires a capacity diagnosis in the owning account. Follow the [storage workflow](../geniustasker-media/SKILL.md#when-a-write-exceeds-a-quota). Reuse the existing grant whenever it covers the operation. Ask for a specific missing permission only after checking the effective grant for this project.
+
 Use `geniustasker whoami --json` and `geniustasker capabilities --json`, or MCP
 `tasker_identity` and `tasker_capabilities`. Use the same named context and
 environment throughout the task. Never infer an account, project ID, field,
@@ -37,7 +41,7 @@ decision in Account → Agents; an agent cannot exceed that owner's rights.
 
 ## Read only what the task needs
 
-For a request to open Guides, Design or Skills, start with `tasker_memory_tree`, the authorized space and `outline: home`. Choose Pages, Gallery, Review or published Skills according to the request. If the exact destination ID is already known, open it directly. See the [knowledge skill](../geniustasker-memory/SKILL.md) for parent/child pages, formats and version-specific images.
+For a request to open Documentation, Design or Skills, start with `tasker_memory_tree`, the authorized space and `outline: home`. Choose Pages, Gallery, Review or published Skills according to the request. If the exact destination ID is already known, open it directly. See the [knowledge skill](../geniustasker-memory/SKILL.md) for parent/child pages, formats and version-specific images.
 
 List projects, then select a scope from the returned data. Read a collection
 listed in capabilities with `resources list --scope project:ID --collection
@@ -89,7 +93,7 @@ authentication exchange. `reauthentication_required` needs logout/login.
 
 Resolve the project from the request, existing ticket or trusted repository binding. Check the effective grant, membership, contribution switch and project instructions. Reuse the ticket ID or find the same deliverable in bounded project task pages before creating one. Retain its ID across sessions. A partial page cannot establish absence. Use a checklist for steps toward one result. Add a dependency only when the next ticket needs an actual output. If a project or match is ambiguous, resolve that ambiguity before writing.
 
-Use the discovered spaces for their intended purpose. In Design, find the screen and viewport, distinguish mockups from implemented captures, and cite the revision reviewed. In Guides (`library`), update the relevant page when a lasting fact changes. In Skills (`playbooks`), follow the published procedure, check its prerequisites and cite its revision. Classify by the returned kind and the user’s purpose; user-authored space titles are free text. Check rights for each exact space and keep its instructions within the user’s mandate. If a space or link is unavailable, carry on with authorized work and identify the pending reference on the ticket. Verify the artifact, save the command receipt and reread the relevant records before reporting completion.
+Use the discovered spaces for their intended purpose. In Design, find the screen and viewport, distinguish mockups from implemented captures, and cite the revision reviewed. In Documentation (`library`), update the relevant page when a lasting fact changes. In Skills (`playbooks`), follow the published procedure, check its prerequisites and cite its revision. Classify by the returned kind and the user’s purpose; user-authored space titles are free text. Check rights for each exact space and keep its instructions within the user’s mandate. If a space or link is unavailable, carry on with authorized work and identify the pending reference on the ticket. Verify the artifact, save the command receipt and reread the relevant records before reporting completion.
 
 Read the project record and its agent instructions, then current ticket,
 dependencies and relevant comments. Report meaningful progress in comments
@@ -171,7 +175,7 @@ project/ticket and distinguish completed work, validation and remaining work.
 - For CLI version checks or an explicitly requested package update, read [CLI updates](references/updates.md). An update is not a repair for missing account permissions or a reason to replay pending operations.
 - To create, switch or restrict an agent identity, read [Profiles](references/profiles.md).
 - For ticket questions, progress reports or precise human approvals, read [Collaboration](references/collaboration.md).
-- Memory is a separate account resource. This project skill never assumes that a project grants Memory access. Discover capabilities and independent memory grants before using it.
+- Documentation, Design and Skills spaces have their own grants. Discover the available spaces and read the grant for the selected space.
 
 Use the same reference to distinguish delivery milestones from routine steps and preserve a human notification choice.
 
@@ -215,7 +219,7 @@ result, but do not claim another device has displayed it unless observed. Do not
 start a polling loop or prescribe a manual refresh as the normal workflow.
 
 At project start and after verifying a durable feature or decision, check the
-linked Memory and documentation preference. Read the [Memory skill](../geniustasker-memory/SKILL.md)
+linked documentation space and the project’s documentation preference. Read the [Documentation and Skills instructions](../geniustasker-memory/SKILL.md)
 and workflow `memory-editorial` to decide whether to update an existing note,
 propose a first note, or leave the information in the task.
 
@@ -227,5 +231,5 @@ comments. Both `tasks:read` and a current `history:read` grant are required.
 
 Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
-the app for deleting a project or an entire Memory. Never approximate that
+the app for deleting a project or an entire content space. Never approximate that
 action with a sequence of child deletions.

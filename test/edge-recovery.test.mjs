@@ -8,6 +8,26 @@ import { fixture, origin, tokens } from './helpers.mjs';
 import { retryAfterSeconds, retryAt } from '../src/recovery.mjs';
 
 const path = '/api/agents/v1/me';
+test('storage refusal reports a safe quota category and never discloses raw owner metrics', async () => {
+  for (const quota of ['account_data', 'media_storage', 'private-scope-name']) {
+    const transport = new Transport(origin, {
+      fetchImpl: async () =>
+        Response.json(
+          {
+            error: { code: 'quota_exceeded', quota, ownerId: 'unrelated-owner', used: 123 },
+          },
+          { status: 409 },
+        ),
+    });
+    await assert.rejects(transport.request(path), (error) => {
+      const detail = error.toJSON();
+      assert.equal(detail.quota, quota === 'private-scope-name' ? undefined : quota);
+      assert.equal(detail.ownerId, undefined);
+      assert.equal(detail.used, undefined);
+      return true;
+    });
+  }
+});
 test('edge refusals retain intent; recognized API denial and CF-Ray alone retain semantics', async () => {
   const cases = [
     [403, '<html>private credential</html>', {}, 'edge_refusal_unknown', 503],

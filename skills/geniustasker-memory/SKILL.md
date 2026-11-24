@@ -1,18 +1,18 @@
 ---
 name: geniustasker-memory
-description: Read and maintain pages in GeniusTasker Guides, find published Skills, and explore Graph relations through CLI or MCP. Use for knowledge search, structured documentation, reusable procedures, linked nodes and authorized imports. Project and space permissions are independent.
+description: Read and maintain pages in GeniusTasker Documentation, find published Skills, and explore Graph relations through CLI or MCP. Use for knowledge search, structured documentation, reusable procedures, linked nodes and authorized imports. Project and space permissions are independent.
 ---
 
-Guides (`library`, formerly Memory) contains reference pages. Any page can have children. Use the existing `memory:ID` scope and `tasker_memory_*` tools.
+Documentation (`library`) contains reference pages. Any page can have children. Use the existing `memory:ID` scope and `tasker_memory_*` tools.
 
-When asked to open a space, call `tasker_memory_tree` with its granted scope and `outline: home`. One read returns its description, destinations and first root page of titles. Follow the destination the user wants. In Guides, open a selected page or expand it with `parentId`. In Design, expand pages with `outline: design` and `parentId`, or go directly to the gallery or an enabled review. A page can hold its own content and children. For new Design pages use kind `design-screen`, optionally under a parent page. For a legacy `design-group`, expand it with its existing ID and use `groupId` to read its gallery. In Skills, search for a procedure to follow with `status: published`. A known page, image or procedure can be opened directly. Seeing Settings never authorizes a change.
+When asked to open a space, call `tasker_memory_tree` with its granted scope and `outline: home`. One read returns its description, destinations and first root page of titles. Follow the destination the user wants. In Documentation, open a selected page or expand it with `parentId`. In Design, expand pages with `outline: design` and `parentId`, or go directly to the gallery or an enabled review. A page can hold its own content and children. For new Design pages use kind `design-screen`, optionally under a parent page. For a legacy `design-group`, expand it with its existing ID and use `groupId` to read its gallery. In Skills, search for a procedure to follow with `status: published`. A known page, image or procedure can be opened directly. Seeing Settings never authorizes a change.
 
 For a published procedure, open workflow `space-skills` (on older connectors, `space-guides`). In the exact Skills space (`playbooks`) use `tasker_memory_catalog` with `status: published` and a short search. Select by purpose, check prerequisites and read its page blocks at the returned revision. Cite that revision in the job’s ticket. For visual variants use workflow `space-design`; its catalog filters distinguish mockups from implemented captures.
 
 Delegated document, history, media and Graph operations require an active
 Starter or Pro plan and explicit access to the target. Stop on
 `memory_premium_required` and discard protected content after revocation.
-Memory belongs to the account and can be linked to several projects. Use the user's
+A content space belongs to the account and can be linked to several projects. Use the user's
 selected context and environment; discover identity and capabilities first.
 If no session exists, ask the user to run `geniustasker auth login --context work`
 in their terminal with the intended environment. The beta defaults to development;
@@ -21,9 +21,9 @@ CLI/MCP invocations. Use a distinct context; its name alone does not select an
 environment. The browser lets them select resources and permissions.
 Do not collect passwords or tokens, approve your own consent, or edit credentials.
 
-## Linked Guide pages and Design images
+## Linked Documentation pages and Design images
 
-A Guide outline can contain `component` blocks. Ask `tasker_guide_components` for the particular block IDs needed from one page. Keep each result with its source revision. When an item is unavailable, keep its placeholder. On a page-body edit, preserve each untouched occurrence including its opaque `componentStamp` when supplied. Open workflow `guide-components` for authoring and optional covers.
+A Documentation page outline can contain `component` blocks. Ask `tasker_guide_components` for the particular block IDs needed from one page. Keep each result with its source revision. When an item is unavailable, keep its placeholder. On a page-body edit, preserve each untouched occurrence including its opaque `componentStamp` when supplied. Open workflow `guide-components` for authoring and optional covers.
 
 For a gallery or per-image verdict, use workflow `design-image-review`. When collecting images, pass `includeTotals: false` on services advertising that field. Request totals for an explicit progress summary. Filter by the requested track, viewport, pair or criterion. Inspect the selected revision's pixels before claiming a visual result. For a review, preserve each target's block, revision and expected decision; report individual conflicts.
 
@@ -31,7 +31,7 @@ For a gallery or per-image verdict, use workflow `design-image-review`. When col
 
 Read `tasker_workflow` topic `memory-editorial` when starting project work,
 closing a verified milestone, or maintaining a feature guide. Check the project's
-linked Memory, policy and explicit resource grants. Look for one existing note
+linked Documentation space, policy and explicit resource grants. Look for one existing note
 to update before offering a specific first page. Respect deferred and declined
 suggestions. Write each section in its existing language and editorial style.
 Use topic `memory-templates` only when choosing an optional starting page.
@@ -113,7 +113,7 @@ Prepare a complete immutable operation using `tasker_prepare_command`. In local
 MCP, execute it with `tasker_retry_command` and the returned operation ID; the CLI
 equivalents are `commands prepare --file draft.json` and
 `commands retry --operation ID`. Hosted ChatGPT has no local operation journal:
-retain the returned command object and send it through the discovered Memory edit
+retain the returned command object and send it through the discovered page edit
 tool (`tasker_edit_memory`), unchanged after an uncertain result. Do not call a
 local-only retry tool in the connector. After a revision conflict, reread and
 reconcile the other contribution before preparing a new operation; never replace
@@ -157,7 +157,7 @@ type; retain the operation ID and pass it to `tasker_media_upload`. After a time
 retry that same ID. Link its returned assetId from an image or attachment block.
 Do not embed base64 files in documents. Use an explicit new destination for
 `tasker_media_download`; never upload a directory or private administrative files.
-The Memory owner pays for the bytes. Compare proposed replacements with
+The space owner pays for the bytes. Compare proposed replacements with
 `tasker_media_compare` and reuse an identical asset ID. When
 `protectedMemoryAssets` is advertised, in-use resource deletion is blocked,
 including private-page and Graph uses; unlink only the authorized references.
@@ -197,10 +197,10 @@ on the local copy, and sync again after relevant completed changes.
 
 Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
-the app for deleting a project or an entire Memory. Never approximate that
+the app for deleting a project or an entire content space. Never approximate that
 action with a sequence of child deletions.
 
-A Guide displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.
+A Documentation page displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.
 
 For a timed observation, send a Design thread on the selected revision with
 `designThread.cue` containing its playable block ID and elapsed milliseconds.

@@ -7,6 +7,15 @@ export const ORIGINS = Object.freeze({
   development: 'https://dev-api-geniustasker.pulsarinteractive.cloud',
 });
 export const CLIENT_ID = 'geniustasker-cli';
+const storageQuotas = new Set([
+  'account_data',
+  'media_storage',
+  'project_count',
+  'project_members',
+  'space_count',
+  'monitors',
+  'messages',
+]);
 /** Resolve an approved API origin; loopback is available only by explicit opt-in. */
 export function originOf(value = ORIGINS.production, allowLocal = false) {
   let url;
@@ -84,7 +93,9 @@ export class Transport {
       }
     }
     const historyPreview =
-      url.pathname === '/api/agents/v1/memory/image-version' &&
+      ['/api/agents/v1/memory/image-version', '/api/agents/v1/memory/image'].includes(
+        url.pathname,
+      ) &&
       method === 'GET' &&
       bytes === undefined;
     const ticketPart =
@@ -254,6 +265,7 @@ export class Transport {
             ? 'Run auth login again; check the connection in Account → Agents.'
             : 'Check permissions, availability and command help.'),
         ...(identifier(e?.requestId) ? { requestId: e.requestId } : {}),
+        ...(code === 'quota_exceeded' && storageQuotas.has(e?.quota) ? { quota: e.quota } : {}),
         ...(Number.isFinite(retry) && retry >= 0 ? { retryAfterSeconds: retry } : {}),
         ...(Number.isSafeInteger(data?.interval) && data.interval > 0
           ? { interval: data.interval }

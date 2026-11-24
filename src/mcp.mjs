@@ -114,7 +114,7 @@ import {
  */
 export function createMcpServer(client) {
   const server = new McpServer(
-    { name: 'geniustasker', version: '0.1.0-beta.20' },
+    { name: 'geniustasker', version: '0.1.0-beta.21' },
     {
       instructions:
         workflow({ topic: 'project-work' }).summary +
@@ -136,6 +136,12 @@ export function createMcpServer(client) {
     server.registerTool(
       name,
       {
+        title:
+          remoteTools.find((tool) => tool.name === name)?.title ??
+          name
+            .replace(/^tasker_/, '')
+            .replaceAll('_', ' ')
+            .replace(/^./, (char) => char.toUpperCase()),
         description,
         inputSchema,
         annotations: {

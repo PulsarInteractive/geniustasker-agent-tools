@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.21
+
+- Read an image from a current Documentation page or Design capture with one bounded request. Selecting an earlier publication requires history access.
+- Use ordered Design captures, review criteria and private drafts in the same CLI and MCP distribution.
+
 ## 0.1.0-beta.20
 
 - Follow a first mission from the connected account and project through a claimed ticket, interruption, resumption and verified evidence. Discover the available actions from the current grant and service capabilities.

@@ -182,6 +182,13 @@ export class AgentClient {
       token: await this.accessToken(),
     });
   }
+  async getCurrentPreview(query) {
+    return this.transport.request('/api/agents/v1/memory/image', {
+      query,
+      binary: true,
+      token: await this.accessToken(),
+    });
+  }
   async getPreview(query) {
     return this.transport.request('/api/agents/v1/media/content', {
       query,

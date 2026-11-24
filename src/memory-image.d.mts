@@ -16,6 +16,9 @@ export function readMemoryImage(
     getHistoricalPreview?(
       query: Record<string, string>,
     ): Promise<{ bytes: Uint8Array; selection: string | null }>;
+    getCurrentPreview?(
+      query: Record<string, string>,
+    ): Promise<{ bytes: Uint8Array; selection: string | null }>;
     getPreview(query: Record<string, string>): Promise<Uint8Array>;
   },
   input: unknown,

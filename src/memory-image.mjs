@@ -52,7 +52,7 @@ export async function readMemoryCatalog(client, input) {
 export async function readMemoryImage(client, input) {
   const parsed = memoryImageSchema.safeParse(input);
   if (!parsed.success) {
-    fail('invalid_arguments', 'Select one image block in an authorized Memory page.');
+    fail('invalid_arguments', 'Select one image block on a page you can read.');
   }
   const { bytes, metadata } = await readMemoryImagePixels(client, parsed.data);
   let binary = '';

@@ -59,16 +59,31 @@ function readDimensions(bytes) {
 
 export async function readMemoryImagePixels(client, input) {
   const { scope, pageId, blockId, revision, atRevision } = input;
-  if (atRevision !== undefined) {
-    if (revision !== undefined) {
-      fail('invalid_arguments', 'Choose either a current revision or a retained Design revision.');
+  if (atRevision !== undefined || client.getCurrentPreview) {
+    if (atRevision !== undefined && revision !== undefined) {
+      fail('invalid_arguments', 'Choose a current or a retained page revision.');
     }
-    const { bytes, selection } = await client.getHistoricalPreview({
-      scope,
-      pageId,
-      blockId,
-      atRevision,
-    });
+    const selectionArgs = { scope, pageId, blockId };
+    let preview;
+    try {
+      preview =
+        atRevision !== undefined
+          ? await client.getHistoricalPreview({ ...selectionArgs, atRevision })
+          : await client.getCurrentPreview({
+              ...selectionArgs,
+              ...(revision === undefined ? {} : { revision }),
+            });
+    } catch (error) {
+      // Older installations expose only sections and the asset preview.
+      if (atRevision !== undefined || error.code !== 'not_found' || error.status !== 404) {
+        throw error;
+      }
+      return readMemoryImagePixels(
+        { get: client.get.bind(client), getPreview: client.getPreview.bind(client) },
+        input,
+      );
+    }
+    const { bytes, selection } = preview;
     if (typeof selection !== 'string' || selection.length > 2048) {
       invalid();
     }
@@ -82,7 +97,9 @@ export async function readMemoryImagePixels(client, input) {
       info?.scope !== scope ||
       info.pageId !== pageId ||
       info.blockId !== blockId ||
-      info.revision !== atRevision ||
+      typeof info.revision !== 'string' ||
+      !/^(0|[1-9][0-9]{0,15})$/.test(info.revision) ||
+      ((atRevision ?? revision) !== undefined && info.revision !== (atRevision ?? revision)) ||
       typeof info.assetId !== 'string' ||
       !/^[a-zA-Z0-9_-]{1,128}$/.test(info.assetId) ||
       typeof info.assetRevision !== 'string' ||
@@ -101,7 +118,7 @@ export async function readMemoryImagePixels(client, input) {
         scope,
         pageId,
         blockId,
-        revision: atRevision,
+        revision: info.revision,
         assetId: info.assetId,
         assetRevision: info.assetRevision,
         originalBytes: info.originalBytes,

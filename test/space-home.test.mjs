@@ -191,3 +191,29 @@ test('the CLI saves only the named historical image and preserves an existing fi
   assert.notEqual((await runCli(f, [...select, '3', '--file', denied])).code, 0);
   await assert.rejects(stat(denied), { code: 'ENOENT' });
 });
+
+test('the client reads a selected current page image in one request with its revision proof', async (t) => {
+  const bytes = Buffer.from('UklGRh4AAABXRUJQVlA4TBEAAAAvA8ACAAdQjmb3pv+BiOh/AAA=', 'base64');
+  const selected = { scope, pageId: 'mobile', blockId: 'screen' };
+  const proof = {
+    ...selected,
+    revision: '9',
+    assetId: 'picture',
+    assetRevision: '2',
+    originalBytes: 520,
+    originalContentType: 'image/png',
+  };
+  const calls = [];
+  const f = await fixture(t, async (url) => {
+    calls.push(url.pathname);
+    assert.deepEqual(Object.fromEntries(url.searchParams), selected);
+    return new Response(bytes, {
+      headers: { 'Content-Type': 'image/webp', 'X-Genius-Image-Version': JSON.stringify(proof) },
+    });
+  });
+  const { readMemoryImagePixels } = await import('../src/memory-image-pixels.mjs');
+  const output = await readMemoryImagePixels(f.client, selected);
+  assert.equal(output.metadata.revision, '9');
+  assert.deepEqual(output.bytes, bytes);
+  assert.deepEqual(calls, ['/api/agents/v1/memory/image']);
+});
