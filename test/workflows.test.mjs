@@ -80,10 +80,9 @@ test('Documentation pages and published Skills have distinct workflows while the
   assert.match(reference.examples.fr, /dans Documentation/);
   assert.match(skill.examples.fr, /skill publiée/);
   assert.match(skill.steps.join(' '), /Skills space \(kind playbooks\).*status=published/);
-  assert.match(
-    workflow({ topic: 'project-work' }).summary,
-    /Documentation.*library.*Skills.*playbooks/,
-  );
+  const projectWork = workflow({ topic: 'project-work' }).summary;
+  assert.match(projectWork, /Documentation.*library.*Skills.*playbooks/);
+  assert.doesNotMatch(projectWork, /\bGuides\b/);
 });
 
 test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {
