@@ -53,6 +53,7 @@ test('every command can request its exact permission without unrelated write gra
   for (const [kind, command] of Object.entries(catalog.commands)) {
     const tool = tools.find(
       (candidate) =>
+        candidate.route === 'commands' &&
         candidate.name.includes('_edit_') &&
         candidate.inputSchema.properties.kind.enum.includes(kind),
     );

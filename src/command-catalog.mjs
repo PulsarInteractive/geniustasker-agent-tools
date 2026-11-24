@@ -913,6 +913,7 @@ export default {
     "task.create": {
       "create": true,
       "fields": [
+        "contentReferences",
         "title",
         "description",
         "importance",
@@ -993,6 +994,7 @@ export default {
     },
     "task.update": {
       "fields": [
+        "contentReferences",
         "title",
         "description",
         "importance",
