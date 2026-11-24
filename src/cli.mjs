@@ -20,6 +20,7 @@ import {
   reviewProjectMemory,
   previewMemoryTemplate,
 } from './memory-editorial.mjs';
+import { pageDraftRequest } from './page-drafts.mjs';
 import { memoryHistoryRequest } from './memory-history.mjs';
 import { readMemoryPages } from './memory-read-pages.mjs';
 import { workflow, workflowTopics } from './workflows.mjs';
@@ -225,6 +226,9 @@ export const commands = {
     summary: 'List optional pages in a family or preview one selected page.',
     options: ['family', 'page', 'language'],
   },
+  'memory drafts': { summary: 'List your private working copies.', options: ['scope', 'after'] },
+  'memory draft': { summary: 'Read your working copy of one page.', options: ['scope', 'page'] },
+  'memory edit-draft': { summary: 'Save, publish or discard one working copy.', options: ['file'] },
   'memory history': {
     summary: 'Read a page of retained revision metadata for an authorized note.',
     options: ['scope', 'page', 'before-revision'],
@@ -689,6 +693,18 @@ export async function main(
         language: options.language,
         ...(options.page ? { page: options.page } : {}),
       });
+    } else if (command === 'memory draft') {
+      data = await pageDraftRequest(client, 'draft', {
+        scope: options.scope,
+        pageId: options.page,
+      });
+    } else if (command === 'memory drafts') {
+      data = await pageDraftRequest(client, 'drafts', {
+        scope: options.scope,
+        ...(options.after ? { after: options.after } : {}),
+      });
+    } else if (command === 'memory edit-draft') {
+      data = await pageDraftRequest(client, 'edit_draft', await readCommandFile(options.file));
     } else if (command === 'memory history') {
       data = await memoryHistoryRequest(client, 'history', {
         scope: options.scope,

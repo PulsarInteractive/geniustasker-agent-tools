@@ -124,3 +124,22 @@ test('CLI command help exposes optional fractional effort without changing the l
   assert.equal(validate(0.09), false);
   assert.equal(validate(60.1), false);
 });
+
+test('ticket help describes bounded links to published knowledge for creation and edits', () => {
+  for (const name of ['task.create', 'task.update']) {
+    const validate = new Ajv({ strict: true }).compile(schemas[name].properties.contentReferences);
+    const reference = {
+      kind: 'design',
+      scope: 'memory:studio',
+      pageId: 'home',
+      revision: '7',
+      blockId: 'phone',
+      criterionId: 'page:labels',
+    };
+    assert.equal(validate([reference]), true);
+    assert.equal(validate(Array(13).fill(reference)), false);
+    assert.equal(validate([{ ...reference, title: 'Do not copy source data' }]), false);
+    assert.equal(validate([{ ...reference, scope: 'unscoped' }]), false);
+    assert.equal(validate([]), true);
+  }
+});

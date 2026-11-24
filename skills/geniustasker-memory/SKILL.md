@@ -65,6 +65,18 @@ how to combine search, Graph neighborhoods and targeted pages without downloadin
 every space. The client revalidates its bounded resource cache on every access;
 it never treats an offline or refused request as a successful cached read.
 
+For Documentation, Design and Skills editorial work, open the account’s working copy with
+`tasker_memory_draft`. For a new page, allocate one stable page ID. Keep the
+page’s language, headings and existing style. Use `tasker_memory_edit_draft`
+with `action: save` for each round, retaining its base and the last draft
+revision. Saves replace the working content. Read it back together with the
+published page before calling `action: publish` for the page that is ready.
+A first publication needs a published parent. Keep the child in drafts while
+the parent is being prepared. Use `tasker_memory_drafts` to resume earlier work.
+On conflict, compare the current revisions and preserve everyone’s edits.
+If these tools are unavailable, report that private sync is unavailable before
+using any command that would make a work in progress visible to other readers.
+
 For inspecting a revision or deliberately restoring its text, follow workflow
 `memory-history`. Restoring requires an explicit instruction, a preview of the
 diff, fresh access and an exact expected revision.
@@ -175,3 +187,5 @@ Read workflow `storage` for one ticket attachment or a project storage review.
 An agent can edit or retire one versioned note; its history is retained for explicit restoration. Refer the owner to
 the app for deleting a project or an entire Memory. Never approximate that
 action with a sequence of child deletions.
+
+When linking published work to a ticket, check the advertised `task.create` or `task.update` input for `contentReferences`. Use a source kind (`guide`, `skill` or `design`), scope and page ID. Pin the published revision for a handoff. A Design finding may point to a specific block and review criterion. Preserve existing references unless asked to replace them. Follow the link with the reader’s current access before describing the source.
