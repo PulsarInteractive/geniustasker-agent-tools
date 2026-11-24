@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import guides from '../remote/workflows.json' with { type: 'json' };
+
 import tools from '../remote/tool-catalog.json' with { type: 'json' };
 import { workflow } from '../src/workflows.mjs';
 import { withFeedbackDiscovery } from '../src/presentation.mjs';
@@ -12,6 +13,27 @@ import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { commandHelp } from '../src/commands.mjs';
+
+test('host-discovered workflows teach ticket parentage and identify the quota on a refused first write', () => {
+  for (const topic of ['first-mission', 'projects', 'planning', 'project-work']) {
+    const steps = workflow({ topic }).steps.join(' ');
+    for (const term of ['Epic', 'Ticket', 'Subtask', 'immediate parent']) {
+      assert.ok(steps.includes(term), topic + ' is missing ' + term);
+    }
+  }
+  for (const topic of ['storage', 'storage-cleanup']) {
+    const steps = workflow({ topic }).steps.join(' ');
+    assert.match(steps, /account_data/);
+    assert.match(steps, /media_storage/);
+  }
+  const cleanup = workflow({ topic: 'storage-cleanup' }).steps.join(' ');
+  assert.match(cleanup, /documentContent/);
+  assert.match(cleanup, /index_incomplete/);
+  assert.match(
+    workflow({ topic: 'guide-components' }).steps.join(' '),
+    /text cards.*tasker_memory_view_image/,
+  );
+});
 
 test('workflow discovery is exhaustive, bounded, and rejects unknown topics', async () => {
   const tool = tools.find((t) => t.name.endsWith('_workflow'));

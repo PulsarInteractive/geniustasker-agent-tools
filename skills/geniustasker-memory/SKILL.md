@@ -202,7 +202,7 @@ An agent can edit or retire one versioned note; its history is retained for expl
 the app for deleting a project or an entire content space. Never approximate that
 action with a sequence of child deletions.
 
-A Documentation page displays images where its author placed them. A card linking to it automatically uses its first accessible inline image in reading order. Use `tasker_guide_components` for the selected cards. Text-only pages have no preview image. When the user changes the reading order, preserve other blocks and references in the selected destination.
+A Documentation page displays images where its author placed them. The reader opens linked Documentation pages from text cards. Use `tasker_guide_components` to resolve the destination, then read its outline and select an image block with `tasker_memory_view_image`. When the user changes the reading order, preserve other blocks and references in the selected destination.
 
 For a timed observation, send a Design thread on the selected revision with
 `designThread.cue` containing its playable block ID and elapsed milliseconds.
