@@ -85,7 +85,9 @@ revision. Saves replace the working content. Read it back together with the
 published page before calling `action: publish` for the page that is ready.
 A first publication needs a published parent. Keep the child in drafts while
 the parent is being prepared. Use `tasker_memory_drafts` to resume earlier work.
-On conflict, compare the current revisions and preserve everyone’s edits.
+The account and its authorized agents share one working copy per page. A save leaves the published page and its history unchanged. Each publication creates one edition for the selected page. Its siblings keep their drafts. A parent with a published edition can keep newer work in draft while its child is published.
+
+If a save reports `revision_conflict` or a publication reports `page_draft_changed`, read the working copy again. If the published base changed, read the published page as well. Compare the edits, preserve the other editor’s work and prepare the merged change against the revisions you just read. On `page_draft_parent_unpublished`, follow the child’s parent ID in this space and check its approval before publishing the parent. A reader with a read-only agent grant can inspect the account’s working copy when the account has editing rights in the space. Editing, discarding and publishing also require the delegated write grant.
 If these tools are unavailable, report that private sync is unavailable before
 using any command that would make a work in progress visible to other readers.
 
