@@ -109,7 +109,7 @@ local plugin manifest must not imply that endpoint already exists.
 
 `knowledge.mjs` validates bounded search, Graph neighborhood and reference inputs
 for both CLI and MCP. It checks response scope/shape, never follows cursors
-automatically and never persists linked Memory content. `truncated` is an explicit
+automatically and never persists linked Documentation space content. `truncated` is an explicit
 partial graph, not evidence that omitted nodes or relations do not exist. Target
 permissions remain server-owned and independent of access to the referring graph.
 
@@ -134,7 +134,7 @@ orchestrator keeps the selection independent of projects, compares descendant
 versions, retrieves changed documents, verifies media and rechecks source
 contexts before commit. `documentation-graph.mjs` maintains qualified Graph
 records through incremental cursors and portable chunks of at most 100 records.
-References do not materialize another Memory's private source bodies.
+References do not materialize another space's private source bodies.
 
 `documentation-store.mjs` owns only the configured destination's `content/`
 subdirectory. A manifest records hashes and provenance. Local edits, unknown

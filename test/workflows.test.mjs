@@ -49,16 +49,19 @@ test('the base Memory guide covers safe imports and clients with a limited topic
   assert.match(instructions, /existing note in its language and style/);
 });
 
-test('Guides pages and published Skills have distinct workflows while the previous procedure topic retains its meaning', () => {
+test('Documentation pages and published Skills have distinct workflows while the previous procedure topic retains its meaning', () => {
   const reference = workflow({ topic: 'memory' });
   const skill = workflow({ topic: 'space-skills' });
   const prior = workflow({ topic: 'space-guides' });
   assert.deepEqual({ ...prior, topic: 'space-skills' }, skill);
   assert.match(reference.steps.join(' '), /parentId/);
-  assert.match(reference.examples.fr, /dans Guides/);
+  assert.match(reference.examples.fr, /dans Documentation/);
   assert.match(skill.examples.fr, /skill publiée/);
   assert.match(skill.steps.join(' '), /Skills space \(kind playbooks\).*status=published/);
-  assert.match(workflow({ topic: 'project-work' }).summary, /Guides.*library.*Skills.*playbooks/);
+  assert.match(
+    workflow({ topic: 'project-work' }).summary,
+    /Documentation.*library.*Skills.*playbooks/,
+  );
 });
 
 test('CLI workflow help lists the actual topics and an invalid selection reports a usage error', async () => {

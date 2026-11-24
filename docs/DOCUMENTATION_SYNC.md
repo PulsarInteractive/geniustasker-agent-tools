@@ -1,8 +1,8 @@
 # Keep product documentation beside your code
 
-Choose the Memory libraries and Graphs relevant to a repository. GeniusTasker is
+Choose the Documentation spaces and Graphs relevant to a repository. GeniusTasker is
 the editable source; the CLI produces a dated Markdown snapshot in your chosen
-directory. Memory remains independent of projects.
+directory. Documentation remains independent of projects.
 
 This workflow requires `documentationSync: true` in `geniustasker capabilities`
 and the `docs sync` command in your installed client. All reads use your current
@@ -70,14 +70,14 @@ creator/editor and source epoch. Older imported records can have an unknown
 editor; the exporter does not invent one. View diagrams in a Mermaid-capable
 Markdown reader.
 
-Shared resources have one local file per asset ID within the selected Memory.
+Shared resources have one local file per asset ID within the selected space.
 The server’s verified SHA-256 is checked when available; unchanged immutable
 assets reuse the previously verified local bytes. Generated files contain no
 bearer tokens or signed download URLs.
 
 Graph JSON is split into chunks of at most 100 records, with a small `graph.json`
 index. The Markdown companions preserve node notes and qualified relations.
-References to another Memory remain source identities: access to a Graph does
+References to another space remain source identities: access to a Graph does
 not grant access to linked content, and a missing reference does not erase nodes.
 
 ## Efficient updates
