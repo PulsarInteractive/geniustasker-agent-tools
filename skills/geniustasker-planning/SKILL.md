@@ -10,6 +10,8 @@ Inspect identity and capabilities, then read `tasker_workflow` with
 
 Read the project configuration, relevant tasks and existing sprint/workflow IDs.
 For a plan with several deliverables, discover the project's enabled ticket hierarchy. First match existing tickets to the plan. Create the Epic, then the child Tickets, then the Subtasks of each Ticket where the work has independent acceptance criteria. Use the server ID of the immediate parent at each level. Read each created record back and retain its ticket number and parent. If work stops partway, resume with the first missing child. Check the [storage workflow](../geniustasker-media/SKILL.md#when-a-write-exceeds-a-quota) when creating a first ticket fails for capacity.
+Check for cycles before linking a child or moving a branch. See [Ticket hierarchy and prerequisites](../../docs/PLANNING.md#ticket-hierarchy-and-prerequisites) for a three-level example and recovery after a rejected link.
+
 On every authorized task creation or taking charge, check `estimateDays` and
 supply a scope-based estimate when possible. Preserve human choices; if effort
 is unknown, keep null, explain the missing assumption and reassess after
