@@ -4,6 +4,26 @@ Use `geniustasker workflow show --topic planning --json` or `tasker_workflow`
 with `topic: planning` for the same guide in CLI, local MCP and ChatGPT.
 Inspect `capabilities` and the current record before preparing a command.
 
+## Ticket hierarchy and prerequisites
+
+1. Discover the intended project by name and ID. Read its planning features,
+   existing tickets, backlog and active sprint. Reuse existing work before creating
+   a parallel plan. Use only features and commands advertised for this project.
+2. Represent an outcome with independently trackable parts as an Epic. Create each
+   deliverable as a Ticket with the Epic's ID in `parent`. For a separately
+   verifiable part, create a Subtask with its Ticket's ID in `parent`. For example,
+   “Release the wiki” → “Publish spell pages” → “Verify the preview on iPad”.
+   Use a checklist for steps that share the same owner and acceptance decision.
+3. Use `ticket.create` with the advertised `kind`, `parent` and placement fields.
+   Read back the saved IDs and parent links at every level. Put scheduled work
+   in the agreed sprint and unscheduled work in the backlog when enabled.
+4. Add an explicit prerequisite when one ticket needs another ticket's result.
+   In projects where children gate completion, the parent already waits for each
+   child. A child that waits for its parent creates a cycle. The same is true
+   across intermediate tickets. On a cycle rejection, reread the current parent,
+   children and prerequisites on both ends. Correct the specific proposed link
+   and verify the saved graph. Keep the existing tickets and their progress.
+
 ## Progress and effort
 
 Use the task's actual progress: `New` means not yet started, `InProgress` means
